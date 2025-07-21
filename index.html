@@ -702,7 +702,23 @@
             let currentMileageValue = 0;
 
             try {
-                if (editingId) {
+                // If not in editing mode, check for duplicate plates
+                if (!editingId) {
+                    const { data: existingVehicles, error: checkError } = await supabase
+                        .from(MAINTENANCE_RECORDS_TABLE)
+                        .select('id')
+                        .eq('plate', plate)
+                        .eq('user_id', gestorUserId);
+
+                    if (checkError) throw checkError;
+
+                    if (existingVehicles && existingVehicles.length > 0) {
+                        showMessageBox("Erro de Duplicação", `Já existe um veículo cadastrado com a placa "${plate}". Por favor, edite o registro existente ou use uma placa diferente.`);
+                        logAppAction("Erro de Validação", `Tentativa de adicionar placa duplicada: ${plate}`);
+                        return; // Stop execution if duplicate plate found
+                    }
+                } else {
+                    // If in editing mode, fetch current mileage for the specific record being edited
                     const { data, error } = await supabase
                         .from(MAINTENANCE_RECORDS_TABLE)
                         .select('current_mileage')
@@ -717,7 +733,7 @@
                 const recordData = {
                     plate,
                     next_maintenance_due_km: nextMaintenanceDueKmGestor,
-                    current_mileage: currentMileageValue,
+                    current_mileage: currentMileageValue, // Keep existing mileage for updates
                     responsible_employee: responsibleEmployee,
                     user_id: gestorUserId
                 };
