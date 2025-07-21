@@ -34,10 +34,10 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 md:p-8">
+<body class="min-h-screen flex items-center justify-center"> <!-- Removed p-4 md:p-8 here -->
 
     <!-- Landing Page (Initial View) -->
-    <div id="landingPage" class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200 text-center">
+    <div id="landingPage" class="bg-white p-8 rounded-lg shadow-xl w-full max-w-full border border-gray-200 text-center md:p-12 lg:p-16"> <!-- Changed max-w-md to max-w-full -->
         <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-8">
             <i class="fas fa-tools text-blue-600 mr-3"></i>Controle de Manutenção
         </h1>
@@ -54,7 +54,7 @@
     </div>
 
     <!-- Driver Portal Section (hidden by default) -->
-    <div id="driverPortalSection" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200 hidden">
+    <div id="driverPortalSection" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-full border border-gray-200 hidden lg:p-10"> <!-- Changed max-w-md to max-w-full -->
         <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 text-center">
             <i class="fas fa-tachometer-alt text-indigo-600 mr-3"></i>Portal do Motorista
         </h1>
@@ -94,7 +94,7 @@
     </div>
 
     <!-- Gestor Section (hidden by default, password protected) -->
-    <div id="gestorSection" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-4xl border border-gray-200 hidden">
+    <div id="gestorSection" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-full border border-gray-200 hidden lg:p-10"> <!-- Changed max-w-4xl to max-w-full -->
         <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 text-center">
             <i class="fas fa-user-secret text-green-600 mr-3"></i>Portal do Gestor
         </h1>
