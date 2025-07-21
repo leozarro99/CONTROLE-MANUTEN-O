@@ -181,13 +181,14 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Próxima Revisão (Km)</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Km Faltantes</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsável</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Última Modificação</th> <!-- New Column Header -->
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="maintenanceList" class="bg-white divide-y divide-gray-200">
                             <!-- Maintenance records will be inserted here by JavaScript -->
                             <tr>
-                                <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum veículo cadastrado ainda.</td>
+                                <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum veículo cadastrado ainda.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -239,7 +240,7 @@
     </div>
 
     <!-- Message Box for alerts -->
-    <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
             <h3 id="messageBoxTitle" class="text-lg font-semibold text-gray-800 mb-4"></h3>
             <p id="messageBoxContent" class="text-gray-600 mb-6"></p>
@@ -356,6 +357,25 @@
             console.log(`[APP LOG] ${timestamp}: ${action} - ${details}`);
         }
 
+        /**
+         * Formats a timestamp string into a readable date and time.
+         * @param {string} timestamp - The ISO timestamp string.
+         * @returns {string} - Formatted date and time string.
+         */
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = new Date(timestamp);
+            if (isNaN(date.getTime())) return 'Inválido'; // Check for invalid date
+            return date.toLocaleString('pt-BR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
         // --- Render Functions ---
 
         /**
@@ -367,13 +387,14 @@
             maintenanceList.innerHTML = ''; // Clear existing rows
 
             if (records.length === 0) {
-                maintenanceList.innerHTML = `<tr><td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum veículo cadastrado ainda.</td></tr>`;
+                maintenanceList.innerHTML = `<tr><td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum veículo cadastrado ainda.</td></tr>`;
                 return;
             }
 
             records.forEach(record => {
                 const nextMaintenanceDueKm = record.next_maintenance_due_km || 0;
                 const kmRemainingForMaintenance = nextMaintenanceDueKm - (record.current_mileage || 0);
+                const lastModified = formatTimestamp(record.last_modified_at); // Get formatted last modified date
 
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-gray-50 transition duration-150 ease-in-out';
@@ -395,6 +416,7 @@
                         ${kmRemainingForMaintenance <= 0 ? 'VENCIDA' : kmRemainingForMaintenance} Km
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.responsible_employee || 'Não atribuído'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${lastModified}</td> <!-- Display Last Modified Date -->
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button data-id="${record.id}" class="edit-btn text-indigo-600 hover:text-indigo-900 mr-3 transition duration-150 ease-in-out">
                             <i class="fas fa-edit"></i>
@@ -694,6 +716,7 @@
 
                 let response;
                 if (editingId) {
+                    recordData.last_modified_at = new Date().toISOString(); // Set last modified date for updates
                     response = await supabase
                         .from(MAINTENANCE_RECORDS_TABLE)
                         .update(recordData)
@@ -785,11 +808,13 @@
                     return;
                 }
 
-                let csvContent = "Placa,Quilometragem Atual (Km),Próxima Revisão (Km),Km Faltantes,Responsável\n";
+                let csvContent = "Placa,Quilometragem Atual (Km),Próxima Revisão (Km),Km Faltantes,Responsável,Última Modificação\n"; // Added new column to CSV
                 recordsToExport.forEach(record => {
                     const nextMaintenanceDueKm = record.next_maintenance_due_km || 0;
                     const kmRemainingForMaintenance = nextMaintenanceDueKm - (record.current_mileage || 0);
-                    csvContent += `${record.plate},${record.current_mileage || 'N/A'},${nextMaintenanceDueKm},${kmRemainingForMaintenance <= 0 ? 'VENCIDA' : kmRemainingForMaintenance},${record.responsible_employee || 'Não atribuído'}\n`;
+                    const lastModified = formatTimestamp(record.last_modified_at);
+
+                    csvContent += `${record.plate},${record.current_mileage || 'N/A'},${nextMaintenanceDueKm},${kmRemainingForMaintenance <= 0 ? 'VENCIDA' : kmRemainingForMaintenance},${record.responsible_employee || 'Não atribuído'},${lastModified}\n`;
                 });
 
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -847,7 +872,7 @@
                     const vehicleToUpdate = vehicles[0];
                     const { error: updateError } = await supabase
                         .from(MAINTENANCE_RECORDS_TABLE)
-                        .update({ current_mileage: driverDailyMileage })
+                        .update({ current_mileage: driverDailyMileage, last_modified_at: new Date().toISOString() }) // Also update last_modified_at
                         .eq('id', vehicleToUpdate.id)
                         .eq('user_id', gestorUserId);
 
