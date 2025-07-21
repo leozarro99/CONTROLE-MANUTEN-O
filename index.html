@@ -37,7 +37,7 @@
 <body class="min-h-screen flex items-center justify-center">
 
     <!-- Landing Page (Initial View) -->
-    <div id="landingPage" class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200 text-center md:p-12 lg:p-16"> <!-- Reverted to max-w-md -->
+    <div id="landingPage" class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200 text-center md:p-12 lg:p-16">
         <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-8">
             <i class="fas fa-tools text-blue-600 mr-3"></i>Controle de Manutenção
         </h1>
@@ -54,7 +54,7 @@
     </div>
 
     <!-- Driver Portal Section (hidden by default) -->
-    <div id="driverPortalSection" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200 hidden lg:p-10"> <!-- Reverted to max-w-md -->
+    <div id="driverPortalSection" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200 hidden lg:p-10">
         <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 text-center">
             <i class="fas fa-tachometer-alt text-indigo-600 mr-3"></i>Portal do Motorista
         </h1>
@@ -94,7 +94,7 @@
     </div>
 
     <!-- Gestor Section (hidden by default, password protected) -->
-    <div id="gestorSection" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-4xl border border-gray-200 hidden lg:p-10"> <!-- Reverted to max-w-4xl -->
+    <div id="gestorSection" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-4xl border border-gray-200 hidden lg:p-10">
         <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 text-center">
             <i class="fas fa-user-secret text-green-600 mr-3"></i>Portal do Gestor
         </h1>
@@ -124,10 +124,11 @@
         <div id="gestorContent" class="hidden">
             <!-- Navigation for Gestor Tabs -->
             <div class="flex justify-center mb-6 border-b border-gray-200">
-                <button id="showVehicleManagement" class="py-3 px-6 text-sm font-medium text-gray-700 border-b-2 border-indigo-500 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition duration-150 ease-in-out">
+                <!-- Tabs with increased padding and w-1/2 -->
+                <button id="showVehicleManagement" class="py-4 px-8 w-1/2 text-sm font-medium text-gray-700 border-b-2 border-indigo-500 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition duration-150 ease-in-out">
                     Gerenciar Veículos
                 </button>
-                <button id="showEmployeeManagement" class="py-3 px-6 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
+                <button id="showEmployeeManagement" class="py-4 px-8 w-1/2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
                     Gerenciar Funcionários
                 </button>
             </div>
@@ -156,9 +157,9 @@
                         </select>
                     </div>
                     <div class="col-span-full flex justify-center sm:justify-end items-end mt-4">
-                        <button type="submit"
+                        <button type="submit" id="submitVehicleBtn"
                                 class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out transform hover:scale-105">
-                            <i class="fas fa-plus-circle mr-2"></i>Adicionar/Atualizar Veículo
+                            <i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo
                         </button>
                     </div>
                 </form>
@@ -172,7 +173,7 @@
                 </div>
 
                 <!-- Maintenance List Table (Gestor's Table - with actions and styling) -->
-                <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200 mt-8">
+                <div class="rounded-lg shadow-md border border-gray-200 mt-8"> <!-- Removed overflow-x-auto -->
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
@@ -181,7 +182,7 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Próxima Revisão (Km)</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Km Faltantes</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsável</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Última Modificação</th> <!-- New Column Header -->
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Última Modificação</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Ações</th>
                             </tr>
                         </thead>
@@ -719,6 +720,7 @@
                     }
                 } else {
                     // If in editing mode, fetch current mileage for the specific record being edited
+                    // We only want to update next_maintenance_due_km, so current_mileage remains unchanged by gestor form
                     const { data, error } = await supabase
                         .from(MAINTENANCE_RECORDS_TABLE)
                         .select('current_mileage')
@@ -733,7 +735,7 @@
                 const recordData = {
                     plate,
                     next_maintenance_due_km: nextMaintenanceDueKmGestor,
-                    current_mileage: currentMileageValue, // Keep existing mileage for updates
+                    current_mileage: currentMileageValue, // Keep existing mileage for updates from gestor form
                     responsible_employee: responsibleEmployee,
                     user_id: gestorUserId
                 };
@@ -759,6 +761,7 @@
                 document.getElementById('maintenanceForm').reset();
                 delete document.getElementById('maintenanceForm').dataset.editingId; // Clear editing state
                 document.getElementById('plate').readOnly = false; // Make plate writable again after submission
+                document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo'; // Reset button text
             } catch (e) {
                 console.error("Error saving vehicle record: ", e);
                 showMessageBox("Erro", "Erro ao salvar registro: " + e.message);
@@ -778,7 +781,8 @@
                 document.getElementById('responsibleEmployee').value = recordToEdit.responsible_employee || '';
                 document.getElementById('maintenanceForm').dataset.editingId = id;
                 document.getElementById('plate').readOnly = true; // Make plate read-only when editing
-                showMessageBox("Editar Registro", "Modifique os campos e clique em 'Adicionar/Atualizar Veículo' para atualizar. A placa não pode ser alterada.");
+                document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-edit mr-2"></i>Atualizar Veículo'; // Change button text
+                showMessageBox("Editar Registro", "Modifique os campos e clique em 'Atualizar Veículo' para salvar. A placa não pode ser alterada.");
                 logAppAction("Edição de Veículo", `Iniciando edição do veículo com ID: ${id}`);
             }
         }
@@ -1006,6 +1010,7 @@
                 setupRealtimeListenerGestor();
                 setupRealtimeListenerEmployees(); // Start listening for employee data
                 document.getElementById('plate').readOnly = false; // Ensure plate is writable by default for new entries
+                document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo'; // Set initial button text
                 logAppAction("Login do Gestor", "Login bem-sucedido.");
             } else {
                 gestorLoginError.classList.remove('hidden');
@@ -1094,6 +1099,7 @@
             document.getElementById('plate').readOnly = false; // Ensure plate is writable for new entries if user logs in again
             delete document.getElementById('maintenanceForm').dataset.editingId; // Clear editing state
             document.getElementById('maintenanceForm').reset(); // Clear form
+            document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo'; // Reset button text
             logAppAction("Navegação", "Voltando para a Tela de Login do Gestor.");
         }
 
@@ -1110,6 +1116,7 @@
             document.getElementById('plate').readOnly = false;
             delete document.getElementById('maintenanceForm').dataset.editingId;
             document.getElementById('maintenanceForm').reset();
+            document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo'; // Reset button text
             
             logAppAction("Navegação (Gestor)", "Acessando aba 'Gerenciar Veículos'.");
         }
