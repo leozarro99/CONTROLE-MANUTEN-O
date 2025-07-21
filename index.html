@@ -711,6 +711,7 @@
                 logAppAction(editingId ? "Atualização de Veículo" : "Adição de Veículo", `Veículo ${plate} ${editingId ? 'atualizado' : 'adicionado'}.`);
                 document.getElementById('maintenanceForm').reset();
                 delete document.getElementById('maintenanceForm').dataset.editingId; // Clear editing state
+                document.getElementById('plate').readOnly = false; // Make plate writable again after submission
             } catch (e) {
                 console.error("Error saving vehicle record: ", e);
                 showMessageBox("Erro", "Erro ao salvar registro: " + e.message);
@@ -729,7 +730,8 @@
                 document.getElementById('nextMaintenanceDueKmGestor').value = recordToEdit.next_maintenance_due_km || '';
                 document.getElementById('responsibleEmployee').value = recordToEdit.responsible_employee || '';
                 document.getElementById('maintenanceForm').dataset.editingId = id;
-                showMessageBox("Editar Registro", "Modifique os campos e clique em 'Adicionar/Atualizar Veículo' para atualizar.");
+                document.getElementById('plate').readOnly = true; // Make plate read-only when editing
+                showMessageBox("Editar Registro", "Modifique os campos e clique em 'Adicionar/Atualizar Veículo' para atualizar. A placa não pode ser alterada.");
                 logAppAction("Edição de Veículo", `Iniciando edição do veículo com ID: ${id}`);
             }
         }
@@ -954,6 +956,7 @@
                 document.getElementById('gestorContent').classList.remove('hidden');
                 setupRealtimeListenerGestor();
                 setupRealtimeListenerEmployees(); // Start listening for employee data
+                document.getElementById('plate').readOnly = false; // Ensure plate is writable by default for new entries
                 logAppAction("Login do Gestor", "Login bem-sucedido.");
             } else {
                 gestorLoginError.classList.remove('hidden');
@@ -1039,6 +1042,12 @@
             document.getElementById('employeeManagementSection').classList.add('hidden');
             document.getElementById('showVehicleManagement').classList.add('border-indigo-500', 'text-indigo-600');
             document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            
+            // Ensure plate field is editable and editing state is cleared when switching to this tab
+            document.getElementById('plate').readOnly = false;
+            delete document.getElementById('maintenanceForm').dataset.editingId;
+            document.getElementById('maintenanceForm').reset();
+            
             logAppAction("Navegação (Gestor)", "Acessando aba 'Gerenciar Veículos'.");
         }
 
