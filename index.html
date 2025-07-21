@@ -3,1090 +3,1303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Manutenção de Veículos</title>
+    <title>Gerenciamento de Placas e Filiais</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Define a fonte Inter para todo o corpo */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Light blue-gray background */
+            font-family: "Inter", sans-serif;
         }
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
+        /* Animação para mensagens */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        ::-webkit-scrollbar-track {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-        /* Hidden by default, shown by JS */
-        .hidden {
-            display: none;
+        .animate-fade-in-down {
+            animation: fadeInDown 0.3s ease-out forwards;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 md:p-8">
-
-    <!-- Landing Page (Initial View) -->
-    <div id="landingPage" class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200 text-center">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-8">
-            <i class="fas fa-tools text-blue-600 mr-3"></i>Controle de Manutenção
-        </h1>
-        <div class="flex flex-col gap-6">
-            <button id="goToDriverPortalBtn"
-                    class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out transform hover:scale-105">
-                <i class="fas fa-user-tie mr-3"></i>Sou Motorista
-            </button>
-            <button id="goToGestorPortalBtn"
-                    class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out transform hover:scale-105">
-                <i class="fas fa-user-secret mr-3"></i>Sou Gestor
-            </button>
-            <!-- O botão "Ver Logs" foi removido daqui -->
-        </div>
+<body>
+    <noscript>Você precisa habilitar o JavaScript para rodar este aplicativo.</noscript>
+    <div id="root">
+        <!-- O seu aplicativo React será montado aqui -->
     </div>
 
-    <!-- Driver Portal Section (hidden by default) -->
-    <div id="driverPortalSection" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200 hidden">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 text-center">
-            <i class="fas fa-tachometer-alt text-indigo-600 mr-3"></i>Portal do Motorista
-        </h1>
+    <!-- React CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel CDN para transformar JSX no navegador (apenas para desenvolvimento/ambientes simples) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- XLSX CDN para exportação de Excel -->
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 
-        <form id="dailyMileageForm" class="space-y-6 p-4 bg-blue-50 rounded-lg shadow-inner">
-            <div>
-                <label for="driverResponsibleEmployee" class="block text-sm font-medium text-gray-700 mb-1">Seu Nome</label>
-                <select id="driverResponsibleEmployee" name="driverResponsibleEmployee" required
-                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out">
-                    <option value="">-- Selecione --</option>
-                    <!-- Employee options will be loaded dynamically here -->
-                </select>
-            </div>
-            <div>
-                <label for="driverPlate" class="block text-sm font-medium text-gray-700 mb-1">Placa do Veículo</label>
-                <input type="text" id="driverPlate" name="driverPlate" required
-                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out">
-            </div>
-            <div>
-                <label for="driverDailyMileage" class="block text-sm font-medium text-gray-700 mb-1">Quilometragem do Dia (Km)</label>
-                <input type="number" id="driverDailyMileage" name="driverDailyMileage" required min="0"
-                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out">
-            </div>
-            <button type="submit"
-                    class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out transform hover:scale-105">
-                <i class="fas fa-save mr-2"></i>Registrar Quilometragem
-            </button>
-        </form>
+    <script type="text/babel">
+        // Importa o cliente Supabase
+        const { createClient } = Supabase; // Supabase é globalmente disponível via CDN
 
-        <!-- Back Button for Driver Portal -->
-        <div class="flex justify-center mt-8">
-            <button id="backToLandingFromDriverBtn"
-                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out transform hover:scale-105">
-                <i class="fas fa-arrow-left mr-2"></i>Voltar
-            </button>
-        </div>
-    </div>
+        // Importação dos ícones do Lucide React (disponíveis globalmente via unpkg.com/lucide@latest)
+        // Para usar os componentes Lucide React, eles precisariam ser importados diretamente ou registrados globalmente.
+        // No contexto de um único arquivo HTML com Babel, vamos simular a disponibilidade dos ícones diretamente.
+        // No entanto, para um projeto React real, você importaria os componentes Lucide React como no código App.js.
+        // Para este exemplo, vamos assumir que os ícones são acessíveis ou que a parte do ícone é tratada no JSX.
+        // Para simplificar, os ícones serão referenciados diretamente como no App.js, assumindo que o ambiente React os resolve.
+        // Em um ambiente de produção real, você usaria um bundler para resolver essas importações.
 
-    <!-- Gestor Section (hidden by default, password protected) -->
-    <div id="gestorSection" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-4xl border border-gray-200 hidden">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 text-center">
-            <i class="fas fa-user-secret text-green-600 mr-3"></i>Portal do Gestor
-        </h1>
+        // Variáveis globais para as chaves do Supabase
+        // ATENÇÃO: Substitua com suas próprias chaves do Supabase
+        const SUPABASE_URL = 'https://jtikvjomzduvjrrrsfeg.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0aWt2am9temR1dmpycnJzZmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMjU3NjcsImV4cCI6MjA2ODcwMTc2N30.2SCuJprMLJROxV6r6z1xKaVnnvy-q0Edwb0DrmcNeEg';
 
-        <!-- Gestor Login Form -->
-        <div id="gestorLogin" class="w-full max-w-md mx-auto p-6 bg-gray-50 rounded-lg shadow-inner mb-8">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Acesso Restrito</h2>
-            <form id="gestorLoginForm" class="space-y-4">
-                <div>
-                    <label for="gestorPassword" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                    <input type="password" id="gestorPassword" name="gestorPassword" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out">
-                </div>
-                <button type="submit"
-                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out transform hover:scale-105">
-                    <i class="fas fa-unlock-alt mr-2"></i>Entrar
-                </button>
-                <p id="gestorLoginError" class="text-red-600 text-sm text-center hidden">Senha incorreta. Tente novamente.</p>
-                <button type="button" id="forgotPasswordBtn"
-                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out transform hover:scale-105 mt-2">
-                    <i class="fas fa-question-circle mr-2"></i>Esqueci minha senha?
-                </button>
-            </form>
-        </div>
-
-        <!-- Gestor Content (Form, Table, Export Button - hidden until logged in) -->
-        <div id="gestorContent" class="hidden">
-            <!-- Navigation for Gestor Tabs -->
-            <div class="flex justify-center mb-6 border-b border-gray-200">
-                <button id="showVehicleManagement" class="py-3 px-6 text-sm font-medium text-gray-700 border-b-2 border-indigo-500 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition duration-150 ease-in-out">
-                    Gerenciar Veículos
-                </button>
-                <button id="showEmployeeManagement" class="py-3 px-6 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
-                    Gerenciar Funcionários
-                </button>
-            </div>
-
-            <!-- Vehicle Management Section -->
-            <div id="vehicleManagementSection">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Adicionar/Atualizar Dados do Veículo</h2>
-                <!-- Add/Update Vehicle Form (Gestor's Form) -->
-                <form id="maintenanceForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 p-4 bg-blue-50 rounded-lg shadow-inner">
-                    <div class="col-span-1 flex flex-col">
-                        <label for="plate" class="block text-sm font-medium text-gray-700 mb-1">Placa</label>
-                        <input type="text" id="plate" name="plate" required
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out h-10">
-                    </div>
-                    <div class="col-span-1 flex flex-col">
-                        <label for="nextMaintenanceDueKmGestor" class="block text-sm font-medium text-gray-700 mb-1">KM Próxima Revisão</label>
-                        <input type="number" id="nextMaintenanceDueKmGestor" name="nextMaintenanceDueKmGestor" required min="0"
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out h-10">
-                    </div>
-                    <div class="col-span-1 flex flex-col">
-                        <label for="responsibleEmployee" class="block text-sm font-medium text-gray-700 mb-1">Funcionário Responsável</label>
-                        <select id="responsibleEmployee" name="responsibleEmployee"
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out h-10">
-                            <option value="">-- Selecione --</option>
-                            <!-- Employee options will be loaded dynamically here -->
-                        </select>
-                    </div>
-                    <div class="col-span-full flex justify-center sm:justify-end items-end mt-4">
-                        <button type="submit"
-                                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out transform hover:scale-105">
-                            <i class="fas fa-plus-circle mr-2"></i>Adicionar/Atualizar Veículo
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Export Button -->
-                <div class="flex justify-end mb-4">
-                    <button id="exportCsvBtn"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
-                        <i class="fas fa-file-csv mr-2"></i>Exportar para CSV
-                    </button>
-                </div>
-
-                <!-- Maintenance List Table (Gestor's Table - with actions and styling) -->
-                <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200 mt-8">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Placa</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quilometragem Atual (Km)</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Próxima Revisão (Km)</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Km Faltantes</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsável</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="maintenanceList" class="bg-white divide-y divide-gray-200">
-                            <!-- Maintenance records will be inserted here by JavaScript -->
-                            <tr>
-                                <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum veículo cadastrado ainda.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Employee Management Section -->
-            <div id="employeeManagementSection" class="hidden">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Adicionar Novo Funcionário</h2>
-                <form id="employeeForm" class="space-y-4 p-4 bg-purple-50 rounded-lg shadow-inner mb-8">
-                    <div>
-                        <label for="employeeName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Funcionário</label>
-                        <input type="text" id="employeeName" name="employeeName" required
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition duration-150 ease-in-out">
-                    </div>
-                    <button type="submit"
-                            class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out transform hover:scale-105">
-                        <i class="fas fa-user-plus mr-2"></i>Adicionar Funcionário
-                    </button>
-                </form>
-
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4 mt-8">Funcionários Cadastrados</h2>
-                <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Nome do Funcionário</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="employeeList" class="bg-white divide-y divide-gray-200">
-                            <!-- Employee records will be inserted here by JavaScript -->
-                            <tr>
-                                <td colspan="2" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum funcionário cadastrado ainda.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Back Button for Gestor Portal -->
-        <div class="flex justify-center mt-8">
-            <button id="backToLandingFromGestorBtn"
-                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out transform hover:scale-105">
-                <i class="fas fa-arrow-left mr-2"></i>Voltar
-            </button>
-        </div>
-    </div>
-
-    <!-- A seção de Logs foi removida daqui -->
-
-
-    <!-- Message Box for alerts -->
-    <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
-            <h3 id="messageBoxTitle" class="text-lg font-semibold text-gray-800 mb-4"></h3>
-            <p id="messageBoxContent" class="text-gray-600 mb-6"></p>
-            <button id="messageBoxClose" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                OK
-            </button>
-        </div>
-    </div>
-
-    <!-- Confirmation Box for delete -->
-    <div id="confirmBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Confirmação</h3>
-            <p id="confirmBoxContent" class="text-gray-600 mb-6">Tem certeza que deseja excluir este registro?</p>
-            <div class="flex justify-center space-x-4">
-                <button id="confirmBoxYes" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                    Sim
-                </button>
-                <button id="confirmBoxNo" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                    Não
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        // Import Supabase client
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-        // Supabase Configuration
-        // *** IMPORTANTE: SUBSTITUA OS VALORES ABAIXO PELAS SUAS CREDENCIAIS REAIS DO SUPABASE ***
-        // Você pode encontrá-los em seu projeto Supabase: Project Settings -> API
-        // A URL do seu projeto Supabase deve ser algo como 'https://abcdefghijk.supabase.co'
-        const SUPABASE_URL = 'https://zkwgpwfmdbhqajzhorlw.supabase.co'; // <-- SUA URL DO SUPABASE AQUI (ATUALIZADO)
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inprd2dwd2ZtZGJocWFqemhvcmx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMjM5NjQsImV4cCI6MjA2ODY5OTk2NH0.I2V9HC_gbiPZSTAib5rJ9Kttl2kIFjkHfxYja-zp9Zk'; // <-- SUA CHAVE ANON DO SUPABASE AQUI
-
+        // Inicializa o cliente Supabase
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // A unique ID for the current "gestor" session, stored in localStorage
-        // This simulates a user ID for data separation without full Supabase Auth.
-        // IMPORTANT: Ensure this ID matches the 'user_id' you use in Supabase RLS policies.
-        let gestorUserId = localStorage.getItem('gestorUserId');
-        if (!gestorUserId) {
-            gestorUserId = crypto.randomUUID(); // Generate a new UUID if not found
-            localStorage.setItem('gestorUserId', gestorUserId);
-            console.log("Generated new gestorUserId:", gestorUserId);
-        } else {
-            console.log("Using existing gestorUserId:", gestorUserId);
-        }
+        const App = () => {
+          // Estados para o formulário de cadastro/alteração
+          const [plate, setPlate] = React.useState('');
+          const [branch, setBranch] = React.useState('');
+          const [date, setDate] = React.useState('');
 
-        let isAuthReady = true; // Supabase anon key is immediately ready for this setup
+          // Estados para dados da aplicação
+          const [plateData, setPlateData] = React.useState([]); // Dados de equipamentos e histórico
+          const [branchesData, setBranchesData] = React.useState([]); // Dados de filiais para dropdowns/autocompletes
+          const [dashboardSelectedBranch, setDashboardSelectedBranch] = React.useState(''); // Filial selecionada no dashboard
 
-        // Table names in Supabase
-        const MAINTENANCE_RECORDS_TABLE = 'maintenance_records';
-        const EMPLOYEES_TABLE = 'employees';
-        // A tabela MILEAGE_LOGS_TABLE foi removida pois os logs foram removidos.
-        const INITIAL_DATA_FLAG_DOC_ID = 'initialDataLoaded'; // Definido aqui
+          // Estados de UI e autenticação
+          const [loading, setLoading] = React.useState(true); // Indica se os dados iniciais estão sendo carregados
+          const [error, setError] = React.useState(null); // Mensagens de erro globais
+          const [message, setMessage] = React.useState({ text: '', type: '' }); // Mensagens de sucesso/erro/info para formulários
+          const [currentView, setCurrentView] = React.useState('auth'); // Controla a seção ativa: 'auth', null (menu principal), 'cadastroEquipamento', etc.
+          const [loggedInAppUser, setLoggedInAppUser] = React.useState(null); // Usuário logado no sistema personalizado
+          const [currentCadastroMode, setCurrentCadastroMode] = React.useState('manual'); // 'manual' ou 'bulk' para cadastro de equipamento
 
-        // Hardcoded password for gestor login.
-        const GESTOR_PASSWORD = "1654";
-        // Security keyword for password recovery
-        const SECURITY_KEYWORD = "GESTOR123";
-        // Email to contact if both password and security keyword are lost
-        const SECURITY_EMAIL = "leozarro99@gmail.com";
+          // Estados para o formulário de login
+          const [loginUsername, setLoginUsername] = React.useState('');
+          const [loginPassword, setLoginPassword] = React.useState('');
 
-        // In-memory array for app functioning logs (non-persistent)
-        const appFunctioningLogs = [];
-        const MAX_APP_LOGS = 50; // Limit the number of in-memory logs
-
-        // Store current employees for dynamic select population
-        let currentEmployees = [];
+          // Estados para o formulário de criação de usuário (Admin)
+          const [newUserName, setNewUserName] = React.useState('');
+          const [newUserDisplayName, setNewUserDisplayName] = React.useState('');
+          const [newUserPassword, setNewUserPassword] = React.useState('');
+          const [newUserIsAdmin, setNewUserIsAdmin] = React.useState(false);
+          const [createUserMessage, setCreateUserMessage] = React.useState({ text: '', type: '' });
 
 
-        // --- Utility Functions (MessageBox, ConfirmBox, App Logging) ---
+          // --- Funções de Utilidade ---
 
-        function showMessageBox(title, message) {
-            const messageBox = document.getElementById('messageBox');
-            document.getElementById('messageBoxTitle').textContent = title;
-            document.getElementById('messageBoxContent').textContent = message;
-            messageBox.classList.remove('hidden');
-            logAppAction("Exibir MessageBox", `Título: "${title}", Mensagem: "${message}"`);
-        }
+          /**
+           * Gera um hash SHA-256 de uma string.
+           * @param {string} message A string para hash.
+           * @returns {Promise<string>} O hash SHA-256 em formato hexadecimal.
+           */
+          const sha256 = React.useCallback(async (message) => {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hexHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hexHash;
+          }, []);
 
-        document.getElementById('messageBoxClose').addEventListener('click', () => {
-            document.getElementById('messageBox').classList.add('hidden');
-            logAppAction("Fechar MessageBox", "Caixa de mensagem fechada.");
-        });
-
-        function showConfirmBox(message) {
-            return new Promise((resolve) => {
-                const confirmBox = document.getElementById('confirmBox');
-                document.getElementById('confirmBoxContent').textContent = message;
-                confirmBox.classList.remove('hidden');
-                logAppAction("Exibir ConfirmBox", `Mensagem: "${message}"`);
-
-                const yesButton = document.getElementById('confirmBoxYes');
-                const noButton = document.getElementById('confirmBoxNo');
-
-                const handleYes = () => {
-                    confirmBox.classList.add('hidden');
-                    yesButton.removeEventListener('click', handleYes);
-                    noButton.removeEventListener('click', handleNo);
-                    logAppAction("ConfirmBox Ação", "Usuário confirmou (Sim).");
-                    resolve(true);
-                };
-
-                const handleNo = () => {
-                    confirmBox.classList.add('hidden');
-                    yesButton.removeEventListener('click', handleYes);
-                    noButton.removeEventListener('click', handleNo);
-                    logAppAction("ConfirmBox Ação", "Usuário cancelou (Não).");
-                    resolve(false);
-                };
-
-                yesButton.addEventListener('click', handleYes);
-                noButton.addEventListener('click', handleNo);
-            });
-        }
-
-        function logAppAction(action, details = '') {
-            const timestamp = new Date().toISOString();
-            appFunctioningLogs.push({ timestamp, action, details });
-            // Keep only the latest MAX_APP_LOGS entries
-            if (appFunctioningLogs.length > MAX_APP_LOGS) {
-                appFunctioningLogs.splice(0, appFunctioningLogs.length - MAX_APP_LOGS);
+          const MessageDisplay = ({ text, type }) => {
+            if (!text) return null;
+            let bgColor, textColor, IconComponent;
+            switch (type) {
+              case 'success':
+                bgColor = 'bg-green-100';
+                textColor = 'text-green-800';
+                IconComponent = LucideReact.CheckCircle;
+                break;
+              case 'error':
+                bgColor = 'bg-red-100';
+                textColor = 'text-red-800';
+                IconComponent = LucideReact.XCircle;
+                break;
+              case 'info':
+                bgColor = 'bg-blue-100';
+                textColor = 'text-blue-800';
+                IconComponent = LucideReact.Info;
+                break;
+              default:
+                bgColor = 'bg-gray-100';
+                textColor = 'text-gray-800';
+                IconComponent = LucideReact.Info;
             }
-            // A chamada para renderAppFunctioningLogs() foi removida daqui
-            console.log(`[APP LOG] ${new Date().toLocaleString()}: ${action} - ${details}`);
-        }
+            return (
+              <div className={`mt-6 p-4 flex items-center justify-center gap-2 rounded-xl text-center font-medium border shadow-md ${bgColor} ${textColor} animate-fade-in-down`}>
+                {IconComponent && typeof IconComponent === 'function' && React.createElement(IconComponent, { className: "w-5 h-5" })}
+                <span>{text}</span>
+              </div>
+            );
+          };
 
+          const formatDate = (isoDate) => {
+            if (!isoDate || isoDate === 'N/A') return 'N/A';
+            const dateObj = new Date(isoDate);
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const year = dateObj.getFullYear();
+            return `${day}/${month}/${year}`;
+          };
 
-        // --- Render Functions ---
+          const parseDateToISO = (ddmmyyyy) => {
+            if (!ddmmyyyy) return '';
+            const parts = ddmmyyyy.split('/');
+            if (parts.length === 3) {
+              return `${parts[2]}-${parts[1]}-${parts[0]}`; // Converte para YYYY-MM-DD
+            }
+            return ddmmyyyy; // Retorna como está se já for ISO ou inválido
+          };
 
-        function renderMaintenanceRecordsGestor(records) {
-            const maintenanceList = document.getElementById('maintenanceList');
-            maintenanceList.innerHTML = '';
+          // --- Funções de Interação com Supabase ---
 
-            if (records.length === 0) {
-                maintenanceList.innerHTML = `<tr><td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum veículo cadastrado ainda.</td></tr>`;
-                logAppAction("Renderização Tabela Gestor", "Nenhum veículo para exibir.");
+          const fetchPlateData = React.useCallback(async () => {
+            try {
+              if (!loggedInAppUser) {
+                setPlateData([]);
+                setLoading(false);
                 return;
-            }
+              }
 
-            records.forEach(record => {
-                const nextMaintenanceDueKm = record.next_maintenance_due_km || 0;
-                const kmRemainingForMaintenance = nextMaintenanceDueKm - (record.current_mileage || 0);
+              const { data, error: fetchError } = await supabase
+                .from('equipamentos')
+                .select('id, placa, filial, trocas(nova_filial, data, usuario)');
 
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 transition duration-150 ease-in-out';
+              if (fetchError) throw fetchError;
 
-                let kmRemainingClass = '';
-                if (kmRemainingForMaintenance <= 0) {
-                    kmRemainingClass = 'font-bold text-red-600';
-                } else if (kmRemainingForMaintenance <= 1000) {
-                    kmRemainingClass = 'font-semibold text-yellow-600';
+              const plates = data.map(item => {
+                let currentBranch = 'N/A';
+                let currentStartDate = 'N/A';
+                let history = [];
+
+                if (item.trocas && item.trocas.length > 0) {
+                  const sortedTrocas = item.trocas.sort((a, b) => new Date(b.data) - new Date(a.data));
+                  currentBranch = sortedTrocas[0].nova_filial;
+                  currentStartDate = sortedTrocas[0].data;
+                  history = sortedTrocas.map(t => ({ branch: t.nova_filial, startDate: t.data, user: t.usuario }));
                 } else {
-                    kmRemainingClass = 'text-green-600';
+                  currentBranch = item.filial;
+                  currentStartDate = 'N/A';
                 }
 
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 rounded-bl-lg">${record.plate}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.current_mileage || 'N/A'} Km</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">${nextMaintenanceDueKm} Km</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm ${kmRemainingClass}">
-                        ${kmRemainingForMaintenance <= 0 ? 'VENCIDA' : kmRemainingForMaintenance} Km
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.responsible_employee || 'Não atribuído'}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button data-id="${record.id}" class="edit-btn text-indigo-600 hover:text-indigo-900 mr-3 transition duration-150 ease-in-out">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button data-id="${record.id}" class="delete-btn text-red-600 hover:text-red-900 transition duration-150 ease-in-out">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                `;
-                maintenanceList.appendChild(row);
-            });
-
-            document.querySelectorAll('#maintenanceList .edit-btn').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const id = event.currentTarget.dataset.id;
-                    const recordToEdit = records.find(r => r.id === id);
-                    if (recordToEdit) {
-                        document.getElementById('plate').value = recordToEdit.plate;
-                        document.getElementById('nextMaintenanceDueKmGestor').value = recordToEdit.next_maintenance_due_km || '';
-                        document.getElementById('responsibleEmployee').value = recordToEdit.responsible_employee || '';
-                        document.getElementById('maintenanceForm').dataset.editingId = id;
-                        showMessageBox("Editar Registro", "Modifique os campos e clique em 'Adicionar/Atualizar Veículo' para atualizar.");
-                        logAppAction("Edição de Veículo", `Iniciando edição do veículo com ID: ${id}`);
-                    }
-                });
-            });
-
-            document.querySelectorAll('#maintenanceList .delete-btn').forEach(button => {
-                button.addEventListener('click', async (event) => {
-                    const id = event.currentTarget.dataset.id;
-                    const confirmed = await showConfirmBox("Tem certeza que deseja excluir este registro?");
-                    if (confirmed) {
-                        try {
-                            const { error } = await supabase
-                                .from(MAINTENANCE_RECORDS_TABLE)
-                                .delete()
-                                .eq('id', id)
-                                .eq('user_id', gestorUserId); // Ensure only deleting own records
-
-                            if (error) throw error;
-
-                            showMessageBox("Sucesso", "Registro excluído com sucesso!");
-                            logAppAction("Exclusão de Veículo", `Veículo com ID ${id} excluído com sucesso.`);
-                        } catch (e) {
-                            console.error("Error deleting document: ", e);
-                            showMessageBox("Erro", "Erro ao excluir registro: " + e.message);
-                            logAppAction("Erro na Exclusão", `Falha ao excluir veículo com ID ${id}: ${e.message}`);
-                        }
-                    } else {
-                        logAppAction("Exclusão de Veículo", `Exclusão do veículo com ID ${id} cancelada.`);
-                    }
-                });
-            });
-        }
-
-        // As funções renderMileageLogs e renderAppFunctioningLogs foram removidas.
-
-        function renderEmployees(employees) {
-            const employeeListTableBody = document.getElementById('employeeList');
-            employeeListTableBody.innerHTML = '';
-            currentEmployees = employees; // Update global list of employees
-
-            if (employees.length === 0) {
-                employeeListTableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum funcionário cadastrado ainda.</td></tr>`;
-                return;
+                return {
+                  id: item.id,
+                  plate: item.placa,
+                  currentBranch: currentBranch,
+                  currentStartDate: currentStartDate,
+                  history: history,
+                };
+              });
+              setPlateData(plates);
+              setLoading(false);
+            } catch (err) {
+              console.error("Erro ao buscar dados de placas do Supabase:", err);
+              setError(`Erro ao carregar dados de placas: ${err.message}. Por favor, verifique suas políticas RLS para a tabela 'equipamentos'.`);
+              setLoading(false);
             }
+          }, [loggedInAppUser]); // Dependência: loggedInAppUser
 
-            employees.forEach(employee => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 transition duration-150 ease-in-out';
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${employee.name}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button data-id="${employee.id}" class="delete-employee-btn text-red-600 hover:text-red-900 transition duration-150 ease-in-out">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                `;
-                employeeListTableBody.appendChild(row);
-            });
+          const fetchBranchesData = React.useCallback(async () => {
+            try {
+              if (!loggedInAppUser) {
+                setBranchesData([]);
+                return;
+              }
 
-            document.querySelectorAll('#employeeList .delete-employee-btn').forEach(button => {
-                button.addEventListener('click', async (event) => {
-                    const id = event.currentTarget.dataset.id;
-                    const employeeToDelete = employees.find(e => e.id === id);
-                    const confirmed = await showConfirmBox(`Tem certeza que deseja excluir o funcionário "${employeeToDelete ? employeeToDelete.name : 'com ID ' + id}"?`);
-                    if (confirmed) {
-                        try {
-                            const { error } = await supabase
-                                .from(EMPLOYEES_TABLE)
-                                .delete()
-                                .eq('id', id)
-                                .eq('user_id', gestorUserId); // Ensure only deleting own records
+              const { data, error: fetchError } = await supabase
+                .from('filiais')
+                .select('nome');
 
-                            if (error) throw error;
+              if (fetchError) throw fetchError;
+              setBranchesData(data);
+            } catch (err) {
+              console.error("Erro ao buscar dados de filiais do Supabase:", err);
+              setMessage({ text: `Erro ao carregar filiais: ${err.message}.`, type: 'error' });
+            }
+          }, [loggedInAppUser]); // Dependência: loggedInAppUser
 
-                            showMessageBox("Sucesso", "Funcionário excluído com sucesso!");
-                            logAppAction("Exclusão de Funcionário", `Funcionário "${employeeToDelete ? employeeToDelete.name : 'N/A'}" (ID: ${id}) excluído.`);
-                        } catch (e) {
-                            console.error("Error deleting employee: ", e);
-                            showMessageBox("Erro", "Erro ao excluir funcionário: " + e.message);
-                            logAppAction("Erro na Exclusão de Funcionário", `Falha ao excluir funcionário (ID: ${id}): ${e.message}`);
-                        }
-                    } else {
-                        logAppAction("Exclusão de Funcionário", `Exclusão do funcionário (ID: ${id}) cancelada.`);
-                    }
-                });
-            });
+          // --- Efeitos para Carregamento Inicial e Realtime ---
 
-            populateEmployeeSelects(); // Update all select dropdowns after employee list changes
-        }
+          // Carrega a biblioteca XLSX dinamicamente via CDN
+          React.useEffect(() => {
+            if (typeof window.XLSX === 'undefined') {
+              const script = document.createElement('script');
+              script.src = "https://unpkg.com/xlsx/dist/xlsx.full.min.js";
+              script.async = true;
+              script.onload = () => {
+                console.log("Biblioteca XLSX carregada com sucesso.");
+              };
+              script.onerror = () => {
+                console.error("Falha ao carregar a biblioteca XLSX.");
+                setError("Erro ao carregar a biblioteca de exportação (XLSX). Por favor, tente novamente.");
+              };
+              document.body.appendChild(script);
 
-        function populateEmployeeSelects() {
-            const driverSelect = document.getElementById('driverResponsibleEmployee');
-            const gestorSelect = document.getElementById('responsibleEmployee');
+              return () => {
+                if (document.body.contains(script)) {
+                  document.body.removeChild(script);
+                }
+              };
+            }
+          }, []);
 
-            // Clear existing options, keep the default "Selecione"
-            driverSelect.innerHTML = '<option value="">-- Selecione --</option>';
-            gestorSelect.innerHTML = '<option value="">-- Selecione --</option>';
+          // Efeito para carregar dados quando o usuário loga ou a view muda para uma que precisa de dados
+          React.useEffect(() => {
+            if (loggedInAppUser) {
+              fetchPlateData();
+              fetchBranchesData();
 
-            currentEmployees.forEach(employee => {
-                const optionDriver = document.createElement('option');
-                optionDriver.value = employee.name;
-                optionDriver.textContent = employee.name;
-                driverSelect.appendChild(optionDriver);
-
-                const optionGestor = document.createElement('option');
-                optionGestor.value = employee.name;
-                optionGestor.textContent = employee.name;
-                gestorSelect.appendChild(optionGestor);
-            });
-            logAppAction("População de Seletores", `Campos de seleção de funcionário atualizados com ${currentEmployees.length} funcionários.`);
-        }
-
-
-        // --- Real-time Listeners (Supabase) ---
-
-        function setupRealtimeListenerGestor() {
-            supabase
-                .from(MAINTENANCE_RECORDS_TABLE)
-                .select('*')
-                .eq('user_id', gestorUserId) // Filter by the current gestor's ID
-                .order('created_at', { ascending: false })
-                .then(({ data, error }) => {
-                    if (error) throw error;
-                    renderMaintenanceRecordsGestor(data);
-                    logAppAction("Supabase Listener (Gestor)", `Dados de manutenção carregados. Total: ${data.length} registros.`);
-                })
-                .catch(error => {
-                    console.error("Error fetching initial data for gestor table:", error);
-                    showMessageBox("Erro de Sincronização", "Não foi possível obter dados iniciais para a tabela do gestor: " + error.message);
-                    logAppAction("Erro de Sincronização (Gestor)", `Falha ao obter dados iniciais: ${error.message}`);
-                });
-
-            // Real-time subscription for changes
-            supabase
-                .channel('maintenance_records_changes')
-                .on('postgres_changes', { event: '*', schema: 'public', table: MAINTENANCE_RECORDS_TABLE, filter: `user_id=eq.${gestorUserId}` }, payload => {
-                    logAppAction("Supabase Realtime (Gestor)", `Mudança detectada na tabela de manutenção: ${payload.eventType}`);
-                    // Re-fetch data to ensure consistency after any change
-                    supabase
-                        .from(MAINTENANCE_RECORDS_TABLE)
-                        .select('*')
-                        .eq('user_id', gestorUserId)
-                        .order('created_at', { ascending: false })
-                        .then(({ data, error }) => {
-                            if (error) throw error;
-                            renderMaintenanceRecordsGestor(data);
-                        })
-                        .catch(error => console.error("Error re-fetching data after real-time update:", error));
+              // Configura listeners de Realtime para atualizações automáticas
+              const plateChanges = supabase
+                .channel('public:equipamentos')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'equipamentos' }, payload => {
+                  console.log('Mudança em equipamentos recebida!', payload);
+                  fetchPlateData(); // Re-fetch para atualizar a lista
                 })
                 .subscribe();
-            logAppAction("Listener em Tempo Real (Gestor)", "Listener para registros de manutenção ativado.");
-        }
 
-        // As funções setupRealtimeListenerLogs foi removida.
-
-        function setupRealtimeListenerEmployees() {
-            supabase
-                .from(EMPLOYEES_TABLE)
-                .select('*')
-                .eq('user_id', gestorUserId) // Filter by the current gestor's ID
-                .order('name', { ascending: true }) // Order employees by name
-                .then(({ data, error }) => {
-                    if (error) throw error;
-                    renderEmployees(data);
-                    logAppAction("Supabase Listener (Funcionários)", `Lista de funcionários carregada. Total: ${data.length} funcionários.`);
-                })
-                .catch(error => {
-                    console.error("Error fetching initial data for employees:", error);
-                    showMessageBox("Erro de Sincronização", "Não foi possível obter dados iniciais para a lista de funcionários: " + error.message);
-                    logAppAction("Erro de Sincronização (Funcionários)", `Falha ao obter lista de funcionários: ${error.message}`);
-                });
-
-            // Real-time subscription for changes
-            supabase
-                .channel('employees_changes')
-                .on('postgres_changes', { event: '*', schema: 'public', table: EMPLOYEES_TABLE, filter: `user_id=eq.${gestorUserId}` }, payload => {
-                    logAppAction("Supabase Realtime (Funcionários)", `Mudança detectada na tabela de funcionários: ${payload.eventType}`);
-                    // Re-fetch data to ensure consistency after any change
-                    supabase
-                        .from(EMPLOYEES_TABLE)
-                        .select('*')
-                        .eq('user_id', gestorUserId)
-                        .order('name', { ascending: true })
-                        .then(({ data, error }) => {
-                            if (error) throw error;
-                            renderEmployees(data);
-                        })
-                        .catch(error => console.error("Error re-fetching data after real-time update:", error));
+              const branchChanges = supabase
+                .channel('public:filiais')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'filiais' }, payload => {
+                  console.log('Mudança em filiais recebida!', payload);
+                  fetchBranchesData(); // Re-fetch para atualizar dropdowns
                 })
                 .subscribe();
-            logAppAction("Listener em Tempo Real (Funcionários)", "Listener para registros de funcionários ativado.");
-        }
 
+              const trocaChanges = supabase
+                .channel('public:trocas')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'trocas' }, payload => {
+                  console.log('Mudança em trocas recebida!', payload);
+                  fetchPlateData(); // Re-fetch para atualizar a filial atual dos equipamentos
+                })
+                .subscribe();
 
-        // --- Initial Data Loading (for Gestor's private data) ---
+              return () => {
+                plateChanges.unsubscribe();
+                branchChanges.unsubscribe();
+                trocaChanges.unsubscribe();
+              };
+            }
+          }, [loggedInAppUser, fetchPlateData, fetchBranchesData]); // Dependências: loggedInAppUser e as funções de fetch
 
-        async function addInitialDataIfEmpty() {
-            console.log("Checking if initial data needs to be added for gestorUserId:", gestorUserId);
-            // Check if initial data has been loaded for this gestorUserId
-            const { data, error } = await supabase
-                .from('app_metadata') // Assuming you create a table named 'app_metadata' for this flag
-                .select('added')
-                .eq('id', INITIAL_DATA_FLAG_DOC_ID) // Use the constant directly
-                .eq('user_id', gestorUserId);
+          // --- Lógica de Autenticação Personalizada ---
 
-            if (error && error.code !== 'PGRST116') { // PGRST116 means table not found, which is fine if it's the first run
-                 console.error("Error checking initial data flag:", error.message || error.details || error);
-                 logAppAction("Erro na Verificação de Dados Iniciais", `Falha ao verificar flag de dados iniciais: ${error.message || error.details || JSON.stringify(error)}`);
+          const handleLogin = async (e) => {
+            e.preventDefault();
+            if (!loginUsername || !loginPassword) {
+              setMessage({ text: "Por favor, insira seu login e senha.", type: 'info' });
+              return;
             }
 
-            if (!data || data.length === 0) {
-                logAppAction("Verificação de Dados Iniciais", "Dados iniciais não encontrados. Adicionando...");
+            try {
+              // 1. Busca o usuário na tabela 'usuarios'
+              const { data: userData, error: userError } = await supabase
+                .from('usuarios')
+                .select('id, login, display_name, senha, is_admin')
+                .eq('login', loginUsername)
+                .single();
 
-                // Add initial employees first
-                const initialEmployees = ["Funcionário A", "Funcionário B", "Funcionário C", "Funcionário D"];
-                for (const empName of initialEmployees) {
-                    const { error: insertError } = await supabase
-                        .from(EMPLOYEES_TABLE)
-                        .insert({ name: empName, user_id: gestorUserId });
-                    if (insertError) {
-                        console.error("Error inserting initial employee:", insertError.message || insertError.details || insertError);
-                        logAppAction("Erro na Inserção Inicial", `Falha ao inserir funcionário inicial "${empName}": ${insertError.message || insertError.details || JSON.stringify(insertError)}`);
-                    }
+              if (userError) {
+                console.error("Erro ao buscar usuário na tabela 'usuarios':", userError);
+                if (userError.code === 'PGRST116') { // No rows found
+                  setMessage({ text: "Usuário ou senha inválidos.", type: 'error' });
+                } else {
+                  setMessage({ text: `Erro de comunicação com o banco de dados: ${userError.message}.`, type: 'error' });
                 }
-                logAppAction("Inicialização de Dados", "Funcionários iniciais adicionados.");
-
-                // Then add initial vehicles, assigning to initial employees
-                const vehicles = [
-                    { plate: "ABC-1234", current_mileage: 50000, next_maintenance_due_km: 55000, responsible_employee: "Funcionário A", user_id: gestorUserId },
-                    { plate: "DEF-5678", current_mileage: 48000, next_maintenance_due_km: 50000, responsible_employee: "Funcionário B", user_id: gestorUserId },
-                    { plate: "GHI-9012", current_mileage: 30000, next_maintenance_due_km: 35000, responsible_employee: "Funcionário C", user_id: gestorUserId },
-                    { plate: "JKL-3456", current_mileage: 60000, next_maintenance_due_km: 65000, responsible_employee: "Funcionário D", user_id: gestorUserId },
-                    { plate: "MNO-7890", current_mileage: 40000, next_maintenance_due_km: 45000, responsible_employee: "Funcionário A", user_id: gestorUserId },
-                    { plate: "PQR-1122", current_mileage: 55000, next_maintenance_due_km: 60000, responsible_employee: "Funcionário B", user_id: gestorUserId },
-                    { plate: "STU-3344", current_mileage: 35000, next_maintenance_due_km: 40000, responsible_employee: "Funcionário C", user_id: gestorUserId },
-                    { plate: "VWX-5566", current_mileage: 120000, next_maintenance_due_km: 135000, responsible_employee: "Funcionário D", user_id: gestorUserId },
-                    { plate: "YZA-7788", current_mileage: 110000, next_maintenance_due_km: 125000, responsible_employee: "Funcionário A", user_id: gestorUserId },
-                    { plate: "BCD-9900", current_mileage: 250000, next_maintenance_due_km: 270000, responsible_employee: "Funcionário B", user_id: gestorUserId }
-                ];
-
-                for (const vehicle of vehicles) {
-                    const { error: insertError } = await supabase
-                        .from(MAINTENANCE_RECORDS_TABLE)
-                        .insert(vehicle);
-                    if (insertError) {
-                        console.error("Error inserting initial vehicle:", insertError.message || insertError.details || insertError);
-                        logAppAction("Erro na Inserção Inicial", `Falha ao inserir veículo inicial "${vehicle.plate}": ${insertError.message || insertError.details || JSON.stringify(insertError)}`);
-                    }
-                }
-                logAppAction("Inicialização de Dados", "Veículos iniciais adicionados.");
-
-                // Mark initial data as loaded for this user
-                const { error: upsertError } = await supabase
-                    .from('app_metadata')
-                    .upsert({ id: INITIAL_DATA_FLAG_DOC_ID, added: true, user_id: gestorUserId });
-                if (upsertError) {
-                    console.error("Error marking initial data as loaded:", upsertError.message || upsertError.details || upsertError);
-                    logAppAction("Erro na Marcação de Dados Iniciais", `Falha ao marcar dados iniciais como carregados: ${upsertError.message || upsertError.details || JSON.stringify(upsertError)}`);
-                }
-
-            } else {
-                logAppAction("Verificação de Dados Iniciais", "Dados iniciais já existem para este usuário.");
-            }
-        }
-
-        async function checkAndAddInitialData() {
-            await addInitialDataIfEmpty();
-        }
-
-
-        // --- Event Listeners ---
-
-        // Gestor's Main Form Submission (Add/Update Vehicle)
-        document.getElementById('maintenanceForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const plate = document.getElementById('plate').value.toUpperCase().trim();
-            const nextMaintenanceDueKmGestor = parseInt(document.getElementById('nextMaintenanceDueKmGestor').value);
-            const responsibleEmployee = document.getElementById('responsibleEmployee').value || 'Não atribuído';
-
-            logAppAction("Envio de Formulário (Gestor)", `Tentativa de adicionar/atualizar veículo. Placa: ${plate}, Próxima Revisão: ${nextMaintenanceDueKmGestor} Km, Responsável: ${responsibleEmployee}`);
-
-            if (!isAuthReady) {
-                showMessageBox("Erro", "O sistema não está pronto. Por favor, aguarde a inicialização.");
-                logAppAction("Erro de Sistema", "Sistema não pronto para envio de formulário do Gestor.");
                 return;
+              }
+
+              // 2. Compara o hash da senha
+              const hashedPassword = await sha256(loginPassword);
+              if (hashedPassword === userData.senha) {
+                setLoggedInAppUser({
+                  id: userData.id,
+                  login: userData.login,
+                  displayName: userData.display_name,
+                  isAdmin: userData.is_admin || false
+                });
+                setMessage({ text: 'Login bem-sucedido!', type: 'success' });
+                setLoginUsername('');
+                setLoginPassword('');
+                setCurrentView(null); // Vai para a tela principal
+              } else {
+                setMessage({ text: "Usuário ou senha inválidos.", type: 'error' });
+              }
+            } catch (err) {
+              console.error("Erro geral no login:", err);
+              setMessage({ text: `Erro ao tentar fazer login: ${err.message}. Por favor, tente novamente.`, type: 'error' });
+            }
+          };
+
+          const handleLogout = () => {
+            setLoggedInAppUser(null);
+            setPlateData([]); // Limpa os dados ao deslogar
+            setBranchesData([]);
+            setCurrentView('auth'); // Volta para a tela de autenticação
+            setMessage({ text: '', type: '' });
+            setError(null);
+            setLoading(false);
+          };
+
+          // --- Lógica de Formulários e Operações ---
+
+          const handleSaveEquipment = async (e) => {
+            e.preventDefault();
+            if (!plate || !branch || !date) {
+              setMessage({ text: "Por favor, preencha todos os campos.", type: 'info' });
+              return;
+            }
+            if (!loggedInAppUser) {
+              setMessage({ text: "Usuário não autenticado. Por favor, faça login.", type: 'error' });
+              return;
             }
 
-            const editingId = document.getElementById('maintenanceForm').dataset.editingId;
-            let currentMileageValue = 0;
+            setMessage({ text: '', type: '' });
 
-            if (editingId) {
-                const { data, error } = await supabase
-                    .from(MAINTENANCE_RECORDS_TABLE)
-                    .select('current_mileage')
-                    .eq('id', editingId)
-                    .eq('user_id', gestorUserId)
-                    .single();
+            try {
+              // 1. Verifica se a filial existe
+              const { data: branchExists, error: branchError } = await supabase
+                .from('filiais')
+                .select('nome')
+                .eq('nome', branch.toUpperCase())
+                .single();
 
-                if (error) {
-                    console.error("Error fetching vehicle for editing:", error);
-                    showMessageBox("Erro", "Erro ao buscar veículo para edição: " + error.message);
-                    logAppAction("Erro de Obtenção de Dados", `Falha ao buscar veículo para edição (ID: ${editingId}): ${error.message || error.details || JSON.stringify(error)}`);
-                    return;
-                }
-                currentMileageValue = data.current_mileage || 0;
-                logAppAction("Obtenção de Dados", `Quilometragem atual do veículo ${plate} (ID: ${editingId}) obtida para edição: ${currentMileageValue} Km.`);
+              if (branchError && branchError.code === 'PGRST116') {
+                setMessage({ text: `Filial "${branch.toUpperCase()}" não cadastrada. Por favor, cadastre a filial primeiro.`, type: 'error' });
+                return;
+              } else if (branchError) {
+                throw branchError;
+              }
+
+              // 2. Verifica se a placa já existe na tabela 'equipamentos'
+              const { data: existingPlate, error: selectError } = await supabase
+                .from('equipamentos')
+                .select('id')
+                .eq('placa', plate.toUpperCase())
+                .single();
+
+              if (selectError && selectError.code === 'PGRST116') { // Placa não existe, então insere novo equipamento
+                const { error: insertEquipError } = await supabase
+                  .from('equipamentos')
+                  .insert([
+                    { placa: plate.toUpperCase(), tipo: 'N/A', filial: branch.toUpperCase() }
+                  ]);
+                if (insertEquipError) throw insertEquipError;
+
+                // Insere a primeira troca na tabela 'trocas'
+                const { error: insertTrocaError } = await supabase
+                  .from('trocas')
+                  .insert([
+                    {
+                      placa: plate.toUpperCase(),
+                      nova_filial: branch.toUpperCase(),
+                      usuario: loggedInAppUser.login,
+                      data: date
+                    }
+                  ]);
+                if (insertTrocaError) throw insertTrocaError;
+
+                setMessage({ text: `Equipamento ${plate.toUpperCase()} cadastrado com sucesso na filial ${branch.toUpperCase()}.`, type: 'success' });
+                setPlate('');
+                setBranch('');
+                setDate('');
+              } else if (selectError) {
+                throw selectError;
+              } else {
+                // Placa já existe
+                setMessage({ text: `Placa "${plate.toUpperCase()}" já cadastrada. Utilize a opção 'Alteração de Filial' para modificá-la.`, type: 'error' });
+              }
+            } catch (e) {
+              console.error("Erro ao cadastrar equipamento:", e);
+              setMessage({ text: `Erro ao cadastrar equipamento: ${e.message}. Por favor, tente novamente.`, type: 'error' });
+            }
+          };
+
+          const handleAlterBranch = async (e) => {
+            e.preventDefault();
+            if (!plate || !branch || !date) {
+              setMessage({ text: "Por favor, preencha todos os campos.", type: 'info' });
+              return;
+            }
+            if (!loggedInAppUser) {
+              setMessage({ text: "Usuário não autenticado. Por favor, faça login.", type: 'error' });
+              return;
             }
 
-            const recordData = {
-                plate,
-                next_maintenance_due_km: nextMaintenanceDueKmGestor,
-                current_mileage: currentMileageValue,
-                responsible_employee: responsibleEmployee,
-                user_id: gestorUserId // Always include user_id
+            setMessage({ text: '', type: '' });
+
+            try {
+              // 1. Verifica se a nova filial existe
+              const { data: branchExists, error: branchError } = await supabase
+                .from('filiais')
+                .select('nome')
+                .eq('nome', branch.toUpperCase())
+                .single();
+
+              if (branchError && branchError.code === 'PGRST116') {
+                setMessage({ text: `Nova filial "${branch.toUpperCase()}" não cadastrada. Por favor, cadastre a filial primeiro.`, type: 'error' });
+                return;
+              } else if (branchError) {
+                throw branchError;
+              }
+
+              // 2. Verifica se a placa existe na tabela equipamentos
+              const { data: equipmentData, error: equipSelectError } = await supabase
+                .from('equipamentos')
+                .select('id')
+                .eq('placa', plate.toUpperCase())
+                .single();
+
+              if (equipSelectError && equipSelectError.code === 'PGRST116') {
+                setMessage({ text: `Placa "${plate.toUpperCase()}" não encontrada. Cadastre o equipamento primeiro.`, type: 'error' });
+                return;
+              } else if (equipSelectError) {
+                throw equipSelectError;
+              }
+
+              // 3. Insere a nova troca na tabela 'trocas'
+              const { error: insertTrocaError } = await supabase
+                .from('trocas')
+                .insert([
+                  {
+                    placa: plate.toUpperCase(),
+                    nova_filial: branch.toUpperCase(),
+                    usuario: loggedInAppUser.login,
+                    data: date
+                  }
+                ]);
+
+              if (insertTrocaError) throw insertTrocaError;
+
+              setMessage({ text: `Filial do equipamento ${plate.toUpperCase()} atualizada para ${branch.toUpperCase()} com sucesso.`, type: 'success' });
+              setPlate('');
+              setBranch('');
+              setDate('');
+            } catch (e) {
+              console.error("Erro ao alterar filial:", e);
+              setMessage({ text: `Erro ao alterar filial: ${e.message}. Por favor, tente novamente.`, type: 'error' });
+            }
+          };
+
+          const handleRegisterBranch = async (e) => {
+            e.preventDefault();
+            if (!branch) {
+              setMessage({ text: "Por favor, insira o nome da filial.", type: 'info' });
+              return;
+            }
+            if (!loggedInAppUser) {
+              setMessage({ text: "Usuário não autenticado. Por favor, faça login.", type: 'error' });
+              return;
+            }
+
+            setMessage({ text: '', type: '' });
+
+            try {
+              // Verifica se a filial já existe
+              const { data: existingBranch, error: selectError } = await supabase
+                .from('filiais')
+                .select('nome')
+                .eq('nome', branch.toUpperCase())
+                .single();
+
+              if (selectError && selectError.code === 'PGRST116') { // Filial não existe, então insere
+                const { error: insertError } = await supabase
+                  .from('filiais')
+                  .insert([
+                    { nome: branch.toUpperCase() }
+                  ]);
+                if (insertError) throw insertError;
+
+                setMessage({ text: `Filial "${branch.toUpperCase()}" cadastrada com sucesso.`, type: 'success' });
+                setBranch(''); // Limpa o campo
+              } else if (selectError) {
+                throw selectError;
+              } else {
+                setMessage({ text: `Filial "${branch.toUpperCase()}" já cadastrada.`, type: 'info' });
+              }
+            } catch (e) {
+              console.error("Erro ao cadastrar filial:", e);
+              setMessage({ text: `Erro ao cadastrar filial: ${e.message}. Por favor, tente novamente.`, type: 'error' });
+            }
+          };
+
+          const handleCreateUser = async (e) => {
+            e.preventDefault();
+            if (!newUserName || !newUserDisplayName || !newUserPassword) {
+              setCreateUserMessage({ text: "Por favor, preencha todos os campos.", type: 'info' });
+              return;
+            }
+
+            if (!loggedInAppUser || !loggedInAppUser.isAdmin) {
+              setCreateUserMessage({ text: "Acesso negado. Você não tem permissões de administrador para criar usuários.", type: 'error' });
+              return;
+            }
+
+            try {
+              // Verifica se o login já existe
+              const { data: existingUser, error: checkError } = await supabase
+                .from('usuarios')
+                .select('id')
+                .eq('login', newUserName)
+                .single();
+
+              if (checkError && checkError.code === 'PGRST116') { // No rows found, so insert new user
+                const hashedPassword = await sha256(newUserPassword);
+                const { error: insertError } = await supabase
+                  .from('usuarios')
+                  .insert([
+                    {
+                      login: newUserName,
+                      display_name: newUserDisplayName,
+                      senha: hashedPassword,
+                      is_admin: newUserIsAdmin
+                    }
+                  ]);
+
+                if (insertError) throw insertError;
+
+                setCreateUserMessage({ text: `Usuário "${newUserName}" criado com sucesso!`, type: 'success' });
+                setNewUserName('');
+                setNewUserDisplayName('');
+                setNewUserPassword('');
+                setNewUserIsAdmin(false);
+              } else if (checkError) {
+                throw checkError;
+              } else {
+                setCreateUserMessage({ text: `Nome de usuário "${newUserName}" já existe.`, type: 'error' });
+              }
+            } catch (err) {
+              console.error("Erro geral ao criar usuário:", err);
+              setCreateUserMessage({ text: `Erro ao criar usuário: ${err.message}.`, type: 'error' });
+            }
+          };
+
+          const handleBulkUpload = async () => {
+            const rawData = document.getElementById('bulk-upload-textarea').value.trim();
+            if (!rawData) {
+              setMessage({ text: "Por favor, cole os dados na área de texto.", type: 'info' });
+              return;
+            }
+            if (!loggedInAppUser) {
+              setMessage({ text: "Usuário não autenticado. Por favor, faça login.", type: 'error' });
+              return;
+            }
+
+            const bulkUploadResultsDisplay = document.getElementById('bulk-upload-results-display');
+            const bulkUploadProgressBar = document.getElementById('bulk-upload-progress');
+
+            if (bulkUploadResultsDisplay) {
+              bulkUploadResultsDisplay.innerHTML = `<p class="text-center text-blue-600">Processando... <span id="bulk-upload-progress">0%</span></p>`;
+              bulkUploadResultsDisplay.style.display = 'block';
+            }
+            setMessage({ text: '', type: '' });
+
+            const lines = rawData.split('\n').filter(line => line.trim() !== '');
+            const totalLines = lines.length;
+            let processedLines = 0;
+
+            const results = { success: [], errors: [] };
+            const newBranchesToInsert = new Set();
+            const newEquipmentsToInsert = [];
+            const newTrocasToInsert = [];
+
+            // Pré-verifica filiais existentes para evitar consultas repetidas
+            const { data: existingBranches, error: existingBranchesError } = await supabase
+              .from('filiais')
+              .select('nome');
+            if (existingBranchesError) {
+              console.error("Erro ao buscar filiais existentes:", existingBranchesError);
+              setMessage({ text: `Erro ao preparar upload: ${existingBranchesError.message}.`, type: 'error' });
+              return;
+            }
+            const existingBranchNames = new Set(existingBranches.map(b => b.nome));
+
+            // Pré-verifica placas existentes
+            const { data: existingEquipments, error: existingEquipmentsError } = await supabase
+              .from('equipamentos')
+              .select('placa');
+            if (existingEquipmentsError) {
+              console.error("Erro ao buscar equipamentos existentes:", existingEquipmentsError);
+              setMessage({ text: `Erro ao preparar upload: ${existingEquipmentsError.message}.`, type: 'error' });
+              return;
+            }
+            const existingPlateNames = new Set(existingEquipments.map(e => e.placa));
+
+
+            for (const line of lines) {
+              const parts = line.split('\t').map(p => p.trim());
+              if (parts.length < 6 || parts[0].toUpperCase() !== 'PLACA' || parts[2].toUpperCase() !== 'FILIAL' || parts[4].toUpperCase() !== 'DATA') {
+                results.errors.push(`Linha inválida (formato esperado: PLACA\\t[valor]\\tFILIAL\\t[valor]\\tDATA\\t[valor]): ${line}`);
+                processedLines++;
+                if (bulkUploadProgressBar) bulkUploadProgressBar.textContent = `${Math.floor((processedLines / totalLines) * 100)}%`;
+                continue;
+              }
+
+              const plateValue = parts[1].toUpperCase();
+              const branchValue = parts[3].toUpperCase();
+              const dateValue = parseDateToISO(parts[5]);
+
+              if (!plateValue || !branchValue || !dateValue) {
+                results.errors.push(`Dados incompletos na linha: ${line}`);
+                processedLines++;
+                if (bulkUploadProgressBar) bulkUploadProgressBar.textContent = `${Math.floor((processedLines / totalLines) * 100)}%`;
+                continue;
+              }
+
+              // Adiciona nova filial à lista para inserção, se não existir
+              if (!existingBranchNames.has(branchValue) && !newBranchesToInsert.has(branchValue)) {
+                newBranchesToInsert.add(branchValue);
+              }
+
+              // Verifica se a placa já existe
+              if (!existingPlateNames.has(plateValue)) {
+                newEquipmentsToInsert.push({ placa: plateValue, tipo: 'N/A', filial: branchValue }); // Assumindo tipo 'N/A'
+                existingPlateNames.add(plateValue); // Adiciona à lista de placas existentes para evitar duplicatas no mesmo upload
+              }
+
+              // Adiciona a troca
+              newTrocasToInsert.push({
+                placa: plateValue,
+                nova_filial: branchValue,
+                usuario: loggedInAppUser.login,
+                data: dateValue
+              });
+
+              processedLines++;
+              if (bulkUploadProgressBar) bulkUploadProgressBar.textContent = `${Math.floor((processedLines / totalLines) * 100)}%`;
+            }
+
+            try {
+              // Inserir novas filiais
+              if (newBranchesToInsert.size > 0) {
+                const branchesArray = Array.from(newBranchesToInsert).map(name => ({ nome: name }));
+                const { error: insertBranchesError } = await supabase
+                  .from('filiais')
+                  .insert(branchesArray);
+                if (insertBranchesError) throw insertBranchesError;
+                branchesArray.forEach(b => results.success.push(`Filial "${b.nome}" adicionada.`));
+              }
+
+              // Inserir novos equipamentos
+              if (newEquipmentsToInsert.length > 0) {
+                const { error: insertEquipmentsError } = await supabase
+                  .from('equipamentos')
+                  .insert(newEquipmentsToInsert);
+                if (insertEquipmentsError) throw insertEquipmentsError;
+                newEquipmentsToInsert.forEach(e => results.success.push(`Equipamento "${e.placa}" cadastrado.`));
+              }
+
+              // Inserir todas as trocas (incluindo as de equipamentos existentes)
+              if (newTrocasToInsert.length > 0) {
+                const { error: insertTrocasError } = await supabase
+                  .from('trocas')
+                  .insert(newTrocasToInsert);
+                if (insertTrocasError) throw insertTrocasError;
+                newTrocasToInsert.forEach(t => results.success.push(`Troca para "${t.placa}" registrada.`));
+              }
+
+              let outputHtml = '<div><p class="font-bold text-green-700">Upload Concluído!</p>';
+              if (results.success.length > 0) {
+                outputHtml += `<p class="text-green-600">Sucessos (${results.success.length}):</p><ul class="list-disc list-inside">`;
+                results.success.forEach(msg => outputHtml += `<li>${msg}</li>`);
+                outputHtml += '</ul>';
+              }
+              if (results.errors.length > 0) {
+                outputHtml += `<p class="font-bold text-red-700 mt-4">Erros (${results.errors.length}):</p><ul class="list-disc list-inside">`;
+                results.errors.forEach(msg => outputHtml += `<li class="text-red-600">${msg}</li>`);
+                outputHtml += '</ul>';
+              }
+              outputHtml += '</div>';
+              bulkUploadResultsDisplay.innerHTML = outputHtml;
+              fetchPlateData(); // Re-fetch all data to update UI
+            } catch (e) {
+              console.error("Erro geral ao commitar upload em massa:", e);
+              bulkUploadResultsDisplay.innerHTML = `<p class="font-bold text-red-700">Erro fatal no upload em massa: ${e.message}</p>`;
+            }
+          };
+
+
+          const exportToExcel = React.useCallback(() => {
+            if (typeof window.XLSX === 'undefined') {
+              setMessage({ text: "A biblioteca de exportação (XLSX) ainda não foi carregada. Por favor, aguarde e tente novamente.", type: 'info' });
+              return;
+            }
+
+            const dataToExport = plateData.map(item => ({
+              'PLACA': item.plate,
+              'FILIAL': item.currentBranch,
+              'DATA': formatDate(item.currentStartDate)
+            }));
+
+            const ws = window.XLSX.utils.json_to_sheet(dataToExport);
+            const wb = window.XLSX.utils.book_new();
+            window.XLSX.utils.book_append_sheet(wb, ws, "Placas e Filiais");
+            window.XLSX.writeFile(wb, "Placas_e_Filiais.xlsx");
+          }, [plateData]);
+
+          // --- Funções de Autocomplete ---
+          const setupAutocomplete = React.useCallback((inputElementId, suggestionsContainerId, dataArray, keyField) => {
+            const inputElement = document.getElementById(inputElementId);
+            const suggestionsContainer = document.getElementById(suggestionsContainerId);
+
+            if (!inputElement || !suggestionsContainer) return;
+
+            const handleInput = () => {
+              const inputValue = inputElement.value.trim().toUpperCase();
+              suggestionsContainer.innerHTML = '';
+              suggestionsContainer.style.display = 'none';
+
+              if (inputValue.length === 0) {
+                return;
+              }
+
+              const filteredData = dataArray.filter(item => {
+                const valueToMatch = typeof item === 'string' ? item : item[keyField];
+                return valueToMatch.toUpperCase().includes(inputValue);
+              });
+
+              if (filteredData.length > 0) {
+                filteredData.forEach(item => {
+                  const suggestionValue = typeof item === 'string' ? item : item[keyField];
+                  const suggestionItem = document.createElement('div');
+                  suggestionItem.classList.add('p-2', 'cursor-pointer', 'hover:bg-blue-100', 'border-b', 'border-gray-200', 'last:border-b-0');
+                  suggestionItem.textContent = suggestionValue;
+                  suggestionItem.addEventListener('click', () => {
+                    inputElement.value = suggestionValue;
+                    // Atualiza o estado do React correspondente
+                    if (inputElementId === 'cadastro-equipamento-plate' || inputElementId === 'alteracao-filial-plate') setPlate(suggestionValue);
+                    if (inputElementId === 'cadastro-equipamento-branch' || inputElementId === 'alteracao-filial-branch' || inputElementId === 'cadastro-filial-name') setBranch(suggestionValue);
+                    suggestionsContainer.style.display = 'none';
+                  });
+                  suggestionsContainer.appendChild(suggestionItem);
+                });
+                suggestionsContainer.style.display = 'block';
+              }
             };
 
-            try {
-                if (editingId) {
-                    const { error } = await supabase
-                        .from(MAINTENANCE_RECORDS_TABLE)
-                        .update(recordData)
-                        .eq('id', editingId)
-                        .eq('user_id', gestorUserId); // Ensure only updating own records
+            const handleBlur = () => {
+              setTimeout(() => {
+                suggestionsContainer.style.display = 'none';
+              }, 100);
+            };
 
-                    if (error) throw error;
+            inputElement.addEventListener('input', handleInput);
+            inputElement.addEventListener('blur', handleBlur);
 
-                    showMessageBox("Sucesso", "Registro atualizado com sucesso!");
-                    logAppAction("Atualização de Veículo", `Veículo ${plate} (ID: ${editingId}) atualizado. Novos dados: ${JSON.stringify(recordData)}`);
-                    delete document.getElementById('maintenanceForm').dataset.editingId;
-                } else {
-                    const { error } = await supabase
-                        .from(MAINTENANCE_RECORDS_TABLE)
-                        .insert(recordData);
+            return () => {
+              inputElement.removeEventListener('input', handleInput);
+              inputElement.removeEventListener('blur', handleBlur);
+            };
+          }, []); // Sem dependências para que a função seja estável e não recrie listeners desnecessariamente
 
-                    if (error) throw error;
-
-                    showMessageBox("Sucesso", "Veículo adicionado com sucesso!");
-                    logAppAction("Adição de Veículo", `Novo veículo ${plate} adicionado. Dados: ${JSON.stringify(recordData)}`);
-                }
-                document.getElementById('maintenanceForm').reset();
-            } catch (e) {
-                console.error("Error adding/updating document: ", e);
-                showMessageBox("Erro", "Erro ao salvar registro: " + e.message);
-                logAppAction("Erro ao Salvar Veículo", `Falha ao salvar veículo ${plate}: ${e.message || e.details || JSON.stringify(e)}`);
+          // Efeitos para configurar autocompletes quando os dados são carregados
+          React.useEffect(() => {
+            if (plateData.length > 0) {
+              setupAutocomplete('cadastro-equipamento-plate', 'plate-suggestions-cadastro', plateData, 'plate');
+              setupAutocomplete('alteracao-filial-plate', 'plate-suggestions-alteracao', plateData, 'plate');
             }
-        });
+          }, [plateData, setupAutocomplete]);
 
-        // Export to CSV (Gestor)
-        document.getElementById('exportCsvBtn').addEventListener('click', async () => {
-            logAppAction("Exportação CSV", "Botão 'Exportar para CSV' clicado. Iniciando exportação.");
-            if (!isAuthReady) {
-                showMessageBox("Erro", "O sistema não está pronto para exportar. Por favor, aguarde a inicialização.");
-                logAppAction("Erro de Sistema", "Sistema não pronto para exportação CSV.");
-                return;
+          React.useEffect(() => {
+            if (branchesData.length > 0) {
+              setupAutocomplete('cadastro-equipamento-branch', 'branch-suggestions-cadastro', branchesData, 'nome');
+              setupAutocomplete('alteracao-filial-branch', 'branch-suggestions-alteracao', branchesData, 'nome');
+              setupAutocomplete('cadastro-filial-name', 'branch-suggestions-cadastro-filial', branchesData, 'nome'); // Adicionado para cadastro de filial
             }
-
-            try {
-                const { data: recordsToExport, error } = await supabase
-                    .from(MAINTENANCE_RECORDS_TABLE)
-                    .select('*')
-                    .eq('user_id', gestorUserId); // Filter by the current gestor's ID
-
-                if (error) throw error;
-
-                if (recordsToExport.length === 0) {
-                    showMessageBox("Informação", "Não há dados para exportar para CSV.");
-                    logAppAction("Exportação CSV", "Nenhum dado encontrado para exportar.");
-                    return;
-                }
-
-                let csvContent = "Placa,Quilometragem Atual (Km),Próxima Revisão (Km),Km Faltantes,Responsável\n";
-
-                recordsToExport.forEach(record => {
-                    const nextMaintenanceDueKm = record.next_maintenance_due_km || 0;
-                    const kmRemainingForMaintenance = nextMaintenanceDueKm - (record.current_mileage || 0);
-
-                    const plate = record.plate;
-                    const currentMileage = record.current_mileage || 'N/A';
-                    const nextMaintenanceKm = nextMaintenanceDueKm;
-                    const kmFaltantes = kmRemainingForMaintenance <= 0 ? 'VENCIDA' : kmRemainingForMaintenance;
-                    const employee = record.responsible_employee || 'Não atribuído';
-
-                    csvContent += `${plate},${currentMileage},${nextMaintenanceKm},${kmFaltantes},${employee}\n`;
-                });
-
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                if (link.download !== undefined) {
-                    const url = URL.createObjectURL(blob);
-                    link.setAttribute('href', url);
-                    link.setAttribute('download', 'controle_manutencao_veiculos.csv');
-                    link.style.visibility = 'hidden';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    showMessageBox("Exportação Concluída", "Dados exportados para 'controle_manutencao_veiculos.csv' com sucesso!");
-                    logAppAction("Exportação CSV", `Exportação de ${recordsToExport.length} registros para CSV concluída.`);
-                } else {
-                    showMessageBox("Erro de Navegador", "Seu navegador não suporta download de arquivos diretamente. Por favor, copie o conteúdo abaixo e cole em um arquivo de texto, salvando como .csv:\n\n" + csvContent);
-                    logAppAction("Exportação CSV", "Erro de navegador ao exportar. Usuário instruído a copiar o conteúdo.");
-                }
-            } catch (e) {
-                console.error("Error exporting data: ", e);
-                showMessageBox("Erro na Exportação", "Erro ao exportar dados: " + e.message);
-                logAppAction("Erro na Exportação CSV", `Falha ao exportar dados: ${e.message || e.details || JSON.stringify(e)}`);
-            }
-        });
+          }, [branchesData, setupAutocomplete]);
 
 
-        // Driver Portal - Daily Mileage Form Submission
-        document.getElementById('dailyMileageForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const driverResponsibleEmployee = document.getElementById('driverResponsibleEmployee').value;
-            const driverPlate = document.getElementById('driverPlate').value.toUpperCase().trim();
-            const driverDailyMileage = parseInt(document.getElementById('driverDailyMileage').value);
-
-            logAppAction("Envio de Formulário (Motorista)", `Tentativa de registrar quilometragem. Placa: ${driverPlate}, Funcionário: ${driverResponsibleEmployee}, KM: ${driverDailyMileage}`);
-
-            if (!isAuthReady) {
-                showMessageBox("Erro", "O sistema não está pronto. Por favor, aguarde a inicialização.");
-                logAppAction("Erro de Sistema", "Sistema não pronto para envio de formulário do Motorista.");
-                return;
-            }
-
-            if (!driverResponsibleEmployee || !driverPlate || isNaN(driverDailyMileage) || driverDailyMileage < 0) {
-                showMessageBox("Erro de Entrada", "Por favor, preencha todos os campos corretamente.");
-                logAppAction("Erro de Entrada", "Campos do formulário de quilometragem incompletos/inválidos.");
-                return;
-            }
-
-            try {
-                const { data: vehicles, error: selectError } = await supabase
-                    .from(MAINTENANCE_RECORDS_TABLE)
-                    .select('id, plate, responsible_employee')
-                    .eq('plate', driverPlate)
-                    .eq('responsible_employee', driverResponsibleEmployee)
-                    .eq('user_id', gestorUserId); // Filter by the current gestor's ID
-
-                if (selectError) throw selectError;
-
-                let vehicleFound = false;
-
-                if (vehicles && vehicles.length > 0) {
-                    const vehicleToUpdate = vehicles[0];
-                    const { error: updateError } = await supabase
-                        .from(MAINTENANCE_RECORDS_TABLE)
-                        .update({ current_mileage: driverDailyMileage })
-                        .eq('id', vehicleToUpdate.id)
-                        .eq('user_id', gestorUserId); // Ensure only updating own records
-
-                    if (updateError) throw updateError;
-
-                    logAppAction("Atualização de Banco de Dados", `Documento de veículo (ID: ${vehicleToUpdate.id}, Placa: ${driverPlate}) atualizado com nova KM: ${driverDailyMileage}.`);
-
-                    // A inserção de log de quilometragem foi removida pois a seção de logs foi removida.
-
-                    showMessageBox("Sucesso", `Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km!`);
-                    logAppAction("Atualização de Quilometragem", `Quilometragem de ${driverPlate} atualizada para ${driverDailyMileage} Km.`);
-                    vehicleFound = true;
-                }
-
-                if (!vehicleFound) {
-                    showMessageBox("Veículo Não Encontrado", `Veículo com placa "${driverPlate}" e funcionário "${driverResponsibleEmployee}" não encontrado. Verifique os dados ou contate o gestor.`);
-                    logAppAction("Veículo Não Encontrado", `Tentativa de atualizar quilometragem para veículo ${driverPlate} por ${driverResponsibleEmployee} falhou: veículo não encontrado.`);
-                }
-                document.getElementById('dailyMileageForm').reset();
-            } catch (e) {
-                console.error("Error updating daily mileage or adding log: ", e);
-                showMessageBox("Erro", "Erro ao registrar quilometragem: " + e.message);
-                logAppAction("Erro ao Registrar Quilometragem", `Falha ao registrar quilometragem para ${driverPlate}: ${e.message || e.details || JSON.stringify(e)}`);
-            }
-        });
-
-        // Employee Form Submission (Gestor)
-        document.getElementById('employeeForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const employeeName = document.getElementById('employeeName').value.trim();
-            logAppAction("Envio de Formulário (Funcionário)", `Tentativa de adicionar funcionário: "${employeeName}"`);
-
-            if (!employeeName) {
-                showMessageBox("Erro de Entrada", "Por favor, digite o nome do funcionário.");
-                logAppAction("Erro de Entrada", "Nome do funcionário vazio.");
-                return;
-            }
-
-            if (!isAuthReady) {
-                showMessageBox("Erro", "O sistema não está pronto. Por favor, aguarde a inicialização.");
-                logAppAction("Erro de Sistema", "Sistema não pronto para adicionar funcionário.");
-                return;
-            }
-
-            try {
-                // Check if employee already exists to prevent duplicates
-                const { data: existingEmployee, error: selectError } = await supabase
-                    .from(EMPLOYEES_TABLE)
-                    .select('id')
-                    .eq('name', employeeName)
-                    .eq('user_id', gestorUserId)
-                    .single();
-
-                if (selectError && selectError.code !== 'PGRST116') { // PGRST116 means no rows found, which is fine
-                    if (selectError.details && selectError.details.includes('0 rows')) {
-                        // No existing employee, proceed
-                    } else {
-                        throw selectError;
-                    }
-                }
-
-                if (existingEmployee) {
-                    showMessageBox("Erro", `O funcionário "${employeeName}" já existe.`);
-                    logAppAction("Adição de Funcionário", `Tentativa de adicionar funcionário duplicado: "${employeeName}".`);
-                    return;
-                }
-
-                const { error } = await supabase
-                    .from(EMPLOYEES_TABLE)
-                    .insert({ name: employeeName, user_id: gestorUserId });
-
-                if (error) throw error;
-
-                showMessageBox("Sucesso", `Funcionário "${employeeName}" adicionado com sucesso!`);
-                logAppAction("Adição de Funcionário", `Funcionário "${employeeName}" adicionado.`);
-                document.getElementById('employeeForm').reset();
-            } catch (e) {
-                console.error("Error adding employee: ", e);
-                showMessageBox("Erro", "Erro ao adicionar funcionário: " + e.message);
-                logAppAction("Erro ao Adicionar Funcionário", `Falha ao adicionar funcionário "${employeeName}": ${e.message || e.details || JSON.stringify(e)}`);
-            }
-        });
-
-
-        // --- Page Navigation Logic ---
-
-        // Go to Driver Portal
-        document.getElementById('goToDriverPortalBtn').addEventListener('click', () => {
-            document.getElementById('landingPage').classList.add('hidden');
-            document.getElementById('gestorSection').classList.add('hidden');
-            // document.getElementById('logsSection').classList.add('hidden'); // Removido
-            document.getElementById('driverPortalSection').classList.remove('hidden');
-            document.getElementById('dailyMileageForm').reset();
-            populateEmployeeSelects(); // Ensure driver employee list is updated
-            logAppAction("Navegação", "Acessando Portal do Motorista.");
-        });
-
-        // Go to Gestor Portal (Login)
-        document.getElementById('goToGestorPortalBtn').addEventListener('click', () => {
-            document.getElementById('landingPage').classList.add('hidden');
-            document.getElementById('driverPortalSection').classList.add('hidden');
-            // document.getElementById('logsSection').classList.add('hidden'); // Removido
-            document.getElementById('gestorSection').classList.remove('hidden');
-            document.getElementById('gestorLoginForm').reset();
-            document.getElementById('gestorLoginError').classList.add('hidden');
-            document.getElementById('gestorLogin').classList.remove('hidden');
-            document.getElementById('gestorContent').classList.add('hidden');
-            // Default to vehicle management when entering gestor portal
-            document.getElementById('vehicleManagementSection').classList.remove('hidden');
-            document.getElementById('employeeManagementSection').classList.add('hidden');
-            document.getElementById('showVehicleManagement').classList.add('border-indigo-500', 'text-indigo-600');
-            document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
-            logAppAction("Navegação", "Acessando Portal do Gestor (Tela de Login).");
-        });
-
-        // O botão goToLogsPortalBtn e seu listener foram removidos.
-
-        // Back to Landing Page from Driver Portal
-        document.getElementById('backToLandingFromDriverBtn').addEventListener('click', () => {
-            document.getElementById('driverPortalSection').classList.add('hidden');
-            document.getElementById('landingPage').classList.remove('hidden');
-            logAppAction("Navegação", "Voltando para a Tela Inicial do Portal do Motorista.");
-        });
-
-        // Back to Landing Page from Gestor Portal
-        document.getElementById('backToLandingFromGestorBtn').addEventListener('click', () => {
-            document.getElementById('gestorSection').classList.add('hidden');
-            document.getElementById('landingPage').classList.remove('hidden');
-            logAppAction("Navegação", "Voltando para a Tela Inicial do Portal do Gestor.");
-        });
-
-        // O botão backToLandingFromLogsBtn e seu listener foram removidos.
-
-        // Gestor Login Logic
-        document.getElementById('gestorLoginForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const enteredPassword = document.getElementById('gestorPassword').value;
-            logAppAction("Login do Gestor", `Tentativa de login com senha: "${enteredPassword}"`);
-            const gestorLoginError = document.getElementById('gestorLoginError');
-
-            if (enteredPassword === GESTOR_PASSWORD) {
-                gestorLoginError.classList.add('hidden');
-                document.getElementById('gestorLogin').classList.add('hidden');
-                document.getElementById('gestorContent').classList.remove('hidden');
-                setupRealtimeListenerGestor(); // Start listening for gestor data
-                populateEmployeeSelects(); // Populate selects immediately after login
-                logAppAction("Login do Gestor", "Login bem-sucedido.");
-            } else {
-                gestorLoginError.classList.remove('hidden');
-                logAppAction("Login do Gestor", "Login falhou: Senha incorreta.");
-            }
-        });
-
-        // Forgot Password Logic
-        document.getElementById('forgotPasswordBtn').addEventListener('click', async () => {
-            logAppAction("Recuperação de Senha", "Botão 'Esqueci minha senha?' clicado. Exibindo informações.");
-            showMessageBox(
-                "Recuperação de Senha (Informação)",
-                `Para um sistema de recuperação de senha completo com envio de código por e-mail e alteração de senha, seria necessário um servidor de back-end.
-                 Nesta versão local, você pode usar a palavra-chave de segurança para revelar a senha.
-                 Por favor, digite a palavra-chave de segurança (sensível a maiúsculas/minúsculas) para continuar:`
+          // Renderização condicional da UI
+          if (loading && loggedInAppUser) { // Apenas mostra loading se o usuário já estiver logado e dados estiverem sendo buscados
+            return (
+              <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <div className="text-xl font-semibold text-gray-700 animate-pulse">Carregando dados...</div>
+              </div>
             );
+          }
 
-            setTimeout(async () => {
-                const keyword = prompt("Palavra-chave de segurança:");
-                logAppAction("Recuperação de Senha", `Palavra-chave digitada no prompt: "${keyword}"`);
+          if (error) { // Erro global
+            return (
+              <div className="flex items-center justify-center min-h-screen bg-red-50 text-red-800 p-6 rounded-lg shadow-lg">
+                {React.createElement(LucideReact.XCircle, { className: "w-6 h-6 mr-3" })}
+                <span className="font-medium">{error}</span>
+              </div>
+            );
+          }
 
-                if (keyword === SECURITY_KEYWORD) {
-                    showMessageBox("Recuperação de Senha", `Sua senha do Gestor é: ${GESTOR_PASSWORD}`);
-                    logAppAction("Recuperação de Senha", "Palavra-chave correta. Senha do Gestor exibida.");
-                } else if (keyword !== null) {
-                    showMessageBox("Palavra-chave Incorreta", `Palavra-chave de segurança incorreta. Se você esqueceu a palavra-chave, por favor, entre em contato com o administrador em: ${SECURITY_EMAIL}`);
-                    logAppAction("Recuperação de Senha", `Palavra-chave incorreta. E-mail de contato: ${SECURITY_EMAIL}`);
-                } else {
-                    logAppAction("Recuperação de Senha", "Prompt de palavra-chave cancelado pelo usuário.");
-                }
-            }, 500);
-        });
+          // Renderiza a tela de login se não houver usuário logado
+          if (!loggedInAppUser) {
+            return (
+              <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 sm:p-6 flex flex-col items-center justify-center">
+                <div className="w-full max-w-4xl bg-white shadow-xl rounded-2xl p-6 sm:p-10 mb-8 transition-all duration-300 ease-in-out transform hover:scale-[1.005]">
+                  <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-800">
+                    Gerenciamento de Placas e Filiais
+                  </h1>
+                  <div id="auth-section" className="flex flex-col items-center justify-center gap-6 mb-8">
+                    <h2 className="text-3xl font-bold text-gray-800 text-center">Acessar o Sistema</h2>
+                    <p className="text-gray-600 text-center text-lg leading-relaxed max-w-2xl">
+                      Faça login para continuar.
+                    </p>
+                    <form onSubmit={handleLogin} className="w-full max-w-sm p-6 bg-gray-50 rounded-lg shadow-inner">
+                      <h3 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Login</h3>
+                      <div className="mb-4">
+                        <label htmlFor="login-username-input" className="block text-sm font-medium text-gray-700 mb-2">Usuário (Login)</label>
+                        <input
+                          type="text"
+                          id="login-username-input"
+                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400"
+                          placeholder="seu.login"
+                          value={loginUsername}
+                          onChange={(e) => setLoginUsername(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="mb-6">
+                        <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                        <input
+                          type="password"
+                          id="login-password"
+                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400"
+                          placeholder="********"
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <button type="submit"
+                        className="w-full px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+                        Entrar
+                      </button>
+                      <MessageDisplay text={message.text} type={message.type} />
+                    </form>
+                  </div>
+                </div>
+              </div>
+            );
+          }
 
-        // Gestor Tab Navigation
-        document.getElementById('showVehicleManagement').addEventListener('click', () => {
-            document.getElementById('vehicleManagementSection').classList.remove('hidden');
-            document.getElementById('employeeManagementSection').classList.add('hidden');
-            document.getElementById('showVehicleManagement').classList.add('border-indigo-500', 'text-indigo-600');
-            document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
-            logAppAction("Navegação (Gestor)", "Acessando aba 'Gerenciar Veículos'.");
-        });
+          // Renderiza a UI principal após o login
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 sm:p-6 font-sans flex flex-col items-center justify-center">
+              <div className="w-full max-w-4xl bg-white shadow-xl rounded-2xl p-6 sm:p-10 mb-8 transition-all duration-300 ease-in-out transform hover:scale-[1.005]">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-800">
+                  Gerenciamento de Placas e Filiais
+                </h1>
 
-        document.getElementById('showEmployeeManagement').addEventListener('click', () => {
-            document.getElementById('vehicleManagementSection').classList.add('hidden');
-            document.getElementById('employeeManagementSection').classList.remove('hidden');
-            document.getElementById('showEmployeeManagement').classList.add('border-indigo-500', 'text-indigo-600');
-            document.getElementById('showVehicleManagement').classList.remove('border-indigo-500', 'text-indigo-600');
-            logAppAction("Navegação (Gestor)", "Acessando aba 'Gerenciar Funcionários'.");
-        });
+                {/* Barra de Informação do Usuário Logado e Botão de Sair */}
+                <div className="flex justify-between items-center mb-6 p-3 bg-gray-50 rounded-lg shadow-sm">
+                  <p className="text-gray-700 font-semibold">Usuário: <span id="current-user-display" className="text-blue-700">{loggedInAppUser.displayName || loggedInAppUser.login}</span></p>
+                  <button onClick={handleLogout}
+                    className="px-4 py-2 bg-red-200 text-red-700 rounded-lg font-semibold hover:bg-red-300 transition-colors duration-200 shadow-sm">
+                    Sair
+                  </button>
+                </div>
 
+                {/* Seção de Botões de Navegação Inicial */}
+                {currentView === null && (
+                  <div className="flex flex-col gap-4 mb-8">
+                    <button
+                      className="flex items-center justify-center px-8 py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:bg-blue-700"
+                      onClick={() => { setCurrentView('cadastroEquipamento'); setMessage({text:'', type:''}); setPlate(''); setBranch(''); setDate(''); }}
+                    >
+                      {React.createElement(LucideReact.CheckCircle, { className: "w-6 h-6 mr-3" })} CADASTRO DE EQUIPAMENTO
+                    </button>
+                    <button
+                      className="flex items-center justify-center px-8 py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:bg-blue-700"
+                      onClick={() => { setCurrentView('alteracaoFilial'); setMessage({text:'', type:''}); setPlate(''); setBranch(''); setDate(''); }}
+                    >
+                      {React.createElement(LucideReact.HardHat, { className: "w-6 h-6 mr-3" })} ALTERAÇÃO DE FILIAL
+                    </button>
+                    <button
+                      className="flex items-center justify-center px-8 py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:bg-blue-700"
+                      onClick={() => { setCurrentView('cadastroFilial'); setMessage({text:'', type:''}); setBranch(''); }}
+                    >
+                      {React.createElement(LucideReact.Briefcase, { className: "w-6 h-6 mr-3" })} CADASTRO DE FILIAL
+                    </button>
+                    <button
+                      className="flex items-center justify-center px-8 py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:bg-blue-700"
+                      onClick={() => { setCurrentView('dashboard'); setMessage({text:'', type:''}); setDashboardSelectedBranch(''); }}
+                    >
+                      {React.createElement(LucideReact.Info, { className: "w-6 h-6 mr-3" })} DASHBOARD
+                    </button>
+                    {loggedInAppUser && loggedInAppUser.isAdmin && (
+                      <button
+                        className="flex items-center justify-center px-8 py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 bg-gradient-to-r from-purple-600 to-pink-700 text-white hover:bg-purple-700"
+                        onClick={() => { setCurrentView('adminPanel'); setCreateUserMessage({text:'', type:''}); setNewUserName(''); setNewUserDisplayName(''); setNewUserPassword(''); setNewUserIsAdmin(false); }}
+                      >
+                        {React.createElement(LucideReact.Info, { className: "w-6 h-6 mr-3" })} ADMINISTRAÇÃO
+                      </button>
+                    )}
+                    <button
+                        className="flex items-center justify-center px-8 py-4 rounded-xl font-bold text-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 bg-gradient-to-r from-teal-600 to-cyan-700 text-white hover:bg-teal-700"
+                        onClick={() => { setCurrentView('urlTransformation'); setMessage({text:'', type:''}); }}
+                    >
+                        {React.createElement(LucideReact.Info, { className: "w-6 h-6 mr-3" })} TRANSFORMAÇÃO DE URL
+                    </button>
+                  </div>
+                )}
 
-        // Initial page load state
-        window.onload = () => {
-            document.getElementById('landingPage').classList.remove('hidden');
-            document.getElementById('driverPortalSection').classList.add('hidden');
-            document.getElementById('gestorSection').classList.add('hidden');
-            // document.getElementById('logsSection').classList.add('hidden'); // Removido
-            logAppAction("Inicialização do Aplicativo", "Página carregada.");
-            checkAndAddInitialData(); // Call initial data check on load
+                {/* Conteúdo da Seção: CADASTRO DE EQUIPAMENTO */}
+                {currentView === 'cadastroEquipamento' && (
+                  <div className="mt-8 p-6 bg-white rounded-xl shadow-md border border-gray-100 flex flex-col items-center">
+                    <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Cadastro de Equipamento</h2>
+                    <p className="text-gray-600 text-center mb-8 text-lg leading-relaxed max-w-2xl">
+                      Utilize esta seção para registrar novos equipamentos com sua placa, filial e data inicial.
+                    </p>
+
+                    <div className="flex gap-4 mb-6">
+                      <button
+                        onClick={() => setCurrentCadastroMode('manual')}
+                        className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 ${currentCadastroMode === 'manual' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                      >
+                        {React.createElement(LucideReact.Info, { className: "w-5 h-5 mr-2" })}
+                        Cadastro Manual
+                      </button>
+                      <button
+                        onClick={() => setCurrentCadastroMode('bulk')}
+                        className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 ${currentCadastroMode === 'bulk' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                      >
+                        {React.createElement(LucideReact.Info, { className: "w-5 h-5 mr-2" })}
+                        Upload em Massa
+                      </button>
+                    </div>
+
+                    {/* Formulário de Cadastro Manual */}
+                    {currentCadastroMode === 'manual' && (
+                      <form onSubmit={handleSaveEquipment} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full max-w-2xl">
+                        <div>
+                          <label htmlFor="cadastro-equipamento-plate" className="block text-sm font-medium text-gray-700 mb-2">PLACA</label>
+                          <input
+                            type="text"
+                            id="cadastro-equipamento-plate"
+                            value={plate}
+                            onChange={(e) => setPlate(e.target.value)}
+                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400 uppercase"
+                            placeholder="Ex: ABC1234"
+                            required
+                          />
+                          <div id="plate-suggestions-cadastro" className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto" style={{display: 'none'}}></div>
+                        </div>
+                        <div>
+                          <label htmlFor="cadastro-equipamento-branch" className="block text-sm font-medium text-gray-700 mb-2">FILIAL (Sigla)</label>
+                          <input
+                            type="text"
+                            id="cadastro-equipamento-branch"
+                            value={branch}
+                            onChange={(e) => setBranch(e.target.value)}
+                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400 uppercase"
+                            placeholder="Ex: IPA"
+                            required
+                          />
+                          <div id="branch-suggestions-cadastro" className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto" style={{display: 'none'}}></div>
+                        </div>
+                        <div>
+                          <label htmlFor="cadastro-equipamento-date" className="block text-sm font-medium text-gray-700 mb-2">DATA</label>
+                          <input
+                            type="date"
+                            id="cadastro-equipamento-date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400"
+                            required
+                          />
+                        </div>
+                        <div className="md:col-span-3 flex justify-center mt-4">
+                          <button type="submit"
+                            className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+                            Cadastrar Equipamento
+                          </button>
+                        </div>
+                      </form>
+                    )}
+
+                    {/* Formulário de Upload em Massa */}
+                    {currentCadastroMode === 'bulk' && (
+                      <div className="w-full max-w-2xl">
+                        <label htmlFor="bulk-upload-textarea" className="block text-sm font-medium text-gray-700 mb-2">Cole os dados aqui (uma linha por equipamento, separados por TAB: PLACA &lt;tab&gt; FILIAL &lt;tab&gt; DATA)</label>
+                        <textarea id="bulk-upload-textarea" rows="10"
+                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400"
+                          placeholder="Ex:&#10;PLACA	ABC1234	FILIAL	IPA	DATA	15/07/2025&#10;PLACA	XYZ5678	FILIAL	SP	DATA	20/03/2023"></textarea>
+                        <div className="flex justify-center mt-4">
+                          <button onClick={handleBulkUpload}
+                            className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+                            Processar Upload
+                          </button>
+                        </div>
+                        <div id="bulk-upload-results-display" className="mt-6 p-4 bg-gray-50 rounded-lg shadow-inner text-sm text-gray-700" style={{display: 'none'}}>
+                          {/* Resultados do upload em massa serão exibidos aqui */}
+                          <p className="text-center text-blue-600">Processando... <span id="bulk-upload-progress">0%</span></p>
+                        </div>
+                      </div>
+                    )}
+
+                    <MessageDisplay text={message.text} type={message.type} />
+                    <button
+                      onClick={() => setCurrentView(null)}
+                      className="mt-8 flex items-center px-6 py-2 bg-gray-100 text-gray-600 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200 shadow-sm"
+                    >
+                      {React.createElement(LucideReact.ArrowLeft, { className: "w-5 h-5 mr-2" })} Voltar
+                    </button>
+                  </div>
+                )}
+
+                {/* Conteúdo da Seção: ALTERAÇÃO DE FILIAL */}
+                {currentView === 'alteracaoFilial' && (
+                  <div className="mt-8 p-6 bg-white rounded-xl shadow-md border border-gray-100 flex flex-col items-center">
+                    <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Alteração de Filial</h2>
+                    <p className="text-gray-600 text-center mb-8 text-lg leading-relaxed max-w-2xl">
+                      Atualize a filial de um equipamento existente. A placa deve estar previamente cadastrada.
+                    </p>
+                    <form onSubmit={handleAlterBranch} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full max-w-2xl">
+                      <div>
+                        <label htmlFor="alteracao-filial-plate" className="block text-sm font-medium text-gray-700 mb-2">PLACA</label>
+                        <input
+                          type="text"
+                          id="alteracao-filial-plate"
+                          value={plate}
+                          onChange={(e) => setPlate(e.target.value)}
+                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400 uppercase"
+                          placeholder="Ex: ABC1234"
+                          required
+                        />
+                        <div id="plate-suggestions-alteracao" className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto" style={{display: 'none'}}></div>
+                      </div>
+                      <div>
+                        <label htmlFor="alteracao-filial-branch" className="block text-sm font-medium text-gray-700 mb-2">NOVA FILIAL (Sigla)</label>
+                        <input
+                          type="text"
+                          id="alteracao-filial-branch"
+                          value={branch}
+                          onChange={(e) => setBranch(e.target.value)}
+                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400 uppercase"
+                          placeholder="Ex: SP"
+                          required
+                        />
+                        <div id="branch-suggestions-alteracao" className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto" style={{display: 'none'}}></div>
+                      </div>
+                      <div>
+                        <label htmlFor="alteracao-filial-date" className="block text-sm font-medium text-gray-700 mb-2">DATA DA ALTERAÇÃO</label>
+                        <input
+                          type="date"
+                          id="alteracao-filial-date"
+                          value={date}
+                          onChange={(e) => setDate(e.target.value)}
+                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div className="md:col-span-3 flex justify-center mt-4">
+                        <button type="submit"
+                          className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+                          Alterar Filial
+                        </button>
+                      </div>
+                    </form>
+                    <MessageDisplay text={message.text} type={message.type} />
+                    <button
+                      onClick={() => setCurrentView(null)}
+                      className="mt-8 flex items-center px-6 py-2 bg-gray-100 text-gray-600 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200 shadow-sm"
+                    >
+                      {React.createElement(LucideReact.ArrowLeft, { className: "w-5 h-5 mr-2" })} Voltar
+                    </button>
+                  </div>
+                )}
+
+                {/* Conteúdo da Seção: CADASTRO DE FILIAL */}
+                {currentView === 'cadastroFilial' && (
+                  <div className="mt-8 p-6 bg-white rounded-xl shadow-md border border-gray-100 flex flex-col items-center">
+                    <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Cadastro de Filial</h2>
+                    <p className="text-gray-600 text-center mb-8 text-lg leading-relaxed max-w-2xl">
+                      Registre novas filiais no sistema para que possam ser utilizadas no cadastro e alteração de equipamentos.
+                    </p>
+                    <form onSubmit={handleRegisterBranch} className="grid grid-cols-1 gap-6 mb-8 w-full max-w-md">
+                      <div>
+                        <label htmlFor="cadastro-filial-name" className="block text-sm font-medium text-gray-700 mb-2">NOME DA FILIAL (Sigla)</label>
+                        <input
+                          type="text"
+                          id="cadastro-filial-name"
+                          value={branch}
+                          onChange={(e) => setBranch(e.target.value)}
+                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400 uppercase"
+                          placeholder="Ex: ITA"
+                          required
+                        />
+                        <div id="branch-suggestions-cadastro-filial" className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto" style={{display: 'none'}}></div>
+                      </div>
+                      <div className="flex justify-center mt-4">
+                        <button type="submit"
+                          className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+                          Cadastrar Filial
+                        </button>
+                      </div>
+                    </form>
+                    <MessageDisplay text={message.text} type={message.type} />
+                    <button
+                      onClick={() => setCurrentView(null)}
+                      className="mt-8 flex items-center px-6 py-2 bg-gray-100 text-gray-600 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200 shadow-sm"
+                    >
+                      {React.createElement(LucideReact.ArrowLeft, { className: "w-5 h-5 mr-2" })} Voltar
+                    </button>
+                  </div>
+                )}
+
+                {/* Conteúdo da Seção: DASHBOARD */}
+                {currentView === 'dashboard' && (
+                  <div className="mt-8 p-6 bg-white rounded-xl shadow-md border border-gray-100 flex flex-col items-center">
+                    <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Dashboard de Equipamentos por Filial</h2>
+                    <p className="text-gray-600 text-center mb-8 text-lg leading-relaxed max-w-2xl">
+                      Selecione uma filial para visualizar a quantidade de equipamentos e suas respectivas placas.
+                    </p>
+                    <div className="w-full max-w-md mb-8">
+                      <label htmlFor="dashboard-branch-select" className="block text-sm font-medium text-gray-700 mb-2">SELECIONE A FILIAL</label>
+                      <select id="dashboard-branch-select"
+                        value={dashboardSelectedBranch}
+                        onChange={(e) => setDashboardSelectedBranch(e.target.value)}
+                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400">
+                        <option value="">-- Selecione uma Filial --</option>
+                        {branchesData.map(branchItem => (
+                          <option key={branchItem.nome} value={branchItem.nome}>{branchItem.nome}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {dashboardSelectedBranch && (
+                      <div id="dashboard-results" className="w-full max-w-2xl bg-gray-50 p-6 rounded-lg shadow-inner text-center">
+                        <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+                          {dashboardSelectedBranch} - {plateData.filter(item => item.currentBranch === dashboardSelectedBranch).length} Equipamentos
+                        </h3>
+                        <ul id="dashboard-equipment-list" className="list-disc list-inside text-gray-700 text-left space-y-1">
+                          {plateData.filter(item => item.currentBranch === dashboardSelectedBranch).length === 0 ? (
+                            <li className="text-gray-500">Nenhum equipamento encontrado para esta filial.</li>
+                          ) : (
+                            plateData.filter(item => item.currentBranch === dashboardSelectedBranch).map(item => (
+                              <li key={item.id}>{item.plate}</li>
+                            ))
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                    <MessageDisplay text={message.text} type={message.type} />
+                    <button
+                      onClick={exportToExcel}
+                      className="mt-6 px-8 py-3 bg-green-600 text-white font-bold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105"
+                    >
+                      Baixar para Excel
+                    </button>
+                    <button
+                      onClick={() => setCurrentView(null)}
+                      className="mt-8 flex items-center px-6 py-2 bg-gray-100 text-gray-600 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200 shadow-sm"
+                    >
+                      {React.createElement(LucideReact.ArrowLeft, { className: "w-5 h-5 mr-2" })} Voltar
+                    </button>
+                  </div>
+                )}
+
+                {/* Seção de Administração */}
+                {currentView === 'adminPanel' && loggedInAppUser && loggedInAppUser.isAdmin && (
+                  <div className="mt-8 p-6 bg-white rounded-xl shadow-md border border-gray-100 flex flex-col items-center">
+                    <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Painel de Administração</h2>
+                    <p className="text-gray-600 text-center mb-8 text-lg leading-relaxed max-w-2xl">
+                      Ferramentas administrativas para gerenciar usuários.
+                    </p>
+                    
+                    {/* Formulário para Criar Novo Usuário */}
+                    <form onSubmit={handleCreateUser} className="w-full max-w-md p-6 bg-gray-50 rounded-lg shadow-inner mb-6">
+                      <h3 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Criar Novo Usuário</h3>
+                      <div className="mb-4">
+                        <label htmlFor="new-user-username" className="block text-sm font-medium text-gray-700 mb-2">Nome de Usuário (Login)</label>
+                        <input
+                          type="text"
+                          id="new-user-username"
+                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400"
+                          placeholder="nome.usuario"
+                          value={newUserName}
+                          onChange={(e) => setNewUserName(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="mb-4">
+                        <label htmlFor="new-user-display-name" className="block text-sm font-medium text-gray-700 mb-2">Nome de Exibição</label>
+                        <input
+                          type="text"
+                          id="new-user-display-name"
+                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400"
+                          placeholder="Nome para exibir (ex: João Silva)"
+                          value={newUserDisplayName}
+                          onChange={(e) => setNewUserDisplayName(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="mb-6">
+                        <label htmlFor="new-user-password" className="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+                        <input
+                          type="password"
+                          id="new-user-password"
+                          className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out hover:border-blue-400"
+                          placeholder="********"
+                          value={newUserPassword}
+                          onChange={(e) => setNewUserPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="mb-6 flex items-center">
+                        <input type="checkbox" id="new-user-is-admin"
+                          checked={newUserIsAdmin}
+                          onChange={(e) => setNewUserIsAdmin(e.target.checked)}
+                          className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                        <label htmlFor="new-user-is-admin" className="ml-2 block text-sm text-gray-900">É Administrador?</label>
+                      </div>
+                      <button type="submit"
+                        className="w-full px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-700 text-white font-bold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+                        Criar Usuário
+                      </button>
+                      <MessageDisplay text={createUserMessage.text} type={createUserMessage.type} />
+                    </form>
+
+                    <div className="mt-8 p-4 bg-yellow-100 text-yellow-800 rounded-lg shadow-inner text-sm">
+                        <p className="font-semibold">Nota:</p>
+                        <p>A redefinição de senha para outros usuários não está disponível diretamente no cliente por razões de segurança. Geralmente, isso é feito através de um fluxo de e-mail de redefinição de senha ou por ferramentas de administração de backend.</p>
+                    </div>
+
+                    <button
+                      onClick={() => setCurrentView(null)}
+                      className="mt-8 flex items-center px-6 py-2 bg-gray-100 text-gray-600 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200 shadow-sm"
+                    >
+                      {React.createElement(LucideReact.ArrowLeft, { className: "w-5 h-5 mr-2" })} Voltar
+                    </button>
+                  </div>
+                )}
+                
+                {/* Conteúdo da Seção: URL Transformation (Placeholder) */}
+                {currentView === 'urlTransformation' && (
+                  <div className="mt-8 p-6 bg-white rounded-xl shadow-md border border-gray-100 flex flex-col items-center">
+                      <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Transformação de URL</h2>
+                      <p className="text-gray-600 text-center mb-8 text-lg leading-relaxed max-w-2xl">
+                          Esta é a seção para a funcionalidade de transformação de URL. Você pode adicionar seu formulário e lógica aqui.
+                      </p>
+                      <MessageDisplay text={message.text} type={message.type} />
+                      <button
+                          onClick={() => setCurrentView(null)}
+                          className="mt-8 flex items-center px-6 py-2 bg-gray-100 text-gray-600 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200 shadow-sm"
+                      >
+                          {React.createElement(LucideReact.ArrowLeft, { className: "w-5 h-5 mr-2" })} Voltar
+                      </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
         };
+
+        // Renderiza o componente App no elemento com id 'root'
+        ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
 </html>
-```
