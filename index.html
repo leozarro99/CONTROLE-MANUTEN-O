@@ -98,18 +98,24 @@
 <body class="min-h-screen flex items-center justify-center">
 
     <!-- Landing Page (Initial View) -->
-    <div id="landingPage" class="bg-white p-10 rounded-xl shadow-lg shadow-blue-200/50 w-full max-w-md md:max-w-xl lg:max-w-2xl border border-gray-100 text-center md:p-14 lg:p-16 transform transition-transform duration-300 ease-in-out">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-10">
-            <i class="fas fa-tools text-blue-600 mr-4"></i>Controle de Manutenção
-        </h1>
+    <div id="landingPage" class="bg-white p-10 rounded-xl shadow-2xl shadow-blue-300/50 w-full max-w-md md:max-w-xl lg:max-w-2xl border border-gray-100 text-center md:p-14 lg:p-16 transform transition-transform duration-500 ease-in-out scale-100 hover:scale-101">
+        <div class="mb-10">
+            <i class="fas fa-cogs text-blue-600 text-6xl mb-4 animate-pulse"></i> <!-- Larger, animated icon -->
+            <h1 class="text-5xl md:text-6xl font-extrabold text-gray-800 mb-4 leading-tight">
+                Controle de Manutenção
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 font-medium">
+                Gerencie sua frota com eficiência e mantenha tudo em ordem.
+            </p>
+        </div>
         <div class="flex flex-col gap-7">
             <button id="goToDriverPortalBtn"
-                    class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-xl font-semibold rounded-lg shadow-md text-white bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
-                <i class="fas fa-user-tie mr-3"></i>Sou Motorista
+                    class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-xl font-semibold rounded-lg shadow-lg text-white bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl">
+                <i class="fas fa-user-tie text-2xl mr-3"></i>Sou Motorista
             </button>
             <button id="goToGestorPortalBtn"
-                    class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-xl font-semibold rounded-lg shadow-md text-white bg-gradient-to-r from-green-600 to-teal-700 hover:from-green-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
-                <i class="fas fa-user-secret mr-3"></i>Sou Gestor
+                    class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-xl font-semibold rounded-lg shadow-lg text-white bg-gradient-to-r from-green-600 to-teal-700 hover:from-green-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl">
+                <i class="fas fa-user-secret text-2xl mr-3"></i>Sou Gestor
             </button>
         </div>
     </div>
