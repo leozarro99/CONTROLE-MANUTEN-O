@@ -249,7 +249,15 @@
                 </div>
 
                 <h2 class="text-2xl font-semibold text-gray-700 mb-5 mt-10">Estatísticas Detalhadas de Veículos (Quantidades)</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <!-- Total Vehicles Count Card (CLICKABLE) -->
+                    <div id="statsCardTotalVehicles" data-filter="all" class="bg-blue-50 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
+                        <div>
+                            <p class="text-sm font-medium text-blue-700">Total de Veículos</p>
+                            <p id="statsTotalVehiclesCount" class="text-3xl font-bold text-blue-900 mt-1">0</p>
+                        </div>
+                        <i class="fas fa-car text-blue-500 text-4xl opacity-50"></i>
+                    </div>
                     <!-- Within Normality Count Card (CLICKABLE) -->
                     <div id="statsCardWithinNormality" data-filter="within_normality" class="bg-green-50 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
                         <div>
@@ -610,12 +618,13 @@
                 return kmRemaining <= 0;
             }).length;
 
-            // Update percentage cards
+            // Update percentage cards (top section)
             document.getElementById('withinNormalityPercentage').textContent = `${totalVehicles > 0 ? ((withinNormalityCount / totalVehicles) * 100).toFixed(1) : 0}%`;
             document.getElementById('nearOverdueMaintenancePercentage').textContent = `${totalVehicles > 0 ? ((nearOverdueCount / totalVehicles) * 100).toFixed(1) : 0}%`;
             document.getElementById('overdueMaintenancePercentage').textContent = `${totalVehicles > 0 ? ((overdueCount / totalVehicles) * 100).toFixed(1) : 0}%`;
 
-            // Update detailed statistics cards (counts)
+            // Update detailed statistics cards (counts - bottom section)
+            document.getElementById('statsTotalVehiclesCount').textContent = totalVehicles; // Update total vehicles count in detailed stats
             document.getElementById('statsWithinNormalityCount').textContent = withinNormalityCount;
             document.getElementById('statsNearOverdueCount').textContent = nearOverdueCount;
             document.getElementById('statsOverdueCount').textContent = overdueCount;
@@ -654,6 +663,9 @@
                     return kmRemaining <= 0;
                 });
                 logAppAction("Filtragem de Veículos", `Filtrando por "Revisões Vencidas". ${filteredRecords.length} resultados.`);
+            } else if (filterType === 'all') {
+                // No specific filter, show all records (already in filteredRecords)
+                logAppAction("Filtragem de Veículos", `Exibindo todos os veículos. ${filteredRecords.length} resultados.`);
             }
 
             // Apply search filter (after filterType)
@@ -1089,7 +1101,8 @@
                 }
 
                 // Use semicolon as delimiter and replace internal semicolons with commas
-                let csvContent = "Placa;Quilometragem Atual (Km);Próxima Revisão (Km);Km Faltantes;Responsável;Última Modificação\n";
+                let csvContent = `Total de Veículos;${recordsToExport.length}\n`; // Add total vehicles as the first line
+                csvContent += "Placa;Quilometragem Atual (Km);Próxima Revisão (Km);Km Faltantes;Responsável;Última Modificação\n";
                 recordsToExport.forEach(record => {
                     const nextMaintenanceDueKm = record.next_maintenance_due_km || 0;
                     const kmRemainingForMaintenance = nextMaintenanceDueKm - (record.current_mileage || 0);
@@ -1308,7 +1321,7 @@
                 setupRealtimeListenerGestor();
                 setupRealtimeListenerEmployees(); // Start listening for employee data
                 document.getElementById('plate').readOnly = false; // Ensure plate is writable by default for new entries
-                document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo'; // Set initial button text
+                document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo'; // Reset button text
                 logAppAction("Login do Gestor", "Login bem-sucedido.");
                 // Default to dashboard tab on login
                 showDashboardTab();
@@ -1504,6 +1517,11 @@
             });
 
             // Dashboard statistics cards click listeners to navigate to Vehicle Management with specific filters
+            document.getElementById('statsCardTotalVehicles').addEventListener('click', () => {
+                showVehicleManagementTab();
+                renderMaintenanceRecordsGestor(allMaintenanceRecords, '', 'all'); // Filter for all vehicles
+                document.getElementById('vehicleSearch').value = ''; // Clear search term
+            });
             document.getElementById('statsCardWithinNormality').addEventListener('click', () => {
                 showVehicleManagementTab();
                 renderMaintenanceRecordsGestor(allMaintenanceRecords, '', 'within_normality');
