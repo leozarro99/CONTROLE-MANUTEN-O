@@ -806,11 +806,12 @@
          */
         async function handleDailyMileageSubmit(event) {
             event.preventDefault();
-            const driverResponsibleEmployee = document.getElementById('driverResponsibleEmployee').value;
+            // Trim whitespace from employee name and convert plate to uppercase for consistent matching
+            const driverResponsibleEmployee = document.getElementById('driverResponsibleEmployee').value.trim();
             const driverPlate = document.getElementById('driverPlate').value.toUpperCase().trim();
             const driverDailyMileage = parseInt(document.getElementById('driverDailyMileage').value);
 
-            logAppAction("Envio de Formulário (Motorista)", `Tentativa de registrar quilometragem. Placa: ${driverPlate}, Funcionário: ${driverResponsibleEmployee}, KM: ${driverDailyMileage}`);
+            logAppAction("Envio de Formulário (Motorista)", `Tentativa de registrar quilometragem. Placa: "${driverPlate}", Funcionário: "${driverResponsibleEmployee}", KM: ${driverDailyMileage}`);
 
             if (!isAuthReady) {
                 showMessageBox("Erro", "O sistema não está pronto. Por favor, aguarde a inicialização.");
@@ -818,10 +819,17 @@
             }
             if (!driverResponsibleEmployee || !driverPlate || isNaN(driverDailyMileage) || driverDailyMileage < 0) {
                 showMessageBox("Erro de Entrada", "Por favor, preencha todos os campos corretamente.");
+                logAppAction("Erro de Entrada", "Campos do formulário do motorista incompletos ou inválidos.");
                 return;
             }
 
             try {
+                console.log("[Console] Buscando veículo com:", {
+                    plate: driverPlate,
+                    employee: driverResponsibleEmployee,
+                    userId: gestorUserId
+                });
+
                 const { data: vehicles, error: selectError } = await supabase
                     .from(MAINTENANCE_RECORDS_TABLE)
                     .select('id, plate, responsible_employee')
@@ -829,24 +837,35 @@
                     .eq('responsible_employee', driverResponsibleEmployee)
                     .eq('user_id', gestorUserId);
 
-                if (selectError) throw selectError;
+                if (selectError) {
+                    console.error("[Console] Erro durante a seleção do veículo para o motorista:", selectError);
+                    throw selectError;
+                }
+
+                console.log("[Console] Veículos encontrados:", vehicles);
 
                 if (vehicles && vehicles.length > 0) {
                     const vehicleToUpdate = vehicles[0];
+                    console.log("[Console] Veículo encontrado, tentando atualizar:", vehicleToUpdate);
                     const { error: updateError } = await supabase
                         .from(MAINTENANCE_RECORDS_TABLE)
                         .update({ current_mileage: driverDailyMileage, last_modified_at: new Date().toISOString() }) // Also update last_modified_at
                         .eq('id', vehicleToUpdate.id)
-                        .eq('user_id', gestorUserId);
+                        .eq('user_id', gestorUserId); // Ensure user_id is also matched for update
 
-                    if (updateError) throw updateError;
+                    if (updateError) {
+                        console.error("[Console] Erro durante a atualização da quilometragem:", updateError);
+                        throw updateError;
+                    }
                     showMessageBox("Sucesso", `Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km!`);
+                    logAppAction("Atualização de Quilometragem", `Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km.`);
                 } else {
                     showMessageBox("Veículo Não Encontrado", `Veículo com placa "${driverPlate}" e funcionário "${driverResponsibleEmployee}" não encontrado. Verifique os dados ou contate o gestor.`);
+                    logAppAction("Veículo Não Encontrado", `Nenhum veículo correspondente encontrado para Placa: "${driverPlate}", Funcionário: "${driverResponsibleEmployee}".`);
                 }
                 document.getElementById('dailyMileageForm').reset();
             } catch (e) {
-                console.error("Error updating daily mileage: ", e);
+                console.error("[Console] Erro geral ao registrar quilometragem: ", e);
                 showMessageBox("Erro", "Erro ao registrar quilometragem: " + e.message);
             }
         }
@@ -857,7 +876,7 @@
          */
         async function handleEmployeeFormSubmit(event) {
             event.preventDefault();
-            const employeeName = document.getElementById('employeeName').value.trim();
+            const employeeName = document.getElementById('employeeName').value.trim(); // Trim whitespace
             logAppAction("Envio de Formulário (Funcionário)", `Tentativa de adicionar funcionário: "${employeeName}"`);
 
             if (!employeeName) {
