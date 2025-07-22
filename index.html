@@ -209,7 +209,7 @@
                 <h2 class="text-2xl font-semibold text-gray-700 mb-5">Visão Geral da Frota</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <!-- Total Vehicles Card -->
-                    <div class="bg-blue-100 p-6 rounded-lg shadow-md flex items-center justify-between transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
+                    <div id="cardTotalVehicles" data-filter="all" class="bg-blue-100 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
                         <div>
                             <p class="text-sm font-medium text-blue-700">Total de Veículos</p>
                             <p id="totalVehiclesCount" class="text-3xl font-bold text-blue-900 mt-1">0</p>
@@ -217,7 +217,7 @@
                         <i class="fas fa-car text-blue-500 text-4xl opacity-50"></i>
                     </div>
                     <!-- Vehicles Needing Maintenance Card -->
-                    <div class="bg-yellow-100 p-6 rounded-lg shadow-md flex items-center justify-between transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
+                    <div id="cardUpcomingMaintenance" data-filter="upcoming" class="bg-yellow-100 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
                         <div>
                             <p class="text-sm font-medium text-yellow-700">Próximas Revisões</p>
                             <p id="upcomingMaintenanceCount" class="text-3xl font-bold text-yellow-900 mt-1">0</p>
@@ -225,7 +225,7 @@
                         <i class="fas fa-exclamation-triangle text-yellow-500 text-4xl opacity-50"></i>
                     </div>
                     <!-- Overdue Maintenance Card -->
-                    <div class="bg-red-100 p-6 rounded-lg shadow-md flex items-center justify-between transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
+                    <div id="cardOverdueMaintenance" data-filter="overdue" class="bg-red-100 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
                         <div>
                             <p class="text-sm font-medium text-red-700">Revisões Vencidas</p>
                             <p id="overdueMaintenanceCount" class="text-3xl font-bold text-red-900 mt-1">0</p>
@@ -567,17 +567,33 @@
          * Renders the list of maintenance records for the Gestor portal, applying search and sort.
          * @param {Array<Object>} records - Array of maintenance record objects.
          * @param {string} [searchTerm=''] - Optional search term.
+         * @param {string} [filterType='all'] - Optional filter type: 'all', 'upcoming', 'overdue'.
          */
-        function renderMaintenanceRecordsGestor(records, searchTerm = '') {
+        function renderMaintenanceRecordsGestor(records, searchTerm = '', filterType = 'all') {
             const maintenanceList = document.getElementById('maintenanceList');
             maintenanceList.innerHTML = ''; // Clear existing rows
 
             let filteredRecords = records;
 
-            // Apply search filter
+            // Apply filter based on filterType
+            if (filterType === 'upcoming') {
+                filteredRecords = filteredRecords.filter(record => {
+                    const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
+                    return kmRemaining > 0 && kmRemaining <= 1000;
+                });
+                logAppAction("Filtragem de Veículos", `Filtrando por "Próximas Revisões". ${filteredRecords.length} resultados.`);
+            } else if (filterType === 'overdue') {
+                filteredRecords = filteredRecords.filter(record => {
+                    const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
+                    return kmRemaining <= 0;
+                });
+                logAppAction("Filtragem de Veículos", `Filtrando por "Revisões Vencidas". ${filteredRecords.length} resultados.`);
+            }
+
+            // Apply search filter (after filterType)
             if (searchTerm) {
                 const lowerCaseSearchTerm = searchTerm.toLowerCase();
-                filteredRecords = records.filter(record => {
+                filteredRecords = filteredRecords.filter(record => {
                     return (record.plate && record.plate.toLowerCase().includes(lowerCaseSearchTerm)) ||
                            (record.responsible_employee && record.responsible_employee.toLowerCase().includes(lowerCaseSearchTerm));
                 });
@@ -733,7 +749,7 @@
         /**
          * Fetches and renders maintenance records for the Gestor portal.
          */
-        async function fetchAndRenderMaintenanceRecords() {
+        async function fetchAndRenderMaintenanceRecords(filterType = 'all') {
             toggleLoading(true, 'vehicleTableLoading');
             logAppAction("Busca de Dados", "Iniciando busca de registros de manutenção.");
             try {
@@ -745,7 +761,7 @@
 
                 if (error) throw error;
                 allMaintenanceRecords = data; // Cache the data
-                renderMaintenanceRecordsGestor(allMaintenanceRecords, document.getElementById('vehicleSearch').value);
+                renderMaintenanceRecordsGestor(allMaintenanceRecords, document.getElementById('vehicleSearch').value, filterType);
                 renderDashboard(allMaintenanceRecords); // Update dashboard
                 logAppAction("Busca de Dados Concluída", `Total de registros: ${data.length}`);
             } catch (e) {
@@ -1489,6 +1505,24 @@
                     renderEmployees(currentEmployees);
                 });
             });
+
+            // Dashboard card click listeners
+            document.getElementById('cardTotalVehicles').addEventListener('click', () => {
+                showVehicleManagementTab();
+                renderMaintenanceRecordsGestor(allMaintenanceRecords, '', 'all');
+                document.getElementById('vehicleSearch').value = ''; // Clear search bar
+            });
+            document.getElementById('cardUpcomingMaintenance').addEventListener('click', () => {
+                showVehicleManagementTab();
+                renderMaintenanceRecordsGestor(allMaintenanceRecords, '', 'upcoming');
+                document.getElementById('vehicleSearch').value = 'Próximas Revisões'; // Indicate filter
+            });
+            document.getElementById('cardOverdueMaintenance').addEventListener('click', () => {
+                showVehicleManagementTab();
+                renderMaintenanceRecordsGestor(allMaintenanceRecords, '', 'overdue');
+                document.getElementById('vehicleSearch').value = 'Revisões Vencidas'; // Indicate filter
+            });
+
 
             // Message Box Close Button
             document.getElementById('messageBoxClose').addEventListener('click', () => {
