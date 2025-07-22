@@ -825,6 +825,26 @@
             }
 
             try {
+                // First, check if the plate exists at all for this gestorUserId
+                const { data: plateCheck, error: plateCheckError } = await supabase
+                    .from(MAINTENANCE_RECORDS_TABLE)
+                    .select('id')
+                    .eq('plate', driverPlate)
+                    .eq('user_id', gestorUserId);
+
+                if (plateCheckError) {
+                    console.error("[Console] Erro ao verificar a existência da placa:", plateCheckError);
+                    showMessageBox("Erro de Busca", "Erro ao verificar a placa: " + plateCheckError.message);
+                    return;
+                }
+
+                if (!plateCheck || plateCheck.length === 0) {
+                    showMessageBox("Placa Não Cadastrada", `A placa "${driverPlate}" não está cadastrada no sistema do gestor. Por favor, verifique ou contate o gestor.`);
+                    logAppAction("Placa Não Cadastrada", `Placa "${driverPlate}" não encontrada no cadastro do gestor.`);
+                    return;
+                }
+
+                // If plate exists, proceed to check for employee and update
                 console.log("[Console] Buscando veículo com:", {
                     plate: driverPlate,
                     employee: driverResponsibleEmployee,
@@ -844,7 +864,7 @@
                     return; // Stop execution on select error
                 }
 
-                console.log("[Console] Veículos encontrados:", vehicles);
+                console.log("[Console] Veículos encontrados (após verificação de funcionário):", vehicles);
 
                 if (vehicles && vehicles.length > 0) {
                     const vehicleToUpdate = vehicles[0];
