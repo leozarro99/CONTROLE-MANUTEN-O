@@ -132,11 +132,11 @@
             </p>
         </div>
 
-        <form id="dailyMileageForm" class="space-y-6 p-6 bg-blue-50 rounded-lg shadow-inner border border-blue-100">
+        <form id="dailyMileageForm" class="space-y-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg shadow-inner border border-blue-200">
             <div>
                 <label for="driverResponsibleEmployee" class="block text-base font-medium text-gray-700 mb-2">Seu Nome</label>
                 <select id="driverResponsibleEmployee" name="driverResponsibleEmployee" required
-                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
+                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out appearance-none">
                     <option value="">-- Selecione --</option>
                     <!-- Employee options will be loaded dynamically here -->
                 </select>
@@ -144,15 +144,15 @@
             <div>
                 <label for="driverPlate" class="block text-base font-medium text-gray-700 mb-2">Placa do Veículo</label>
                 <input type="text" id="driverPlate" name="driverPlate" required
-                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
+                       class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
             </div>
             <div>
                 <label for="driverDailyMileage" class="block text-base font-medium text-gray-700 mb-2">Quilometragem do Dia (Km)</label>
                 <input type="number" id="driverDailyMileage" name="driverDailyMileage" required min="0"
-                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
+                       class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
             </div>
             <button type="submit"
-                    class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
+                    class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-lg text-white bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-xl">
                 <i class="fas fa-save mr-2"></i>Registrar Quilometragem
             </button>
         </form>
@@ -168,9 +168,15 @@
 
     <!-- Gestor Section (hidden by default, password protected) -->
     <div id="gestorSection" class="bg-white p-8 md:p-10 rounded-xl shadow-lg shadow-green-200/50 w-full max-w-4xl border border-gray-100 hidden lg:p-12 transform transition-transform duration-300 ease-in-out">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-8 text-center">
-            <i class="fas fa-user-secret text-green-600 mr-3"></i>Portal do Gestor
-        </h1>
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 text-center flex-grow">
+                <i class="fas fa-user-secret text-green-600 mr-3"></i>Portal do Gestor
+            </h1>
+            <button id="logoutGestorBtn"
+                    class="ml-4 px-4 py-2 bg-red-500 text-white rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out">
+                <i class="fas fa-sign-out-alt mr-2"></i>Sair
+            </button>
+        </div>
 
         <!-- Gestor Login Form -->
         <div id="gestorLogin" class="w-full max-w-md mx-auto p-6 bg-gray-50 rounded-lg shadow-inner border border-gray-200 mb-8">
@@ -1491,6 +1497,7 @@
             document.getElementById('backButtonGestorLogin').addEventListener('click', backToLandingPage);
             document.getElementById('gestorLoginForm').addEventListener('submit', handleGestorLogin);
             document.getElementById('forgotPasswordBtn').addEventListener('click', handleForgotPassword);
+            document.getElementById('logoutGestorBtn').addEventListener('click', backToLandingPage); // New logout button for Gestor
             document.getElementById('showDashboard').addEventListener('click', showDashboardTab); // New Dashboard tab
             document.getElementById('showVehicleManagement').addEventListener('click', showVehicleManagementTab);
             document.getElementById('showEmployeeManagement').addEventListener('click', showEmployeeManagementTab);
