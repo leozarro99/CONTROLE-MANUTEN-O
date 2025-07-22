@@ -624,7 +624,8 @@
             event.preventDefault();
             const plate = document.getElementById('plate').value.toUpperCase().trim();
             const nextMaintenanceDueKmGestor = parseInt(document.getElementById('nextMaintenanceDueKmGestor').value);
-            const responsibleEmployee = document.getElementById('responsibleEmployee').value || 'Não atribuído';
+            // Ensure employee name is trimmed when saving
+            const responsibleEmployee = document.getElementById('responsibleEmployee').value.trim() || 'Não atribuído';
 
             logAppAction("Envio de Formulário (Gestor)", `Tentativa de adicionar/atualizar veículo. Placa: ${plate}, Próxima Revisão: ${nextMaintenanceDueKmGestor} Km, Responsável: ${responsibleEmployee}`);
 
@@ -839,7 +840,8 @@
 
                 if (selectError) {
                     console.error("[Console] Erro durante a seleção do veículo para o motorista:", selectError);
-                    throw selectError;
+                    showMessageBox("Erro de Busca", "Erro ao buscar veículo: " + selectError.message);
+                    return; // Stop execution on select error
                 }
 
                 console.log("[Console] Veículos encontrados:", vehicles);
@@ -855,7 +857,8 @@
 
                     if (updateError) {
                         console.error("[Console] Erro durante a atualização da quilometragem:", updateError);
-                        throw updateError;
+                        showMessageBox("Erro de Atualização", "Erro ao atualizar quilometragem: " + updateError.message);
+                        return; // Stop execution on update error
                     }
                     showMessageBox("Sucesso", `Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km!`);
                     logAppAction("Atualização de Quilometragem", `Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km.`);
@@ -866,7 +869,7 @@
                 document.getElementById('dailyMileageForm').reset();
             } catch (e) {
                 console.error("[Console] Erro geral ao registrar quilometragem: ", e);
-                showMessageBox("Erro", "Erro ao registrar quilometragem: " + e.message);
+                showMessageBox("Erro Inesperado", "Ocorreu um erro ao registrar quilometragem: " + e.message);
             }
         }
 
@@ -1098,6 +1101,7 @@
 
             // Driver Portal Buttons
             document.getElementById('backButtonDriver').addEventListener('click', backToLandingPage);
+            document.getElementById('dailyMileageForm').addEventListener('submit', handleDailyMileageSubmit); // Added submit listener for driver form
 
             // Gestor Portal Buttons
             document.getElementById('backButtonGestorLogin').addEventListener('click', backToLandingPage);
