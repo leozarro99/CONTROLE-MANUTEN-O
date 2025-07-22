@@ -37,158 +37,165 @@
 <body class="min-h-screen flex items-center justify-center">
 
     <!-- Landing Page (Initial View) -->
-    <div id="landingPage" class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200 text-center md:p-12 lg:p-16">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-8">
-            <i class="fas fa-tools text-blue-600 mr-3"></i>Controle de Manutenção
+    <div id="landingPage" class="bg-white p-10 rounded-xl shadow-lg shadow-blue-200/50 w-full max-w-md border border-gray-100 text-center md:p-14 lg:p-16">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-10">
+            <i class="fas fa-tools text-blue-600 mr-4"></i>Controle de Manutenção
         </h1>
-        <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-7">
             <button id="goToDriverPortalBtn"
-                    class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out transform hover:scale-105">
+                    class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-xl font-semibold rounded-lg shadow-md text-white bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105">
                 <i class="fas fa-user-tie mr-3"></i>Sou Motorista
             </button>
             <button id="goToGestorPortalBtn"
-                    class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out transform hover:scale-105">
+                    class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-xl font-semibold rounded-lg shadow-md text-white bg-gradient-to-r from-green-600 to-teal-700 hover:from-green-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 ease-in-out transform hover:scale-105">
                 <i class="fas fa-user-secret mr-3"></i>Sou Gestor
             </button>
         </div>
     </div>
 
     <!-- Driver Portal Section (hidden by default) -->
-    <div id="driverPortalSection" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200 hidden lg:p-10">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 text-center">
+    <div id="driverPortalSection" class="bg-white p-8 md:p-10 rounded-xl shadow-lg shadow-blue-200/50 w-full max-w-md border border-gray-100 hidden lg:p-12">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-8 text-center">
             <i class="fas fa-tachometer-alt text-indigo-600 mr-3"></i>Portal do Motorista
         </h1>
 
-        <form id="dailyMileageForm" class="space-y-6 p-4 bg-blue-50 rounded-lg shadow-inner">
+        <form id="dailyMileageForm" class="space-y-6 p-5 bg-blue-50 rounded-lg shadow-inner border border-blue-100">
             <div>
-                <label for="driverResponsibleEmployee" class="block text-sm font-medium text-gray-700 mb-1">Seu Nome</label>
+                <label for="driverResponsibleEmployee" class="block text-base font-medium text-gray-700 mb-2">Seu Nome</label>
                 <select id="driverResponsibleEmployee" name="driverResponsibleEmployee" required
-                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out">
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
                     <option value="">-- Selecione --</option>
                     <!-- Employee options will be loaded dynamically here -->
                 </select>
             </div>
             <div>
-                <label for="driverPlate" class="block text-sm font-medium text-gray-700 mb-1">Placa do Veículo</label>
+                <label for="driverPlate" class="block text-base font-medium text-gray-700 mb-2">Placa do Veículo</label>
                 <input type="text" id="driverPlate" name="driverPlate" required
-                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out">
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
             </div>
             <div>
-                <label for="driverDailyMileage" class="block text-sm font-medium text-gray-700 mb-1">Quilometragem do Dia (Km)</label>
+                <label for="driverDailyMileage" class="block text-base font-medium text-gray-700 mb-2">Quilometragem do Dia (Km)</label>
                 <input type="number" id="driverDailyMileage" name="driverDailyMileage" required min="0"
-                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out">
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
             </div>
             <button type="submit"
-                    class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out transform hover:scale-105">
+                    class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105">
                 <i class="fas fa-save mr-2"></i>Registrar Quilometragem
             </button>
         </form>
 
         <!-- Back Button for Driver Portal -->
-        <div class="flex justify-center mt-8">
-            <button id="backToLandingFromDriverBtn"
-                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out transform hover:scale-105">
+        <div class="flex justify-center mt-10">
+            <button id="backButtonDriver"
+                    class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105">
                 <i class="fas fa-arrow-left mr-2"></i>Voltar
             </button>
         </div>
     </div>
 
     <!-- Gestor Section (hidden by default, password protected) -->
-    <div id="gestorSection" class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-4xl border border-gray-200 hidden lg:p-10">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-6 text-center">
+    <div id="gestorSection" class="bg-white p-8 md:p-10 rounded-xl shadow-lg shadow-green-200/50 w-full max-w-4xl border border-gray-100 hidden lg:p-12">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-8 text-center">
             <i class="fas fa-user-secret text-green-600 mr-3"></i>Portal do Gestor
         </h1>
 
         <!-- Gestor Login Form -->
-        <div id="gestorLogin" class="w-full max-w-md mx-auto p-6 bg-gray-50 rounded-lg shadow-inner mb-8">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Acesso Restrito</h2>
-            <form id="gestorLoginForm" class="space-y-4">
+        <div id="gestorLogin" class="w-full max-w-md mx-auto p-6 bg-gray-50 rounded-lg shadow-inner border border-gray-200 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6 text-center">Acesso Restrito</h2>
+            <form id="gestorLoginForm" class="space-y-5">
                 <div>
-                    <label for="gestorPassword" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <label for="gestorPassword" class="block text-base font-medium text-gray-700 mb-2">Senha</label>
                     <input type="password" id="gestorPassword" name="gestorPassword" required
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out">
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-base transition duration-150 ease-in-out">
                 </div>
                 <button type="submit"
-                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out transform hover:scale-105">
+                        class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 ease-in-out transform hover:scale-105">
                     <i class="fas fa-unlock-alt mr-2"></i>Entrar
                 </button>
-                <p id="gestorLoginError" class="text-red-600 text-sm text-center hidden">Senha incorreta. Tente novamente.</p>
+                <p id="gestorLoginError" class="text-red-600 text-sm text-center hidden mt-3">Senha incorreta. Tente novamente.</p>
                 <button type="button" id="forgotPasswordBtn"
-                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out transform hover:scale-105 mt-2">
+                        class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105 mt-4">
                     <i class="fas fa-question-circle mr-2"></i>Esqueci minha senha?
                 </button>
             </form>
+            <!-- Back Button for Gestor Login - NOW INSIDE gestorLogin -->
+            <div class="flex justify-center mt-10">
+                <button id="backButtonGestorLogin"
+                        class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105">
+                    <i class="fas fa-arrow-left mr-2"></i>Voltar
+                </button>
+            </div>
         </div>
 
         <!-- Gestor Content (Form, Table, Export Button - hidden until logged in) -->
         <div id="gestorContent" class="hidden">
             <!-- Navigation for Gestor Tabs -->
-            <div class="flex justify-center mb-6 border-b border-gray-200">
+            <div class="flex justify-center mb-8 border-b-2 border-gray-200">
                 <!-- Tabs with increased padding and w-1/2 -->
-                <button id="showVehicleManagement" class="py-4 px-8 w-1/2 text-sm font-medium text-gray-700 border-b-2 border-indigo-500 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition duration-150 ease-in-out">
+                <button id="showVehicleManagement" class="py-4 px-8 w-1/2 text-lg font-semibold text-gray-700 border-b-4 border-indigo-500 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition duration-150 ease-in-out">
                     Gerenciar Veículos
                 </button>
-                <button id="showEmployeeManagement" class="py-4 px-8 w-1/2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
+                <button id="showEmployeeManagement" class="py-4 px-8 w-1/2 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
                     Gerenciar Funcionários
                 </button>
             </div>
 
             <!-- Vehicle Management Section -->
             <div id="vehicleManagementSection">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Adicionar/Atualizar Dados do Veículo</h2>
+                <h2 class="text-2xl font-semibold text-gray-700 mb-5">Adicionar/Atualizar Dados do Veículo</h2>
                 <!-- Add/Update Vehicle Form (Gestor's Form) -->
-                <form id="maintenanceForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 p-4 bg-blue-50 rounded-lg shadow-inner">
+                <form id="maintenanceForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 p-6 bg-blue-50 rounded-lg shadow-inner border border-blue-100">
                     <div class="col-span-1 flex flex-col">
-                        <label for="plate" class="block text-sm font-medium text-gray-700 mb-1">Placa</label>
+                        <label for="plate" class="block text-base font-medium text-gray-700 mb-2">Placa</label>
                         <input type="text" id="plate" name="plate" required
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out h-10">
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base transition duration-150 ease-in-out h-11">
                     </div>
                     <div class="col-span-1 flex flex-col">
-                        <label for="nextMaintenanceDueKmGestor" class="block text-sm font-medium text-gray-700 mb-1">KM Próxima Revisão</label>
+                        <label for="nextMaintenanceDueKmGestor" class="block text-base font-medium text-gray-700 mb-2">KM Próxima Revisão</label>
                         <input type="number" id="nextMaintenanceDueKmGestor" name="nextMaintenanceDueKmGestor" required min="0"
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out h-10">
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base transition duration-150 ease-in-out h-11">
                     </div>
                     <div class="col-span-1 flex flex-col">
-                        <label for="responsibleEmployee" class="block text-sm font-medium text-gray-700 mb-1">Funcionário Responsável</label>
+                        <label for="responsibleEmployee" class="block text-base font-medium text-gray-700 mb-2">Funcionário Responsável</label>
                         <select id="responsibleEmployee" name="responsibleEmployee"
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out h-10">
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base transition duration-150 ease-in-out h-11">
                             <option value="">-- Selecione --</option>
                             <!-- Employee options will be loaded dynamically here -->
                         </select>
                     </div>
                     <div class="col-span-full flex justify-center sm:justify-end items-end mt-4">
                         <button type="submit" id="submitVehicleBtn"
-                                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out transform hover:scale-105">
+                                class="inline-flex items-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 ease-in-out transform hover:scale-105">
                             <i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo
                         </button>
                     </div>
                 </form>
 
                 <!-- Export Button -->
-                <div class="flex justify-end mb-4">
+                <div class="flex justify-end mb-6">
                     <button id="exportCsvBtn"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                            class="inline-flex items-center px-5 py-2 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
                         <i class="fas fa-file-csv mr-2"></i>Exportar para CSV
                     </button>
                 </div>
 
                 <!-- Maintenance List Table (Gestor's Table - with actions and styling) -->
-                <div class="rounded-lg shadow-md border border-gray-200 mt-8"> <!-- Removed overflow-x-auto -->
+                <div class="rounded-lg shadow-md border border-gray-200 mt-8 overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-gray-100">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Placa</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quilometragem Atual (Km)</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Próxima Revisão (Km)</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Km Faltantes</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsável</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Última Modificação</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Ações</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-lg">Placa</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Quilometragem Atual (Km)</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Próxima Revisão (Km)</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Km Faltantes</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Responsável</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Última Modificação</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tr-lg">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="maintenanceList" class="bg-white divide-y divide-gray-200">
                             <!-- Maintenance records will be inserted here by JavaScript -->
-                            <tr>
+                            <tr class="odd:bg-white even:bg-gray-50">
                                 <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum veículo cadastrado ainda.</td>
                             </tr>
                         </tbody>
@@ -198,31 +205,31 @@
 
             <!-- Employee Management Section -->
             <div id="employeeManagementSection" class="hidden">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Adicionar Novo Funcionário</h2>
-                <form id="employeeForm" class="space-y-4 p-4 bg-purple-50 rounded-lg shadow-inner mb-8">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-5">Adicionar Novo Funcionário</h2>
+                <form id="employeeForm" class="space-y-5 p-6 bg-purple-50 rounded-lg shadow-inner border border-purple-100 mb-8">
                     <div>
-                        <label for="employeeName" class="block text-sm font-medium text-gray-700 mb-1">Nome do Funcionário</label>
+                        <label for="employeeName" class="block text-base font-medium text-gray-700 mb-2">Nome do Funcionário</label>
                         <input type="text" id="employeeName" name="employeeName" required
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition duration-150 ease-in-out">
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-base transition duration-150 ease-in-out h-11">
                     </div>
                     <button type="submit"
-                            class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out transform hover:scale-105">
+                            class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-200 ease-in-out transform hover:scale-105">
                         <i class="fas fa-user-plus mr-2"></i>Adicionar Funcionário
                     </button>
                 </form>
 
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4 mt-8">Funcionários Cadastrados</h2>
-                <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-5 mt-8">Funcionários Cadastrados</h2>
+                <div class="rounded-lg shadow-md border border-gray-200 overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-gray-100">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Nome do Funcionário</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Ações</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-lg">Nome do Funcionário</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tr-lg">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="employeeList" class="bg-white divide-y divide-gray-200">
                             <!-- Employee records will be inserted here by JavaScript -->
-                            <tr>
+                            <tr class="odd:bg-white even:bg-gray-50">
                                 <td colspan="2" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum funcionário cadastrado ainda.</td>
                             </tr>
                         </tbody>
@@ -230,45 +237,37 @@
                 </div>
             </div>
 
-            <!-- New Button: Logout / Back to Login for Gestor -->
-            <div class="flex justify-center mt-8">
-                <button id="backToGestorLoginBtn"
-                        class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out transform hover:scale-105">
-                    <i class="fas fa-sign-out-alt mr-2"></i>Sair / Voltar para Login
+            <!-- Back Button for Gestor Content -->
+            <div class="flex justify-center mt-10">
+                <button id="backButtonGestorContent"
+                        class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105">
+                    <i class="fas fa-arrow-left mr-2"></i>Voltar
                 </button>
             </div>
-        </div>
-
-        <!-- Back Button for Gestor Portal (this one goes to Landing Page) -->
-        <div class="flex justify-center mt-8">
-            <button id="backToLandingFromGestorBtn"
-                    class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out transform hover:scale-105">
-                <i class="fas fa-arrow-left mr-2"></i>Voltar para o Início
-            </button>
         </div>
     </div>
 
     <!-- Message Box for alerts -->
-    <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity50 flex items-center justify-center hidden z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
-            <h3 id="messageBoxTitle" class="text-lg font-semibold text-gray-800 mb-4"></h3>
-            <p id="messageBoxContent" class="text-gray-600 mb-6"></p>
-            <button id="messageBoxClose" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+    <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full text-center border border-gray-200">
+            <h3 id="messageBoxTitle" class="text-xl font-semibold text-gray-800 mb-4"></h3>
+            <p id="messageBoxContent" class="text-gray-600 mb-6 text-base"></p>
+            <button id="messageBoxClose" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
                 OK
             </button>
         </div>
     </div>
 
     <!-- Confirmation Box for delete -->
-    <div id="confirmBox" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Confirmação</h3>
-            <p id="confirmBoxContent" class="text-gray-600 mb-6">Tem certeza que deseja excluir este registro?</p>
+    <div id="confirmBox" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full text-center border border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Confirmação</h3>
+            <p id="confirmBoxContent" class="text-gray-600 mb-6 text-base">Tem certeza que deseja excluir este registro?</p>
             <div class="flex justify-center space-x-4">
-                <button id="confirmBoxYes" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                <button id="confirmBoxYes" class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out">
                     Sim
                 </button>
-                <button id="confirmBoxNo" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                <button id="confirmBoxNo" class="px-6 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out">
                     Não
                 </button>
             </div>
@@ -396,17 +395,17 @@
             maintenanceList.innerHTML = ''; // Clear existing rows
 
             if (records.length === 0) {
-                maintenanceList.innerHTML = `<tr><td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum veículo cadastrado ainda.</td></tr>`;
+                maintenanceList.innerHTML = `<tr class="odd:bg-white even:bg-gray-50"><td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum veículo cadastrado ainda.</td></tr>`;
                 return;
             }
 
-            records.forEach(record => {
+            records.forEach((record, index) => {
                 const nextMaintenanceDueKm = record.next_maintenance_due_km || 0;
                 const kmRemainingForMaintenance = nextMaintenanceDueKm - (record.current_mileage || 0);
                 const lastModified = formatTimestamp(record.last_modified_at); // Get formatted last modified date
 
                 const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 transition duration-150 ease-in-out';
+                row.className = `hover:bg-gray-100 transition duration-150 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`;
 
                 let kmRemainingClass = '';
                 if (kmRemainingForMaintenance <= 0) {
@@ -427,10 +426,10 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.responsible_employee || 'Não atribuído'}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${lastModified}</td> <!-- Display Last Modified Date -->
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button data-id="${record.id}" class="edit-btn text-indigo-600 hover:text-indigo-900 mr-3 transition duration-150 ease-in-out">
+                        <button data-id="${record.id}" class="edit-btn text-indigo-600 hover:text-indigo-800 mr-3 transition duration-150 ease-in-out">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button data-id="${record.id}" class="delete-btn text-red-600 hover:text-red-900 transition duration-150 ease-in-out">
+                        <button data-id="${record.id}" class="delete-btn text-red-600 hover:text-red-800 transition duration-150 ease-in-out">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </td>
@@ -457,17 +456,17 @@
             currentEmployees = employees; // Update global cache
 
             if (employees.length === 0) {
-                employeeListTableBody.innerHTML = `<tr><td colspan="2" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum funcionário cadastrado ainda.</td></tr>`;
+                employeeListTableBody.innerHTML = `<tr class="odd:bg-white even:bg-gray-50"><td colspan="2" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum funcionário cadastrado ainda.</td></tr>`;
                 return;
             }
 
-            employees.forEach(employee => {
+            employees.forEach((employee, index) => {
                 const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 transition duration-150 ease-in-out';
+                row.className = `hover:bg-gray-100 transition duration-150 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`;
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${employee.name}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button data-id="${employee.id}" class="delete-employee-btn text-red-600 hover:text-red-900 transition duration-150 ease-in-out">
+                        <button data-id="${employee.id}" class="delete-employee-btn text-red-600 hover:text-red-800 transition duration-150 ease-in-out">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </td>
@@ -610,74 +609,9 @@
          */
         async function addInitialDataIfEmpty() {
             console.log("Checking if initial data needs to be added for gestorUserId:", gestorUserId);
-            try {
-                const { data, error } = await supabase
-                    .from(APP_METADATA_TABLE)
-                    .select('added')
-                    .eq('id', INITIAL_DATA_FLAG_DOC_ID)
-                    .eq('user_id', gestorUserId)
-                    .single(); // Use single to expect 0 or 1 row
-
-                if (error && error.code !== 'PGRST116' && error.details !== 'The result contains 0 rows') {
-                    // PGRST116 and "0 rows" means no record found, which is expected for first run
-                    throw error;
-                }
-
-                if (!data || !data.added) { // If no data or 'added' is false
-                    logAppAction("Verificação de Dados Iniciais", "Dados iniciais não encontrados ou não marcados como adicionados. Adicionando...");
-
-                    const initialEmployees = ["Funcionário A", "Funcionário B", "Funcionário C", "Funcionário D"];
-                    for (const empName of initialEmployees) {
-                        console.log("Attempting to insert initial employee:", { name: empName, user_id: gestorUserId });
-                        const { error: insertError } = await supabase
-                            .from(EMPLOYEES_TABLE)
-                            .insert({ name: empName, user_id: gestorUserId });
-                        if (insertError) {
-                            console.error("Error inserting initial employee:", insertError.message || insertError.details || insertError);
-                            showMessageBox("Erro de Inicialização", `Falha ao inserir funcionário inicial "${empName}": ${insertError.message}`);
-                        }
-                    }
-                    logAppAction("Inicialização de Dados", "Funcionários iniciais adicionados.");
-
-                    const vehicles = [
-                        { plate: "ABC-1234", current_mileage: 50000, next_maintenance_due_km: 55000, responsible_employee: "Funcionário A", user_id: gestorUserId },
-                        { plate: "DEF-5678", current_mileage: 48000, next_maintenance_due_km: 50000, responsible_employee: "Funcionário B", user_id: gestorUserId },
-                        { plate: "GHI-9012", current_mileage: 30000, next_maintenance_due_km: 35000, responsible_employee: "Funcionário C", user_id: gestorUserId },
-                        { plate: "JKL-3456", current_mileage: 60000, next_maintenance_due_km: 65000, responsible_employee: "Funcionário D", user_id: gestorUserId },
-                        { plate: "MNO-7890", current_mileage: 40000, next_maintenance_due_km: 45000, responsible_employee: "Funcionário A", user_id: gestorUserId },
-                        { plate: "PQR-1122", current_mileage: 55000, next_maintenance_due_km: 60000, responsible_employee: "Funcionário B", user_id: gestorUserId },
-                        { plate: "STU-3344", current_mileage: 35000, next_maintenance_due_km: 40000, responsible_employee: "Funcionário C", user_id: gestorUserId },
-                        { plate: "VWX-5566", current_mileage: 120000, next_maintenance_due_km: 135000, responsible_employee: "Funcionário D", user_id: gestorUserId },
-                        { plate: "YZA-7788", current_mileage: 110000, next_maintenance_due_km: 125000, responsible_employee: "Funcionário A", user_id: gestorUserId },
-                        { plate: "BCD-9900", current_mileage: 250000, next_maintenance_due_km: 270000, responsible_employee: "Funcionário B", user_id: gestorUserId }
-                    ];
-
-                    for (const vehicle of vehicles) {
-                        const { error: insertError } = await supabase
-                            .from(MAINTENANCE_RECORDS_TABLE)
-                            .insert(vehicle);
-                        if (insertError) {
-                            console.error("Error inserting initial vehicle:", insertError.message || insertError.details || insertError);
-                            showMessageBox("Erro de Inicialização", `Falha ao inserir veículo inicial "${vehicle.plate}": ${insertError.message}`);
-                        }
-                    }
-                    logAppAction("Inicialização de Dados", "Veículos iniciais adicionados.");
-
-                    // Mark initial data as loaded for this user
-                    const { error: upsertError } = await supabase
-                        .from(APP_METADATA_TABLE)
-                        .upsert({ id: INITIAL_DATA_FLAG_DOC_ID, added: true, user_id: gestorUserId });
-                    if (upsertError) {
-                        console.error("Error marking initial data as loaded:", upsertError.message || upsertError.details || upsertError);
-                        showMessageBox("Erro de Inicialização", `Falha ao marcar dados iniciais como carregados: ${upsertError.message}`);
-                    }
-                } else {
-                    logAppAction("Verificação de Dados Iniciais", "Dados iniciais já existem para este usuário.");
-                }
-            } catch (e) {
-                console.error("Critical error during initial data check/add:", e);
-                showMessageBox("Erro Crítico", "Falha ao verificar/adicionar dados iniciais: " + e.message);
-            }
+            // Removed all initial data insertion logic as per user request.
+            // The app will now start with empty tables, ready for new registrations.
+            logAppAction("Verificação de Dados Iniciais", "Dados iniciais não serão adicionados. Aplicativo pronto para novos cadastros.");
         }
 
         // --- Event Handlers ---
@@ -762,7 +696,8 @@
                 delete document.getElementById('maintenanceForm').dataset.editingId; // Clear editing state
                 document.getElementById('plate').readOnly = false; // Make plate writable again after submission
                 document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo'; // Reset button text
-            } catch (e) {
+            }
+            catch (e) {
                 console.error("Error saving vehicle record: ", e);
                 showMessageBox("Erro", "Erro ao salvar registro: " + e.message);
             }
@@ -1079,7 +1014,7 @@
         }
 
         /**
-         * Returns to the landing page from any portal.
+         * Returns to the landing page.
          */
         function backToLandingPage() {
             document.getElementById('driverPortalSection').classList.add('hidden');
@@ -1143,11 +1078,10 @@
             document.getElementById('goToGestorPortalBtn').addEventListener('click', goToGestorPortal);
 
             // Driver Portal Buttons
-            document.getElementById('backToLandingFromDriverBtn').addEventListener('click', backToLandingPage);
-            document.getElementById('dailyMileageForm').addEventListener('submit', handleDailyMileageSubmit);
+            document.getElementById('backButtonDriver').addEventListener('click', backToLandingPage);
 
             // Gestor Portal Buttons
-            document.getElementById('backToLandingFromGestorBtn').addEventListener('click', backToLandingPage);
+            document.getElementById('backButtonGestorLogin').addEventListener('click', backToLandingPage);
             document.getElementById('gestorLoginForm').addEventListener('submit', handleGestorLogin);
             document.getElementById('forgotPasswordBtn').addEventListener('click', handleForgotPassword);
             document.getElementById('showVehicleManagement').addEventListener('click', showVehicleManagementTab);
@@ -1155,7 +1089,7 @@
             document.getElementById('maintenanceForm').addEventListener('submit', handleMaintenanceFormSubmit);
             document.getElementById('exportCsvBtn').addEventListener('click', handleExportCsv);
             document.getElementById('employeeForm').addEventListener('submit', handleEmployeeFormSubmit);
-            document.getElementById('backToGestorLoginBtn').addEventListener('click', backToGestorLogin); // New event listener
+            document.getElementById('backButtonGestorContent').addEventListener('click', backToGestorLogin);
 
             // Message Box Close Button
             document.getElementById('messageBoxClose').addEventListener('click', () => {
@@ -1169,7 +1103,8 @@
          */
         async function initializeApp() {
             setupEventListeners();
-            await addInitialDataIfEmpty(); // Ensure initial data is set up
+            // The addInitialDataIfEmpty function now does nothing, ensuring a clean slate.
+            await addInitialDataIfEmpty(); 
             // Initial data loading for employees will trigger renderEmployees, which populates selects
             setupRealtimeListenerEmployees(); // Load employees and set up real-time updates
             logAppAction("Inicialização", "Aplicativo inicializado.");
