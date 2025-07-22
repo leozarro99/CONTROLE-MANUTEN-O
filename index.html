@@ -839,7 +839,8 @@
                 }
 
                 if (!plateCheck || plateCheck.length === 0) {
-                    showMessageBox("Placa Não Cadastrada", `A placa "${driverPlate}" não está cadastrada no sistema do gestor. Por favor, verifique ou contate o gestor.`);
+                    // Changed message to "Placa inexistente" as requested
+                    showMessageBox("Erro", `Placa inexistente`);
                     logAppAction("Placa Não Cadastrada", `Placa "${driverPlate}" não encontrada no cadastro do gestor.`);
                     return;
                 }
