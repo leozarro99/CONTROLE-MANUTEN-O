@@ -172,7 +172,6 @@
             <h1 id="gestorPortalTitle" class="text-3xl md:text-4xl font-extrabold text-gray-800 text-center flex-grow cursor-pointer hover:text-green-700 transition duration-150 ease-in-out">
                 <i class="fas fa-user-secret text-green-600 mr-3"></i>Portal do Gestor
             </h1>
-            <!-- Removed the logoutGestorBtn as per user request -->
         </div>
 
         <!-- Gestor Login Form -->
@@ -208,14 +207,17 @@
             <!-- Navigation for Gestor Tabs -->
             <div class="flex justify-center mb-8 border-b-2 border-gray-200">
                 <!-- Tabs with increased padding and w-1/2 -->
-                <button id="showDashboard" class="py-4 px-8 w-1/3 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
+                <button id="showDashboard" class="py-4 px-8 w-1/4 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
                     Dashboard
                 </button>
-                <button id="showVehicleManagement" class="py-4 px-8 w-1/3 text-lg font-semibold text-gray-700 border-b-4 border-indigo-500 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition duration-150 ease-in-out">
+                <button id="showVehicleManagement" class="py-4 px-8 w-1/4 text-lg font-semibold text-gray-700 border-b-4 border-indigo-500 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition duration-150 ease-in-out">
                     Gerenciar Veículos
                 </button>
-                <button id="showEmployeeManagement" class="py-4 px-8 w-1/3 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
+                <button id="showEmployeeManagement" class="py-4 px-8 w-1/4 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
                     Gerenciar Funcionários
+                </button>
+                <button id="showVehicleStatistics" class="py-4 px-8 w-1/4 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
+                    Estatísticas de Veículos
                 </button>
             </div>
 
@@ -223,19 +225,19 @@
             <div id="dashboardSection" class="hidden">
                 <h2 class="text-2xl font-semibold text-gray-700 mb-5">Visão Geral da Frota</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <!-- Total Vehicles Card -->
-                    <div id="cardTotalVehicles" data-filter="all" class="bg-blue-100 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
+                    <!-- Vehicles Within Normality Percentage Card -->
+                    <div id="cardWithinNormality" data-filter="within_normality" class="bg-green-100 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
                         <div>
-                            <p class="text-sm font-medium text-blue-700">Total de Veículos</p>
-                            <p id="totalVehiclesCount" class="text-3xl font-bold text-blue-900 mt-1">0</p>
+                            <p class="text-sm font-medium text-green-700">Veículos em Normalidade</p>
+                            <p id="withinNormalityPercentage" class="text-3xl font-bold text-green-900 mt-1">0%</p>
                         </div>
-                        <i class="fas fa-car text-blue-500 text-4xl opacity-50"></i>
+                        <i class="fas fa-check-circle text-green-500 text-4xl opacity-50"></i>
                     </div>
-                    <!-- Vehicles Needing Maintenance Card -->
-                    <div id="cardUpcomingMaintenance" data-filter="upcoming" class="bg-yellow-100 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
+                    <!-- Vehicles Near Overdue Maintenance Card -->
+                    <div id="cardNearOverdueMaintenance" data-filter="near_overdue" class="bg-yellow-100 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
                         <div>
-                            <p class="text-sm font-medium text-yellow-700">Próximas Revisões</p>
-                            <p id="upcomingMaintenanceCount" class="text-3xl font-bold text-yellow-900 mt-1">0</p>
+                            <p class="text-sm font-medium text-yellow-700">Perto de Vencer</p>
+                            <p id="nearOverdueMaintenanceCount" class="text-3xl font-bold text-yellow-900 mt-1">0</p>
                         </div>
                         <i class="fas fa-exclamation-triangle text-yellow-500 text-4xl opacity-50"></i>
                     </div>
@@ -358,6 +360,37 @@
                 </div>
             </div>
 
+            <!-- Vehicle Statistics Section (NEW) -->
+            <div id="vehicleStatisticsSection" class="hidden">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-5">Estatísticas Detalhadas de Veículos</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Within Normality Count Card -->
+                    <div class="bg-green-50 p-6 rounded-lg shadow-md flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-green-700">Dentro da Normalidade</p>
+                            <p id="statsWithinNormalityCount" class="text-3xl font-bold text-green-900 mt-1">0</p>
+                        </div>
+                        <i class="fas fa-car-alt text-green-500 text-4xl opacity-50"></i>
+                    </div>
+                    <!-- Near Overdue Count Card -->
+                    <div class="bg-yellow-50 p-6 rounded-lg shadow-md flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-yellow-700">Perto de Vencer</p>
+                            <p id="statsNearOverdueCount" class="text-3xl font-bold text-yellow-900 mt-1">0</p>
+                        </div>
+                        <i class="fas fa-clock text-yellow-500 text-4xl opacity-50"></i>
+                    </div>
+                    <!-- Overdue Count Card -->
+                    <div class="bg-red-50 p-6 rounded-lg shadow-md flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-red-700">Revisões Vencidas</p>
+                            <p id="statsOverdueCount" class="text-3xl font-bold text-red-900 mt-1">0</p>
+                        </div>
+                        <i class="fas fa-wrench text-red-500 text-4xl opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+
             <!-- Back Button for Gestor Content -->
             <div class="flex justify-center mt-10">
                 <button id="backButtonGestorContent"
@@ -432,6 +465,10 @@
         const EMPLOYEES_TABLE = 'employees';
         const APP_METADATA_TABLE = 'app_metadata'; // Table to store app metadata like initial data flag
         const INITIAL_DATA_FLAG_DOC_ID = 'initialDataLoaded';
+
+        // --- Maintenance Thresholds (User defined) ---
+        const NORMALITY_THRESHOLD_KM = 2000; // Vehicles with more than this KM remaining are "Dentro da Normalidade"
+        const NEAR_OVERDUE_THRESHOLD_KM = 2000; // Vehicles with 0 to 2000 KM remaining are "Perto de Vencer"
 
         // --- Hardcoded Credentials (for demonstration) ---
         const GESTOR_PASSWORD = "1654";
@@ -558,31 +595,68 @@
         // --- Render Functions ---
 
         /**
-         * Renders the dashboard summary cards.
+         * Renders the dashboard summary cards with percentages and counts based on new thresholds.
          * @param {Array<Object>} records - All maintenance records.
          */
         function renderDashboard(records) {
             const totalVehicles = records.length;
-            const upcomingMaintenance = records.filter(record => {
+            
+            const withinNormalityCount = records.filter(record => {
                 const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
-                return kmRemaining > 0 && kmRemaining <= 1000; // Vehicles needing maintenance soon (e.g., within 1000km)
-            }).length;
-            const overdueMaintenance = records.filter(record => {
-                const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
-                return kmRemaining <= 0; // Vehicles with overdue maintenance
+                return kmRemaining > NORMALITY_THRESHOLD_KM;
             }).length;
 
-            document.getElementById('totalVehiclesCount').textContent = totalVehicles;
-            document.getElementById('upcomingMaintenanceCount').textContent = upcomingMaintenance;
-            document.getElementById('overdueMaintenanceCount').textContent = overdueMaintenance;
-            logAppAction("Dashboard Renderizado", `Total: ${totalVehicles}, Próximas: ${upcomingMaintenance}, Vencidas: ${overdueMaintenance}`);
+            const nearOverdueCount = records.filter(record => {
+                const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
+                return kmRemaining > 0 && kmRemaining <= NEAR_OVERDUE_THRESHOLD_KM;
+            }).length;
+
+            const overdueCount = records.filter(record => {
+                const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
+                return kmRemaining <= 0;
+            }).length;
+
+            const withinNormalityPercentage = totalVehicles > 0 ? ((withinNormalityCount / totalVehicles) * 100).toFixed(1) : 0;
+
+            document.getElementById('withinNormalityPercentage').textContent = `${withinNormalityPercentage}%`;
+            document.getElementById('nearOverdueMaintenanceCount').textContent = nearOverdueCount;
+            document.getElementById('overdueMaintenanceCount').textContent = overdueCount;
+            
+            logAppAction("Dashboard Renderizado", `Total: ${totalVehicles}, Normalidade: ${withinNormalityPercentage}%, Perto de Vencer: ${nearOverdueCount}, Vencidas: ${overdueCount}`);
+        }
+
+        /**
+         * Renders the detailed vehicle statistics counts.
+         * @param {Array<Object>} records - All maintenance records.
+         */
+        function renderVehicleStatistics(records) {
+            const withinNormalityCount = records.filter(record => {
+                const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
+                return kmRemaining > NORMALITY_THRESHOLD_KM;
+            }).length;
+
+            const nearOverdueCount = records.filter(record => {
+                const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
+                return kmRemaining > 0 && kmRemaining <= NEAR_OVERDUE_THRESHOLD_KM;
+            }).length;
+
+            const overdueCount = records.filter(record => {
+                const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
+                return kmRemaining <= 0;
+            }).length;
+
+            document.getElementById('statsWithinNormalityCount').textContent = withinNormalityCount;
+            document.getElementById('statsNearOverdueCount').textContent = nearOverdueCount;
+            document.getElementById('statsOverdueCount').textContent = overdueCount;
+
+            logAppAction("Estatísticas de Veículos Renderizadas", `Normalidade: ${withinNormalityCount}, Perto de Vencer: ${nearOverdueCount}, Vencidas: ${overdueCount}`);
         }
 
         /**
          * Renders the list of maintenance records for the Gestor portal, applying search and sort.
          * @param {Array<Object>} records - Array of maintenance record objects.
          * @param {string} [searchTerm=''] - Optional search term.
-         * @param {string} [filterType='all'] - Optional filter type: 'all', 'upcoming', 'overdue'.
+         * @param {string} [filterType='all'] - Optional filter type: 'all', 'within_normality', 'near_overdue', 'overdue'.
          */
         function renderMaintenanceRecordsGestor(records, searchTerm = '', filterType = 'all') {
             const maintenanceList = document.getElementById('maintenanceList');
@@ -591,12 +665,18 @@
             let filteredRecords = records;
 
             // Apply filter based on filterType
-            if (filterType === 'upcoming') {
+            if (filterType === 'within_normality') {
                 filteredRecords = filteredRecords.filter(record => {
                     const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
-                    return kmRemaining > 0 && kmRemaining <= 1000;
+                    return kmRemaining > NORMALITY_THRESHOLD_KM;
                 });
-                logAppAction("Filtragem de Veículos", `Filtrando por "Próximas Revisões". ${filteredRecords.length} resultados.`);
+                logAppAction("Filtragem de Veículos", `Filtrando por "Dentro da Normalidade". ${filteredRecords.length} resultados.`);
+            } else if (filterType === 'near_overdue') {
+                filteredRecords = filteredRecords.filter(record => {
+                    const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
+                    return kmRemaining > 0 && kmRemaining <= NEAR_OVERDUE_THRESHOLD_KM;
+                });
+                logAppAction("Filtragem de Veículos", `Filtrando por "Perto de Vencer". ${filteredRecords.length} resultados.`);
             } else if (filterType === 'overdue') {
                 filteredRecords = filteredRecords.filter(record => {
                     const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
@@ -651,7 +731,7 @@
                     kmRemainingBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                             <i class="fas fa-exclamation-circle mr-1"></i> VENCIDA
                                         </span>`;
-                } else if (kmRemainingForMaintenance <= 1000) {
+                } else if (kmRemainingForMaintenance > 0 && kmRemainingForMaintenance <= NEAR_OVERDUE_THRESHOLD_KM) {
                     kmRemainingBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                             <i class="fas fa-hourglass-half mr-1"></i> ${kmRemainingForMaintenance} Km
                                         </span>`;
@@ -779,6 +859,7 @@
                 allMaintenanceRecords = data; // Cache the data
                 renderMaintenanceRecordsGestor(allMaintenanceRecords, document.getElementById('vehicleSearch').value);
                 renderDashboard(allMaintenanceRecords); // Update dashboard
+                renderVehicleStatistics(allMaintenanceRecords); // Update new statistics tab
                 logAppAction("Busca de Dados Concluída", `Total de registros: ${data.length}`);
             } catch (e) {
                 console.error("Error fetching maintenance data:", e);
@@ -815,6 +896,7 @@
                     
                     renderMaintenanceRecordsGestor(allMaintenanceRecords, document.getElementById('vehicleSearch').value);
                     renderDashboard(allMaintenanceRecords);
+                    renderVehicleStatistics(allMaintenanceRecords); // Update new statistics tab
                 })
                 .subscribe();
             logAppAction("Listener em Tempo Real (Gestor)", "Listener para registros de manutenção ativado.");
@@ -1037,13 +1119,18 @@
                     return;
                 }
 
-                let csvContent = "Placa,Quilometragem Atual (Km),Próxima Revisão (Km),Km Faltantes,Responsável,Última Modificação\n"; // Added new column to CSV
+                // Use semicolon as delimiter and replace internal semicolons with commas
+                let csvContent = "Placa;Quilometragem Atual (Km);Próxima Revisão (Km);Km Faltantes;Responsável;Última Modificação\n";
                 recordsToExport.forEach(record => {
                     const nextMaintenanceDueKm = record.next_maintenance_due_km || 0;
                     const kmRemainingForMaintenance = nextMaintenanceDueKm - (record.current_mileage || 0);
                     const lastModified = formatTimestamp(record.last_modified_at);
 
-                    csvContent += `${record.plate},${record.current_mileage || 'N/A'},${nextMaintenanceDueKm},${kmRemainingForMaintenance <= 0 ? 'VENCIDA' : kmRemainingForMaintenance},${record.responsible_employee || 'Não atribuído'},${lastModified}\n`;
+                    // Sanitize data by replacing semicolons within fields with commas
+                    const plate = (record.plate || '').replace(/;/g, ',');
+                    const responsibleEmployee = (record.responsible_employee || 'Não atribuído').replace(/;/g, ',');
+
+                    csvContent += `${plate};${record.current_mileage || 'N/A'};${nextMaintenanceDueKm};${kmRemainingForMaintenance <= 0 ? 'VENCIDA' : kmRemainingForMaintenance};${responsibleEmployee};${lastModified}\n`;
                 });
 
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -1314,15 +1401,12 @@
             document.getElementById('gestorLoginError').classList.add('hidden');
             document.getElementById('gestorLogin').classList.remove('hidden');
             document.getElementById('gestorContent').classList.add('hidden');
-            // Default to dashboard tab on initial entry to gestor portal
-            document.getElementById('dashboardSection').classList.add('hidden'); // Ensure hidden initially
-            document.getElementById('vehicleManagementSection').classList.add('hidden'); // Ensure hidden initially
-            document.getElementById('employeeManagementSection').classList.add('hidden'); // Ensure hidden initially
             
             // Reset tab styling
             document.getElementById('showDashboard').classList.remove('border-indigo-500', 'text-indigo-600');
             document.getElementById('showVehicleManagement').classList.remove('border-indigo-500', 'text-indigo-600');
             document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showVehicleStatistics').classList.remove('border-indigo-500', 'text-indigo-600');
 
             logAppAction("Navegação", "Acessando Portal do Gestor (Tela de Login).");
         }
@@ -1344,10 +1428,12 @@
             document.getElementById('dashboardSection').classList.remove('hidden');
             document.getElementById('vehicleManagementSection').classList.add('hidden');
             document.getElementById('employeeManagementSection').classList.add('hidden');
+            document.getElementById('vehicleStatisticsSection').classList.add('hidden'); // Hide new stats tab
 
             document.getElementById('showDashboard').classList.add('border-indigo-500', 'text-indigo-600');
             document.getElementById('showVehicleManagement').classList.remove('border-indigo-500', 'text-indigo-600');
             document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showVehicleStatistics').classList.remove('border-indigo-500', 'text-indigo-600');
             logAppAction("Navegação (Gestor)", "Acessando aba 'Dashboard'.");
         }
 
@@ -1358,10 +1444,12 @@
             document.getElementById('dashboardSection').classList.add('hidden');
             document.getElementById('vehicleManagementSection').classList.remove('hidden');
             document.getElementById('employeeManagementSection').classList.add('hidden');
+            document.getElementById('vehicleStatisticsSection').classList.add('hidden'); // Hide new stats tab
 
             document.getElementById('showVehicleManagement').classList.add('border-indigo-500', 'text-indigo-600');
             document.getElementById('showDashboard').classList.remove('border-indigo-500', 'text-indigo-600');
             document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showVehicleStatistics').classList.remove('border-indigo-500', 'text-indigo-600');
             
             // Ensure plate field is editable and editing state is cleared when switching to this tab
             document.getElementById('plate').readOnly = false;
@@ -1379,11 +1467,31 @@
             document.getElementById('dashboardSection').classList.add('hidden');
             document.getElementById('vehicleManagementSection').classList.add('hidden');
             document.getElementById('employeeManagementSection').classList.remove('hidden');
+            document.getElementById('vehicleStatisticsSection').classList.add('hidden'); // Hide new stats tab
 
             document.getElementById('showEmployeeManagement').classList.add('border-indigo-500', 'text-indigo-600');
             document.getElementById('showDashboard').classList.remove('border-indigo-500', 'text-indigo-600');
             document.getElementById('showVehicleManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showVehicleStatistics').classList.remove('border-indigo-500', 'text-indigo-600');
             logAppAction("Navegação (Gestor)", "Acessando aba 'Gerenciar Funcionários'.");
+        }
+
+        /**
+         * Switches the Gestor view to Vehicle Statistics (NEW).
+         */
+        function showVehicleStatisticsTab() {
+            document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('vehicleManagementSection').classList.add('hidden');
+            document.getElementById('employeeManagementSection').classList.add('hidden');
+            document.getElementById('vehicleStatisticsSection').classList.remove('hidden'); // Show new stats tab
+
+            document.getElementById('showVehicleStatistics').classList.add('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showDashboard').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showVehicleManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+
+            renderVehicleStatistics(allMaintenanceRecords); // Render statistics when tab is shown
+            logAppAction("Navegação (Gestor)", "Acessando aba 'Estatísticas de Veículos'.");
         }
 
         // --- Initialization ---
@@ -1405,17 +1513,19 @@
             document.getElementById('gestorLoginForm').addEventListener('submit', handleGestorLogin);
             document.getElementById('forgotPasswordBtn').addEventListener('click', handleForgotPassword);
             
-            // New: Gestor Portal Title click returns to landing page
+            // Gestor Portal Title click returns to landing page
             document.getElementById('gestorPortalTitle').addEventListener('click', backToLandingPage);
 
             document.getElementById('showDashboard').addEventListener('click', showDashboardTab); // New Dashboard tab
             document.getElementById('showVehicleManagement').addEventListener('click', showVehicleManagementTab);
             document.getElementById('showEmployeeManagement').addEventListener('click', showEmployeeManagementTab);
+            document.getElementById('showVehicleStatistics').addEventListener('click', showVehicleStatisticsTab); // New statistics tab listener
+
             document.getElementById('maintenanceForm').addEventListener('submit', handleMaintenanceFormSubmit);
             document.getElementById('exportCsvBtn').addEventListener('click', handleExportCsv);
             document.getElementById('employeeForm').addEventListener('submit', handleEmployeeFormSubmit);
             
-            // Updated: backButtonGestorContent now goes to Dashboard
+            // backButtonGestorContent now goes to Dashboard
             document.getElementById('backButtonGestorContent').addEventListener('click', showDashboardTab);
 
             document.getElementById('vehicleSearch').addEventListener('input', (event) => {
@@ -1450,16 +1560,16 @@
                 });
             });
 
-            // Dashboard card click listeners
-            document.getElementById('cardTotalVehicles').addEventListener('click', () => {
+            // Dashboard card click listeners to navigate to Vehicle Management with specific filters
+            document.getElementById('cardWithinNormality').addEventListener('click', () => {
                 showVehicleManagementTab();
-                renderMaintenanceRecordsGestor(allMaintenanceRecords, '', 'all');
-                document.getElementById('vehicleSearch').value = ''; // Clear search bar
+                renderMaintenanceRecordsGestor(allMaintenanceRecords, '', 'within_normality');
+                document.getElementById('vehicleSearch').value = 'Dentro da Normalidade'; // Indicate filter
             });
-            document.getElementById('cardUpcomingMaintenance').addEventListener('click', () => {
+            document.getElementById('cardNearOverdueMaintenance').addEventListener('click', () => {
                 showVehicleManagementTab();
-                renderMaintenanceRecordsGestor(allMaintenanceRecords, '', 'upcoming');
-                document.getElementById('vehicleSearch').value = 'Próximas Revisões'; // Indicate filter
+                renderMaintenanceRecordsGestor(allMaintenanceRecords, '', 'near_overdue');
+                document.getElementById('vehicleSearch').value = 'Perto de Vencer'; // Indicate filter
             });
             document.getElementById('cardOverdueMaintenance').addEventListener('click', () => {
                 showVehicleManagementTab();
