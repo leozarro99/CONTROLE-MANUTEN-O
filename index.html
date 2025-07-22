@@ -279,7 +279,9 @@
 
         // --- Supabase Configuration ---
         const SUPABASE_URL = 'https://zkwgpwfmdbhqajzhorlw.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inprd2dwd2ZtZGJocWFqemhvcmx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMjM5NjQsImV4cCI6MjA2ODY5OTk2NH0.I2V9HC_gbiPZSTAib5rJ9Kttl2kIFjkHfxYja-zp9Zk';
+        // ATENÇÃO: Substitua 'YOUR_SUPABASE_ANON_KEY_HERE' pela sua chave 'anon' do Supabase.
+        // Você pode encontrá-la em Project Settings > API no seu painel do Supabase.
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inprd2dwd2ZtZGJocWFqemhvcmx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMjM5NjQsImV4cCI6MjA2ODY5OTk2NH0.I2V9HC_gbiPZSTAib5rJ9Kttl2kIFjkHfxYja-zp9Zk'; 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // --- Global State Variables ---
