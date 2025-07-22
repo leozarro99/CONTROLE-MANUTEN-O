@@ -12,6 +12,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f0f4f8; /* Light blue-gray background */
+            background-image: radial-gradient(at 50% 0%, #e0f2f7, #f0f4f8); /* Subtle radial gradient */
         }
         /* Custom scrollbar for better aesthetics */
         ::-webkit-scrollbar {
@@ -57,6 +58,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border for toasts */
         }
 
         .toast.success {
@@ -96,24 +98,24 @@
 <body class="min-h-screen flex items-center justify-center">
 
     <!-- Landing Page (Initial View) -->
-    <div id="landingPage" class="bg-white p-10 rounded-xl shadow-lg shadow-blue-200/50 w-full max-w-md border border-gray-100 text-center md:p-14 lg:p-16">
+    <div id="landingPage" class="bg-white p-10 rounded-xl shadow-lg shadow-blue-200/50 w-full max-w-md md:max-w-xl lg:max-w-2xl border border-gray-100 text-center md:p-14 lg:p-16 transform transition-transform duration-300 ease-in-out">
         <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-10">
             <i class="fas fa-tools text-blue-600 mr-4"></i>Controle de Manutenção
         </h1>
         <div class="flex flex-col gap-7">
             <button id="goToDriverPortalBtn"
-                    class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-xl font-semibold rounded-lg shadow-md text-white bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105">
+                    class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-xl font-semibold rounded-lg shadow-md text-white bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
                 <i class="fas fa-user-tie mr-3"></i>Sou Motorista
             </button>
             <button id="goToGestorPortalBtn"
-                    class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-xl font-semibold rounded-lg shadow-md text-white bg-gradient-to-r from-green-600 to-teal-700 hover:from-green-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 ease-in-out transform hover:scale-105">
+                    class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-xl font-semibold rounded-lg shadow-md text-white bg-gradient-to-r from-green-600 to-teal-700 hover:from-green-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
                 <i class="fas fa-user-secret mr-3"></i>Sou Gestor
             </button>
         </div>
     </div>
 
     <!-- Driver Portal Section (hidden by default) -->
-    <div id="driverPortalSection" class="bg-white p-8 md:p-10 rounded-xl shadow-lg shadow-blue-200/50 w-full max-w-md border border-gray-100 hidden lg:p-12">
+    <div id="driverPortalSection" class="bg-white p-8 md:p-10 rounded-xl shadow-lg shadow-blue-200/50 w-full max-w-md border border-gray-100 hidden lg:p-12 transform transition-transform duration-300 ease-in-out">
         <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-8 text-center">
             <i class="fas fa-tachometer-alt text-indigo-600 mr-3"></i>Portal do Motorista
         </h1>
@@ -138,7 +140,7 @@
                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
             </div>
             <button type="submit"
-                    class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105">
+                    class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
                 <i class="fas fa-save mr-2"></i>Registrar Quilometragem
             </button>
         </form>
@@ -146,14 +148,14 @@
         <!-- Back Button for Driver Portal -->
         <div class="flex justify-center mt-10">
             <button id="backButtonDriver"
-                    class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105">
+                    class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
                 <i class="fas fa-arrow-left mr-2"></i>Voltar
             </button>
         </div>
     </div>
 
     <!-- Gestor Section (hidden by default, password protected) -->
-    <div id="gestorSection" class="bg-white p-8 md:p-10 rounded-xl shadow-lg shadow-green-200/50 w-full max-w-4xl border border-gray-100 hidden lg:p-12">
+    <div id="gestorSection" class="bg-white p-8 md:p-10 rounded-xl shadow-lg shadow-green-200/50 w-full max-w-4xl border border-gray-100 hidden lg:p-12 transform transition-transform duration-300 ease-in-out">
         <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 mb-8 text-center">
             <i class="fas fa-user-secret text-green-600 mr-3"></i>Portal do Gestor
         </h1>
@@ -168,19 +170,19 @@
                            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-base transition duration-150 ease-in-out">
                 </div>
                 <button type="submit"
-                        class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 ease-in-out transform hover:scale-105">
+                        class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
                     <i class="fas fa-unlock-alt mr-2"></i>Entrar
                 </button>
                 <p id="gestorLoginError" class="text-red-600 text-sm text-center hidden mt-3">Senha incorreta. Tente novamente.</p>
                 <button type="button" id="forgotPasswordBtn"
-                        class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105 mt-4">
+                        class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg mt-4">
                     <i class="fas fa-question-circle mr-2"></i>Esqueci minha senha?
                 </button>
             </form>
             <!-- Back Button for Gestor Login - NOW INSIDE gestorLogin -->
             <div class="flex justify-center mt-10">
                 <button id="backButtonGestorLogin"
-                        class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105">
+                        class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
                     <i class="fas fa-arrow-left mr-2"></i>Voltar
                 </button>
             </div>
@@ -207,7 +209,7 @@
                 <h2 class="text-2xl font-semibold text-gray-700 mb-5">Visão Geral da Frota</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <!-- Total Vehicles Card -->
-                    <div class="bg-blue-100 p-6 rounded-lg shadow-md flex items-center justify-between">
+                    <div class="bg-blue-100 p-6 rounded-lg shadow-md flex items-center justify-between transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
                         <div>
                             <p class="text-sm font-medium text-blue-700">Total de Veículos</p>
                             <p id="totalVehiclesCount" class="text-3xl font-bold text-blue-900 mt-1">0</p>
@@ -215,7 +217,7 @@
                         <i class="fas fa-car text-blue-500 text-4xl opacity-50"></i>
                     </div>
                     <!-- Vehicles Needing Maintenance Card -->
-                    <div class="bg-yellow-100 p-6 rounded-lg shadow-md flex items-center justify-between">
+                    <div class="bg-yellow-100 p-6 rounded-lg shadow-md flex items-center justify-between transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
                         <div>
                             <p class="text-sm font-medium text-yellow-700">Próximas Revisões</p>
                             <p id="upcomingMaintenanceCount" class="text-3xl font-bold text-yellow-900 mt-1">0</p>
@@ -223,7 +225,7 @@
                         <i class="fas fa-exclamation-triangle text-yellow-500 text-4xl opacity-50"></i>
                     </div>
                     <!-- Overdue Maintenance Card -->
-                    <div class="bg-red-100 p-6 rounded-lg shadow-md flex items-center justify-between">
+                    <div class="bg-red-100 p-6 rounded-lg shadow-md flex items-center justify-between transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
                         <div>
                             <p class="text-sm font-medium text-red-700">Revisões Vencidas</p>
                             <p id="overdueMaintenanceCount" class="text-3xl font-bold text-red-900 mt-1">0</p>
@@ -241,24 +243,24 @@
                     <div class="col-span-1 flex flex-col">
                         <label for="plate" class="block text-base font-medium text-gray-700 mb-2">Placa</label>
                         <input type="text" id="plate" name="plate" required
-                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base transition duration-150 ease-in-out h-11">
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base transition duration-150 ease-in-out">
                     </div>
                     <div class="col-span-1 flex flex-col">
                         <label for="nextMaintenanceDueKmGestor" class="block text-base font-medium text-gray-700 mb-2">KM Próxima Revisão</label>
                         <input type="number" id="nextMaintenanceDueKmGestor" name="nextMaintenanceDueKmGestor" required min="0"
-                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base transition duration-150 ease-in-out h-11">
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base transition duration-150 ease-in-out">
                     </div>
                     <div class="col-span-1 flex flex-col">
                         <label for="responsibleEmployee" class="block text-base font-medium text-gray-700 mb-2">Funcionário Responsável</label>
                         <select id="responsibleEmployee" name="responsibleEmployee"
-                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base transition duration-150 ease-in-out h-11">
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base transition duration-150 ease-in-out">
                             <option value="">-- Selecione --</option>
                             <!-- Employee options will be loaded dynamically here -->
                         </select>
                     </div>
                     <div class="col-span-full flex justify-center sm:justify-end items-end mt-4">
                         <button type="submit" id="submitVehicleBtn"
-                                class="inline-flex items-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 ease-in-out transform hover:scale-105">
+                                class="inline-flex items-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
                             <i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo
                         </button>
                     </div>
@@ -272,7 +274,7 @@
                         <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                     </div>
                     <button id="exportCsvBtn"
-                            class="w-full sm:w-1/3 inline-flex items-center justify-center px-5 py-2 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                            class="w-full sm:w-1/3 inline-flex items-center justify-center px-5 py-2 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out hover:shadow-lg">
                         <i class="fas fa-file-csv mr-2"></i>Exportar para CSV
                     </button>
                 </div>
@@ -288,12 +290,12 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-lg cursor-pointer" data-sort="plate">Placa <i class="fas fa-sort text-gray-400 ml-1"></i></th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="current_mileage">Quilometragem Atual (Km) <i class="fas fa-sort text-gray-400 ml-1"></i></th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="next_maintenance_due_km">Próxima Revisão (Km) <i class="fas fa-sort text-gray-400 ml-1"></i></th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="km_remaining">Km Faltantes <i class="fas fa-sort text-gray-400 ml-1"></i></th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="responsible_employee">Responsável <i class="fas fa-sort text-gray-400 ml-1"></i></th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="last_modified_at">Última Modificação <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-lg cursor-pointer hover:bg-gray-200 transition duration-150 ease-in-out" data-sort="plate">Placa <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-200 transition duration-150 ease-in-out" data-sort="current_mileage">Quilometragem Atual (Km) <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-200 transition duration-150 ease-in-out" data-sort="next_maintenance_due_km">Próxima Revisão (Km) <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-200 transition duration-150 ease-in-out" data-sort="km_remaining">Km Faltantes <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-200 transition duration-150 ease-in-out" data-sort="responsible_employee">Responsável <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-200 transition duration-150 ease-in-out" data-sort="last_modified_at">Última Modificação <i class="fas fa-sort text-gray-400 ml-1"></i></th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tr-lg">Ações</th>
                             </tr>
                         </thead>
@@ -314,10 +316,10 @@
                     <div>
                         <label for="employeeName" class="block text-base font-medium text-gray-700 mb-2">Nome do Funcionário</label>
                         <input type="text" id="employeeName" name="employeeName" required
-                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-base transition duration-150 ease-in-out h-11">
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-base transition duration-150 ease-in-out">
                     </div>
                     <button type="submit"
-                            class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-200 ease-in-out transform hover:scale-105">
+                            class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
                         <i class="fas fa-user-plus mr-2"></i>Adicionar Funcionário
                     </button>
                 </form>
@@ -327,7 +329,7 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-lg cursor-pointer" data-sort="name">Nome do Funcionário <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-lg cursor-pointer hover:bg-gray-200 transition duration-150 ease-in-out" data-sort="name">Nome do Funcionário <i class="fas fa-sort text-gray-400 ml-1"></i></th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tr-lg">Ações</th>
                             </tr>
                         </thead>
@@ -344,7 +346,7 @@
             <!-- Back Button for Gestor Content -->
             <div class="flex justify-center mt-10">
                 <button id="backButtonGestorContent"
-                        class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105">
+                        class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md shadow-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
                     <i class="fas fa-arrow-left mr-2"></i>Voltar
                 </button>
             </div>
