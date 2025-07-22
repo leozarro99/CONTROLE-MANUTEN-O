@@ -169,7 +169,7 @@
     <!-- Gestor Section (hidden by default, password protected) -->
     <div id="gestorSection" class="bg-white p-8 md:p-10 rounded-xl shadow-lg shadow-green-200/50 w-full max-w-4xl border border-gray-100 hidden lg:p-12 transform transition-transform duration-300 ease-in-out">
         <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 text-center flex-grow">
+            <h1 id="gestorPortalTitle" class="text-3xl md:text-4xl font-extrabold text-gray-800 text-center flex-grow cursor-pointer hover:text-green-700 transition duration-150 ease-in-out">
                 <i class="fas fa-user-secret text-green-600 mr-3"></i>Portal do Gestor
             </h1>
             <!-- Removed the logoutGestorBtn as per user request -->
@@ -871,94 +871,12 @@
 
         /**
          * Adds initial data (employees and vehicles) if the app metadata flag is not set for the current user.
+         * This function is now empty as per user request to not generate sample data.
          */
         async function addInitialDataIfEmpty() {
-            logAppAction("Verificação de Dados Iniciais", `Verificando se dados iniciais precisam ser adicionados para o usuário: ${gestorUserId}`);
-
-            try {
-                // Check if employees table is empty for this user
-                const { count: employeeCount, error: employeeCountError } = await supabase
-                    .from(EMPLOYEES_TABLE)
-                    .select('id', { count: 'exact' })
-                    .eq('user_id', gestorUserId);
-
-                if (employeeCountError) throw employeeCountError;
-
-                // Check if maintenance records table is empty for this user
-                const { count: maintenanceCount, error: maintenanceCountError } = await supabase
-                    .from(MAINTENANCE_RECORDS_TABLE)
-                    .select('id', { count: 'exact' })
-                    .eq('user_id', gestorUserId);
-
-                if (maintenanceCountError) throw maintenanceCountError;
-
-                if (employeeCount === 0 && maintenanceCount === 0) {
-                    logAppAction("Dados Iniciais", "Tabelas de funcionários e manutenção vazias. Adicionando dados de exemplo.");
-
-                    // Sample Employees (More diverse names)
-                    const sampleEmployees = [
-                        { name: 'João Silva', user_id: gestorUserId },
-                        { name: 'Maria Oliveira', user_id: gestorUserId },
-                        { name: 'Pedro Souza', user_id: gestorUserId },
-                        { name: 'Ana Costa', user_id: gestorUserId },
-                        { name: 'Carlos Pereira', user_id: gestorUserId },
-                        { name: 'Fernanda Lima', user_id: gestorUserId },
-                        { name: 'Rafael Santos', user_id: gestorUserId },
-                        { name: 'Gabriela Alves', user_id: gestorUserId },
-                        { name: 'Lucas Martins', user_id: gestorUserId },
-                        { name: 'Beatriz Rocha', user_id: gestorUserId }
-                    ];
-
-                    const { error: employeeInsertError } = await supabase
-                        .from(EMPLOYEES_TABLE)
-                        .insert(sampleEmployees);
-
-                    if (employeeInsertError) throw employeeInsertError;
-                    showToast("Funcionários de exemplo adicionados!", 'success');
-                    logAppAction("Dados Iniciais", "Funcionários de exemplo inseridos.");
-
-                    // Sample Maintenance Records (More records, diverse statuses, and responsible employees)
-                    const sampleMaintenanceRecords = [
-                        // Vehicles in good standing
-                        { plate: 'ABC1234', current_mileage: 50000, next_maintenance_due_km: 60000, responsible_employee: 'João Silva', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'DEF9012', current_mileage: 20000, next_maintenance_due_km: 25000, responsible_employee: 'João Silva', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'JKL7890', current_mileage: 12000, next_maintenance_due_km: 30000, responsible_employee: 'Ana Costa', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'PQR3344', current_mileage: 15000, next_maintenance_due_km: 28000, responsible_employee: 'Rafael Santos', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'STU5566', current_mileage: 5000, next_maintenance_due_km: 18000, responsible_employee: 'Gabriela Alves', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'VWX7788', current_mileage: 30000, next_maintenance_due_km: 45000, responsible_employee: 'Lucas Martins', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'YZA9900', current_mileage: 2500, next_maintenance_due_km: 10000, responsible_employee: 'Beatriz Rocha', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'BCD1122', current_mileage: 60000, next_maintenance_due_km: 75000, responsible_employee: 'Maria Oliveira', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'EFG3344', current_mileage: 8000, next_maintenance_due_km: 22000, responsible_employee: 'Pedro Souza', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'HIJ5566', current_mileage: 35000, next_maintenance_due_km: 50000, responsible_employee: 'Fernanda Lima', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-
-                        // Vehicles near maintenance (within 1000km)
-                        { plate: 'GHI3456', current_mileage: 99500, next_maintenance_due_km: 100000, responsible_employee: 'Pedro Souza', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'QWE1234', current_mileage: 29800, next_maintenance_due_km: 30000, responsible_employee: 'Carlos Pereira', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'RTY5678', current_mileage: 49200, next_maintenance_due_km: 50000, responsible_employee: 'Rafael Santos', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'UOP9012', current_mileage: 78900, next_maintenance_due_km: 79500, responsible_employee: 'Gabriela Alves', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'ASD3456', current_mileage: 9900, next_maintenance_due_km: 10000, responsible_employee: 'Lucas Martins', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-
-                        // Vehicles with overdue maintenance
-                        { plate: 'XYZ5678', current_mileage: 75000, next_maintenance_due_km: 70000, responsible_employee: 'Maria Oliveira', user_id: gestorUserId, last_modified_at: new Date(Date.now() - 86400000 * 5).toISOString() }, // 5 days ago, overdue
-                        { plate: 'MNO1122', current_mileage: 45000, next_maintenance_due_km: 44000, responsible_employee: 'Carlos Pereira', user_id: gestorUserId, last_modified_at: new Date(Date.now() - 86400000 * 10).toISOString() }, // 10 days ago, overdue
-                        { plate: 'FGH4455', current_mileage: 120000, next_maintenance_due_km: 115000, responsible_employee: 'Fernanda Lima', user_id: gestorUserId, last_modified_at: new Date(Date.now() - 86400000 * 20).toISOString() }, // 20 days ago, very overdue
-                        { plate: 'IJK6677', current_mileage: 30000, next_maintenance_due_km: 29000, responsible_employee: 'Beatriz Rocha', user_id: gestorUserId, last_modified_at: new Date(Date.now() - 86400000 * 2).toISOString() } // 2 days ago, overdue
-                    ];
-
-                    const { error: maintenanceInsertError } = await supabase
-                        .from(MAINTENANCE_RECORDS_TABLE)
-                        .insert(sampleMaintenanceRecords);
-
-                    if (maintenanceInsertError) throw maintenanceInsertError;
-                    showToast("Registros de veículos de exemplo adicionados!", 'success');
-                    logAppAction("Dados Iniciais", "Registros de veículos de exemplo inseridos.");
-                } else {
-                    logAppAction("Dados Iniciais", "Dados existentes encontrados. Não adicionando dados de exemplo.");
-                }
-            } catch (e) {
-                console.error("Error adding initial data:", e);
-                showToast("Erro ao adicionar dados iniciais: " + e.message, 'error');
-            }
+            // This function is intentionally left empty to prevent adding sample data.
+            // The user requested to not generate examples.
+            logAppAction("Verificação de Dados Iniciais", "Função addInitialDataIfEmpty está desativada. Não adicionando dados de exemplo.");
         }
 
         // --- Event Handlers ---
@@ -1486,15 +1404,20 @@
             document.getElementById('backButtonGestorLogin').addEventListener('click', backToLandingPage);
             document.getElementById('gestorLoginForm').addEventListener('submit', handleGestorLogin);
             document.getElementById('forgotPasswordBtn').addEventListener('click', handleForgotPassword);
-            // Removed logoutGestorBtn listener
+            
+            // New: Gestor Portal Title click returns to landing page
+            document.getElementById('gestorPortalTitle').addEventListener('click', backToLandingPage);
+
             document.getElementById('showDashboard').addEventListener('click', showDashboardTab); // New Dashboard tab
             document.getElementById('showVehicleManagement').addEventListener('click', showVehicleManagementTab);
             document.getElementById('showEmployeeManagement').addEventListener('click', showEmployeeManagementTab);
             document.getElementById('maintenanceForm').addEventListener('submit', handleMaintenanceFormSubmit);
             document.getElementById('exportCsvBtn').addEventListener('click', handleExportCsv);
             document.getElementById('employeeForm').addEventListener('submit', handleEmployeeFormSubmit);
-            // Updated: backButtonGestorContent now goes to landing page
-            document.getElementById('backButtonGestorContent').addEventListener('click', backToLandingPage);
+            
+            // Updated: backButtonGestorContent now goes to Dashboard
+            document.getElementById('backButtonGestorContent').addEventListener('click', showDashboardTab);
+
             document.getElementById('vehicleSearch').addEventListener('input', (event) => {
                 renderMaintenanceRecordsGestor(allMaintenanceRecords, event.target.value);
             });
@@ -1557,7 +1480,8 @@
          */
         async function initializeApp() {
             setupEventListeners();
-            await addInitialDataIfEmpty(); 
+            // Removed the call to addInitialDataIfEmpty() as per user request to not generate sample data.
+            // await addInitialDataIfEmpty(); 
             setupRealtimeListenerEmployees(); // Load employees and set up real-time updates
             logAppAction("Inicialização", "Aplicativo inicializado.");
         }
