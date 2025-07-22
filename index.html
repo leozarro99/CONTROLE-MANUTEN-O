@@ -760,8 +760,9 @@
 
         /**
          * Fetches and renders maintenance records for the Gestor portal.
+         * This function is now primarily for initial load. Real-time updates will modify `allMaintenanceRecords` directly.
          */
-        async function fetchAndRenderMaintenanceRecords(filterType = 'all') {
+        async function fetchAndRenderMaintenanceRecords() {
             toggleLoading(true, 'vehicleTableLoading');
             logAppAction("Busca de Dados", "Iniciando busca de registros de manutenção.");
             try {
@@ -773,7 +774,7 @@
 
                 if (error) throw error;
                 allMaintenanceRecords = data; // Cache the data
-                renderMaintenanceRecordsGestor(allMaintenanceRecords, document.getElementById('vehicleSearch').value, filterType);
+                renderMaintenanceRecordsGestor(allMaintenanceRecords, document.getElementById('vehicleSearch').value);
                 renderDashboard(allMaintenanceRecords); // Update dashboard
                 logAppAction("Busca de Dados Concluída", `Total de registros: ${data.length}`);
             } catch (e) {
@@ -786,14 +787,31 @@
 
         /**
          * Sets up real-time listeners for maintenance records.
+         * Updates `allMaintenanceRecords` directly based on payload.
          */
         function setupRealtimeListenerGestor() {
-            fetchAndRenderMaintenanceRecords(); // Initial fetch
+            // Initial fetch
+            fetchAndRenderMaintenanceRecords();
+
             supabase
                 .channel('maintenance_records_changes')
                 .on('postgres_changes', { event: '*', schema: 'public', table: MAINTENANCE_RECORDS_TABLE, filter: `user_id=eq.${gestorUserId}` }, payload => {
                     logAppAction("Supabase Realtime (Gestor)", `Mudança detectada na tabela de manutenção: ${payload.eventType}`);
-                    fetchAndRenderMaintenanceRecords(); // Re-fetch data to ensure consistency after any change
+                    if (payload.eventType === 'INSERT') {
+                        allMaintenanceRecords.unshift(payload.new); // Add new record to the beginning
+                    } else if (payload.eventType === 'UPDATE') {
+                        const index = allMaintenanceRecords.findIndex(record => record.id === payload.old.id);
+                        if (index !== -1) {
+                            allMaintenanceRecords[index] = payload.new;
+                        }
+                    } else if (payload.eventType === 'DELETE') {
+                        allMaintenanceRecords = allMaintenanceRecords.filter(record => record.id !== payload.old.id);
+                    }
+                    // Re-sort to maintain order if needed (based on created_at desc)
+                    allMaintenanceRecords.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                    
+                    renderMaintenanceRecordsGestor(allMaintenanceRecords, document.getElementById('vehicleSearch').value);
+                    renderDashboard(allMaintenanceRecords);
                 })
                 .subscribe();
             logAppAction("Listener em Tempo Real (Gestor)", "Listener para registros de manutenção ativado.");
@@ -801,6 +819,7 @@
 
         /**
          * Sets up real-time listeners for employee data.
+         * Updates `currentEmployees` directly based on payload.
          */
         function setupRealtimeListenerEmployees() {
             // Initial fetch
@@ -815,7 +834,8 @@
                         showToast("Não foi possível obter a lista de funcionários: " + error.message, 'error');
                         return;
                     }
-                    renderEmployees(data);
+                    currentEmployees = data; // Cache the data
+                    renderEmployees(currentEmployees);
                     logAppAction("Supabase Listener (Funcionários)", `Lista de funcionários carregada. Total: ${data.length} funcionários.`);
                 })
                 .catch(e => {
@@ -828,20 +848,19 @@
                 .channel('employees_changes')
                 .on('postgres_changes', { event: '*', schema: 'public', table: EMPLOYEES_TABLE, filter: `user_id=eq.${gestorUserId}` }, payload => {
                     logAppAction("Supabase Realtime (Funcionários)", `Mudança detectada na tabela de funcionários: ${payload.eventType}`);
-                    // Re-fetch data to ensure consistency after any change
-                    supabase
-                        .from(EMPLOYEES_TABLE)
-                        .select('*')
-                        .eq('user_id', gestorUserId)
-                        .order('name', { ascending: true })
-                        .then(({ data, error }) => {
-                            if (error) {
-                                console.error("Error re-fetching employee data after real-time update:", error);
-                                return;
-                            }
-                            renderEmployees(data);
-                        })
-                        .catch(e => console.error("Caught error re-fetching employee data:", e));
+                    if (payload.eventType === 'INSERT') {
+                        currentEmployees.push(payload.new);
+                    } else if (payload.eventType === 'UPDATE') {
+                        const index = currentEmployees.findIndex(employee => employee.id === payload.old.id);
+                        if (index !== -1) {
+                            currentEmployees[index] = payload.new;
+                        }
+                    } else if (payload.eventType === 'DELETE') {
+                        currentEmployees = currentEmployees.filter(employee => employee.id !== payload.old.id);
+                    }
+                    // Re-sort to maintain order (based on name asc)
+                    currentEmployees.sort((a, b) => a.name.localeCompare(b.name));
+                    renderEmployees(currentEmployees);
                 })
                 .subscribe();
             logAppAction("Listener em Tempo Real (Funcionários)", "Listener para registros de funcionários ativado.");
@@ -1398,18 +1417,11 @@
         }
 
         /**
-         * Returns to the Gestor Login screen from the Gestor Content area.
+         * Returns to the Gestor Dashboard from other Gestor content tabs.
          */
-        function backToGestorLogin() {
-            document.getElementById('gestorContent').classList.add('hidden');
-            document.getElementById('gestorLogin').classList.remove('hidden');
-            document.getElementById('gestorLoginForm').reset(); // Clear password field
-            document.getElementById('gestorLoginError').classList.add('hidden'); // Hide any previous error
-            document.getElementById('plate').readOnly = false; // Ensure plate is writable for new entries if user logs in again
-            delete document.getElementById('maintenanceForm').dataset.editingId; // Clear editing state
-            document.getElementById('maintenanceForm').reset(); // Clear form
-            document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo'; // Reset button text
-            logAppAction("Navegação", "Voltando para a Tela de Login do Gestor.");
+        function backToGestorDashboard() {
+            showDashboardTab();
+            logAppAction("Navegação", "Voltando para o Dashboard do Gestor.");
         }
 
         /**
@@ -1485,7 +1497,8 @@
             document.getElementById('maintenanceForm').addEventListener('submit', handleMaintenanceFormSubmit);
             document.getElementById('exportCsvBtn').addEventListener('click', handleExportCsv);
             document.getElementById('employeeForm').addEventListener('submit', handleEmployeeFormSubmit);
-            document.getElementById('backButtonGestorContent').addEventListener('click', backToGestorLogin);
+            // Updated: backButtonGestorContent now goes to dashboard
+            document.getElementById('backButtonGestorContent').addEventListener('click', backToGestorDashboard);
             document.getElementById('vehicleSearch').addEventListener('input', (event) => {
                 renderMaintenanceRecordsGestor(allMaintenanceRecords, event.target.value);
             });
