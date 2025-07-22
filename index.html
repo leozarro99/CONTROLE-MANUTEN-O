@@ -32,6 +32,65 @@
         .hidden {
             display: none;
         }
+
+        /* Styles for toast notifications */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background-color: #333;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: fadeInOut 4s forwards;
+            min-width: 250px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.success {
+            background-color: #28a745; /* Green */
+        }
+
+        .toast.error {
+            background-color: #dc3545; /* Red */
+        }
+
+        .toast.info {
+            background-color: #007bff; /* Blue */
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6; /* Tailwind blue-500 */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center">
@@ -132,12 +191,46 @@
             <!-- Navigation for Gestor Tabs -->
             <div class="flex justify-center mb-8 border-b-2 border-gray-200">
                 <!-- Tabs with increased padding and w-1/2 -->
-                <button id="showVehicleManagement" class="py-4 px-8 w-1/2 text-lg font-semibold text-gray-700 border-b-4 border-indigo-500 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition duration-150 ease-in-out">
+                <button id="showDashboard" class="py-4 px-8 w-1/3 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
+                    Dashboard
+                </button>
+                <button id="showVehicleManagement" class="py-4 px-8 w-1/3 text-lg font-semibold text-gray-700 border-b-4 border-indigo-500 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition duration-150 ease-in-out">
                     Gerenciar Veículos
                 </button>
-                <button id="showEmployeeManagement" class="py-4 px-8 w-1/2 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
+                <button id="showEmployeeManagement" class="py-4 px-8 w-1/3 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
                     Gerenciar Funcionários
                 </button>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="hidden">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-5">Visão Geral da Frota</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Total Vehicles Card -->
+                    <div class="bg-blue-100 p-6 rounded-lg shadow-md flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-blue-700">Total de Veículos</p>
+                            <p id="totalVehiclesCount" class="text-3xl font-bold text-blue-900 mt-1">0</p>
+                        </div>
+                        <i class="fas fa-car text-blue-500 text-4xl opacity-50"></i>
+                    </div>
+                    <!-- Vehicles Needing Maintenance Card -->
+                    <div class="bg-yellow-100 p-6 rounded-lg shadow-md flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-yellow-700">Próximas Revisões</p>
+                            <p id="upcomingMaintenanceCount" class="text-3xl font-bold text-yellow-900 mt-1">0</p>
+                        </div>
+                        <i class="fas fa-exclamation-triangle text-yellow-500 text-4xl opacity-50"></i>
+                    </div>
+                    <!-- Overdue Maintenance Card -->
+                    <div class="bg-red-100 p-6 rounded-lg shadow-md flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-red-700">Revisões Vencidas</p>
+                            <p id="overdueMaintenanceCount" class="text-3xl font-bold text-red-900 mt-1">0</p>
+                        </div>
+                        <i class="fas fa-times-circle text-red-500 text-4xl opacity-50"></i>
+                    </div>
+                </div>
             </div>
 
             <!-- Vehicle Management Section -->
@@ -171,12 +264,23 @@
                     </div>
                 </form>
 
-                <!-- Export Button -->
-                <div class="flex justify-end mb-6">
+                <!-- Search and Export -->
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                    <div class="w-full sm:w-2/3 relative">
+                        <input type="text" id="vehicleSearch" placeholder="Buscar por placa ou funcionário..."
+                               class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
                     <button id="exportCsvBtn"
-                            class="inline-flex items-center px-5 py-2 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                            class="w-full sm:w-1/3 inline-flex items-center justify-center px-5 py-2 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
                         <i class="fas fa-file-csv mr-2"></i>Exportar para CSV
                     </button>
+                </div>
+
+                <!-- Loading Indicator for Vehicle Table -->
+                <div id="vehicleTableLoading" class="text-center py-4 hidden">
+                    <div class="spinner mx-auto"></div>
+                    <p class="text-gray-600 mt-2">Carregando veículos...</p>
                 </div>
 
                 <!-- Maintenance List Table (Gestor's Table - with actions and styling) -->
@@ -184,12 +288,12 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-lg">Placa</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Quilometragem Atual (Km)</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Próxima Revisão (Km)</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Km Faltantes</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Responsável</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Última Modificação</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-lg cursor-pointer" data-sort="plate">Placa <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="current_mileage">Quilometragem Atual (Km) <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="next_maintenance_due_km">Próxima Revisão (Km) <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="km_remaining">Km Faltantes <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="responsible_employee">Responsável <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer" data-sort="last_modified_at">Última Modificação <i class="fas fa-sort text-gray-400 ml-1"></i></th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tr-lg">Ações</th>
                             </tr>
                         </thead>
@@ -223,7 +327,7 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-lg">Nome do Funcionário</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-lg cursor-pointer" data-sort="name">Nome do Funcionário <i class="fas fa-sort text-gray-400 ml-1"></i></th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tr-lg">Ações</th>
                             </tr>
                         </thead>
@@ -247,7 +351,7 @@
         </div>
     </div>
 
-    <!-- Message Box for alerts -->
+    <!-- Message Box for alerts (kept for critical messages, but toasts are preferred for general feedback) -->
     <div id="messageBox" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full text-center border border-gray-200">
             <h3 id="messageBoxTitle" class="text-xl font-semibold text-gray-800 mb-4"></h3>
@@ -274,6 +378,9 @@
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
@@ -295,7 +402,13 @@
         }
 
         let isAuthReady = true; // For this setup with anon key, auth is immediately ready
+        let allMaintenanceRecords = []; // Cache for all maintenance records (for filtering/sorting)
         let currentEmployees = []; // Cache for employee data
+
+        let currentVehicleSortColumn = 'plate';
+        let currentVehicleSortDirection = 'asc';
+        let currentEmployeeSortColumn = 'name';
+        let currentEmployeeSortDirection = 'asc';
 
         // --- Supabase Table Names ---
         const MAINTENANCE_RECORDS_TABLE = 'maintenance_records';
@@ -311,7 +424,7 @@
         // --- Utility Functions ---
 
         /**
-         * Displays a custom message box to the user.
+         * Displays a custom message box to the user. (Kept for critical messages)
          * @param {string} title - The title of the message box.
          * @param {string} message - The content message.
          */
@@ -358,6 +471,45 @@
         }
 
         /**
+         * Displays a toast notification.
+         * @param {string} message - The message to display.
+         * @param {string} type - Type of toast: 'success', 'error', 'info'.
+         */
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                ${type === 'success' ? '<i class="fas fa-check-circle"></i>' : ''}
+                ${type === 'error' ? '<i class="fas fa-times-circle"></i>' : ''}
+                ${type === 'info' ? '<i class="fas fa-info-circle"></i>' : ''}
+                <span>${message}</span>
+            `;
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 4000); // Remove after 4 seconds
+            logAppAction(`Toast (${type})`, message);
+        }
+
+        /**
+         * Shows or hides a loading spinner.
+         * @param {boolean} show - True to show, false to hide.
+         * @param {string} elementId - The ID of the loading element.
+         */
+        function toggleLoading(show, elementId) {
+            const loadingElement = document.getElementById(elementId);
+            if (loadingElement) {
+                if (show) {
+                    loadingElement.classList.remove('hidden');
+                } else {
+                    loadingElement.classList.add('hidden');
+                }
+            }
+        }
+
+        /**
          * Logs application actions to the console for debugging.
          * @param {string} action - Description of the action.
          * @param {string} [details=''] - Additional details for the action.
@@ -389,42 +541,101 @@
         // --- Render Functions ---
 
         /**
-         * Renders the list of maintenance records for the Gestor portal.
-         * @param {Array<Object>} records - Array of maintenance record objects.
+         * Renders the dashboard summary cards.
+         * @param {Array<Object>} records - All maintenance records.
          */
-        function renderMaintenanceRecordsGestor(records) {
+        function renderDashboard(records) {
+            const totalVehicles = records.length;
+            const upcomingMaintenance = records.filter(record => {
+                const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
+                return kmRemaining > 0 && kmRemaining <= 1000; // Vehicles needing maintenance soon (e.g., within 1000km)
+            }).length;
+            const overdueMaintenance = records.filter(record => {
+                const kmRemaining = (record.next_maintenance_due_km || 0) - (record.current_mileage || 0);
+                return kmRemaining <= 0; // Vehicles with overdue maintenance
+            }).length;
+
+            document.getElementById('totalVehiclesCount').textContent = totalVehicles;
+            document.getElementById('upcomingMaintenanceCount').textContent = upcomingMaintenance;
+            document.getElementById('overdueMaintenanceCount').textContent = overdueMaintenance;
+            logAppAction("Dashboard Renderizado", `Total: ${totalVehicles}, Próximas: ${upcomingMaintenance}, Vencidas: ${overdueMaintenance}`);
+        }
+
+        /**
+         * Renders the list of maintenance records for the Gestor portal, applying search and sort.
+         * @param {Array<Object>} records - Array of maintenance record objects.
+         * @param {string} [searchTerm=''] - Optional search term.
+         */
+        function renderMaintenanceRecordsGestor(records, searchTerm = '') {
             const maintenanceList = document.getElementById('maintenanceList');
             maintenanceList.innerHTML = ''; // Clear existing rows
 
-            if (records.length === 0) {
-                maintenanceList.innerHTML = `<tr class="odd:bg-white even:bg-gray-50"><td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum veículo cadastrado ainda.</td></tr>`;
+            let filteredRecords = records;
+
+            // Apply search filter
+            if (searchTerm) {
+                const lowerCaseSearchTerm = searchTerm.toLowerCase();
+                filteredRecords = records.filter(record => {
+                    return (record.plate && record.plate.toLowerCase().includes(lowerCaseSearchTerm)) ||
+                           (record.responsible_employee && record.responsible_employee.toLowerCase().includes(lowerCaseSearchTerm));
+                });
+                logAppAction("Filtragem de Veículos", `Filtrando por "${searchTerm}". ${filteredRecords.length} resultados.`);
+            }
+
+            // Apply sorting
+            filteredRecords.sort((a, b) => {
+                let valA, valB;
+                if (currentVehicleSortColumn === 'km_remaining') {
+                    valA = (a.next_maintenance_due_km || 0) - (a.current_mileage || 0);
+                    valB = (b.next_maintenance_due_km || 0) - (b.current_mileage || 0);
+                } else if (currentVehicleSortColumn === 'last_modified_at') {
+                    valA = new Date(a.last_modified_at || 0).getTime();
+                    valB = new Date(b.last_modified_at || 0).getTime();
+                } else {
+                    valA = a[currentVehicleSortColumn] || '';
+                    valB = b[currentVehicleSortColumn] || '';
+                }
+
+                if (typeof valA === 'string') {
+                    return currentVehicleSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                } else {
+                    return currentVehicleSortDirection === 'asc' ? valA - valB : valB - valA;
+                }
+            });
+
+            if (filteredRecords.length === 0) {
+                maintenanceList.innerHTML = `<tr class="odd:bg-white even:bg-gray-50"><td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum veículo encontrado.</td></tr>`;
                 return;
             }
 
-            records.forEach((record, index) => {
+            filteredRecords.forEach((record, index) => {
                 const nextMaintenanceDueKm = record.next_maintenance_due_km || 0;
                 const kmRemainingForMaintenance = nextMaintenanceDueKm - (record.current_mileage || 0);
                 const lastModified = formatTimestamp(record.last_modified_at); // Get formatted last modified date
 
+                let kmRemainingBadge = '';
+                if (kmRemainingForMaintenance <= 0) {
+                    kmRemainingBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <i class="fas fa-exclamation-circle mr-1"></i> VENCIDA
+                                        </span>`;
+                } else if (kmRemainingForMaintenance <= 1000) {
+                    kmRemainingBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            <i class="fas fa-hourglass-half mr-1"></i> ${kmRemainingForMaintenance} Km
+                                        </span>`;
+                } else {
+                    kmRemainingBadge = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <i class="fas fa-check-circle mr-1"></i> ${kmRemainingForMaintenance} Km
+                                        </span>`;
+                }
+
                 const row = document.createElement('tr');
                 row.className = `hover:bg-gray-100 transition duration-150 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`;
-
-                let kmRemainingClass = '';
-                if (kmRemainingForMaintenance <= 0) {
-                    kmRemainingClass = 'font-bold text-red-600';
-                } else if (kmRemainingForMaintenance <= 1000) {
-                    kmRemainingClass = 'font-semibold text-yellow-600';
-                } else {
-                    kmRemainingClass = 'text-green-600';
-                }
 
                 row.innerHTML = `
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 rounded-bl-lg">${record.plate}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.current_mileage || 'N/A'} Km</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">${nextMaintenanceDueKm} Km</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm ${kmRemainingClass}">
-                        ${kmRemainingForMaintenance <= 0 ? 'VENCIDA' : kmRemainingForMaintenance} Km
-                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${kmRemainingBadge}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.responsible_employee || 'Não atribuído'}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${lastModified}</td> <!-- Display Last Modified Date -->
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -456,6 +667,13 @@
             const employeeListTableBody = document.getElementById('employeeList');
             employeeListTableBody.innerHTML = '';
             currentEmployees = employees; // Update global cache
+
+            // Apply sorting
+            employees.sort((a, b) => {
+                let valA = a[currentEmployeeSortColumn] || '';
+                let valB = b[currentEmployeeSortColumn] || '';
+                return currentEmployeeSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            });
 
             if (employees.length === 0) {
                 employeeListTableBody.innerHTML = `<tr class="odd:bg-white even:bg-gray-50"><td colspan="2" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum funcionário cadastrado ainda.</td></tr>`;
@@ -511,48 +729,41 @@
         // --- Supabase Data Operations & Real-time Listeners ---
 
         /**
+         * Fetches and renders maintenance records for the Gestor portal.
+         */
+        async function fetchAndRenderMaintenanceRecords() {
+            toggleLoading(true, 'vehicleTableLoading');
+            logAppAction("Busca de Dados", "Iniciando busca de registros de manutenção.");
+            try {
+                const { data, error } = await supabase
+                    .from(MAINTENANCE_RECORDS_TABLE)
+                    .select('*')
+                    .eq('user_id', gestorUserId)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                allMaintenanceRecords = data; // Cache the data
+                renderMaintenanceRecordsGestor(allMaintenanceRecords, document.getElementById('vehicleSearch').value);
+                renderDashboard(allMaintenanceRecords); // Update dashboard
+                logAppAction("Busca de Dados Concluída", `Total de registros: ${data.length}`);
+            } catch (e) {
+                console.error("Error fetching maintenance data:", e);
+                showToast("Erro ao carregar dados de manutenção: " + e.message, 'error');
+            } finally {
+                toggleLoading(false, 'vehicleTableLoading');
+            }
+        }
+
+        /**
          * Sets up real-time listeners for maintenance records.
          */
         function setupRealtimeListenerGestor() {
-            // Initial fetch
-            supabase
-                .from(MAINTENANCE_RECORDS_TABLE)
-                .select('*')
-                .eq('user_id', gestorUserId)
-                .order('created_at', { ascending: false })
-                .then(({ data, error }) => {
-                    if (error) {
-                        console.error("Error fetching initial maintenance data:", error);
-                        showMessageBox("Erro de Sincronização", "Não foi possível obter dados de manutenção: " + error.message);
-                        return;
-                    }
-                    renderMaintenanceRecordsGestor(data);
-                    logAppAction("Supabase Listener (Gestor)", `Dados de manutenção carregados. Total: ${data.length} registros.`);
-                })
-                .catch(e => {
-                    console.error("Caught error fetching initial maintenance data:", e);
-                    showMessageBox("Erro Inesperado", "Ocorreu um erro ao carregar dados de manutenção: " + e.message);
-                });
-
-            // Real-time subscription
+            fetchAndRenderMaintenanceRecords(); // Initial fetch
             supabase
                 .channel('maintenance_records_changes')
                 .on('postgres_changes', { event: '*', schema: 'public', table: MAINTENANCE_RECORDS_TABLE, filter: `user_id=eq.${gestorUserId}` }, payload => {
                     logAppAction("Supabase Realtime (Gestor)", `Mudança detectada na tabela de manutenção: ${payload.eventType}`);
-                    // Re-fetch data to ensure consistency after any change
-                    supabase
-                        .from(MAINTENANCE_RECORDS_TABLE)
-                        .select('*')
-                        .eq('user_id', gestorUserId)
-                        .order('created_at', { ascending: false })
-                        .then(({ data, error }) => {
-                            if (error) {
-                                console.error("Error re-fetching maintenance data after real-time update:", error);
-                                return;
-                            }
-                            renderMaintenanceRecordsGestor(data);
-                        })
-                        .catch(e => console.error("Caught error re-fetching maintenance data:", e));
+                    fetchAndRenderMaintenanceRecords(); // Re-fetch data to ensure consistency after any change
                 })
                 .subscribe();
             logAppAction("Listener em Tempo Real (Gestor)", "Listener para registros de manutenção ativado.");
@@ -571,7 +782,7 @@
                 .then(({ data, error }) => {
                     if (error) {
                         console.error("Error fetching initial employee data:", error);
-                        showMessageBox("Erro de Sincronização", "Não foi possível obter a lista de funcionários: " + error.message);
+                        showToast("Não foi possível obter a lista de funcionários: " + error.message, 'error');
                         return;
                     }
                     renderEmployees(data);
@@ -579,7 +790,7 @@
                 })
                 .catch(e => {
                     console.error("Caught error fetching initial employee data:", e);
-                    showMessageBox("Erro Inesperado", "Ocorreu um erro ao carregar dados de funcionários: " + e.message);
+                    showToast("Ocorreu um erro ao carregar dados de funcionários: " + e.message, 'error');
                 });
 
             // Real-time subscription
@@ -632,7 +843,7 @@
             logAppAction("Envio de Formulário (Gestor)", `Tentativa de adicionar/atualizar veículo. Placa: ${plate}, Próxima Revisão: ${nextMaintenanceDueKmGestor} Km, Responsável: ${responsibleEmployee}`);
 
             if (!isAuthReady) {
-                showMessageBox("Erro", "O sistema não está pronto. Por favor, aguarde a inicialização.");
+                showToast("O sistema não está pronto. Por favor, aguarde a inicialização.", 'error');
                 return;
             }
 
@@ -651,7 +862,7 @@
                     if (checkError) throw checkError;
 
                     if (existingVehicles && existingVehicles.length > 0) {
-                        showMessageBox("Erro de Duplicação", `Já existe um veículo cadastrado com a placa "${plate}". Por favor, edite o registro existente ou use uma placa diferente.`);
+                        showToast(`Já existe um veículo cadastrado com a placa "${plate}". Por favor, edite o registro existente ou use uma placa diferente.`, 'error');
                         logAppAction("Erro de Validação", `Tentativa de adicionar placa duplicada: ${plate}`);
                         return; // Stop execution if duplicate plate found
                     }
@@ -693,7 +904,7 @@
 
                 if (response.error) throw response.error;
 
-                showMessageBox("Sucesso", `Registro ${editingId ? 'atualizado' : 'adicionado'} com sucesso!`);
+                showToast(`Registro ${editingId ? 'atualizado' : 'adicionado'} com sucesso!`, 'success');
                 logAppAction(editingId ? "Atualização de Veículo" : "Adição de Veículo", `Veículo ${plate} ${editingId ? 'atualizado' : 'adicionado'}.`);
                 document.getElementById('maintenanceForm').reset();
                 delete document.getElementById('maintenanceForm').dataset.editingId; // Clear editing state
@@ -702,7 +913,7 @@
             }
             catch (e) {
                 console.error("Error saving vehicle record: ", e);
-                showMessageBox("Erro", "Erro ao salvar registro: " + e.message);
+                showToast("Erro ao salvar registro: " + e.message, 'error');
             }
         }
 
@@ -720,7 +931,7 @@
                 document.getElementById('maintenanceForm').dataset.editingId = id;
                 document.getElementById('plate').readOnly = true; // Make plate read-only when editing
                 document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-edit mr-2"></i>Atualizar Veículo'; // Change button text
-                showMessageBox("Editar Registro", "Modifique os campos e clique em 'Atualizar Veículo' para salvar. A placa não pode ser alterada.");
+                showToast("Modifique os campos e clique em 'Atualizar Veículo' para salvar. A placa não pode ser alterada.", 'info');
                 logAppAction("Edição de Veículo", `Iniciando edição do veículo com ID: ${id}`);
             }
         }
@@ -740,11 +951,11 @@
                         .eq('user_id', gestorUserId);
 
                     if (error) throw error;
-                    showMessageBox("Sucesso", "Registro excluído com sucesso!");
+                    showToast("Registro excluído com sucesso!", 'success');
                     logAppAction("Exclusão de Veículo", `Veículo com ID ${id} excluído com sucesso.`);
                 } catch (e) {
                     console.error("Error deleting vehicle record: ", e);
-                    showMessageBox("Erro", "Erro ao excluir registro: " + e.message);
+                    showToast("Erro ao excluir registro: " + e.message, 'error');
                 }
             } else {
                 logAppAction("Exclusão de Veículo", `Exclusão do veículo com ID ${id} cancelada.`);
@@ -757,7 +968,7 @@
         async function handleExportCsv() {
             logAppAction("Exportação CSV", "Botão 'Exportar para CSV' clicado. Iniciando exportação.");
             if (!isAuthReady) {
-                showMessageBox("Erro", "O sistema não está pronto para exportar. Por favor, aguarde a inicialização.");
+                showToast("O sistema não está pronto para exportar. Por favor, aguarde a inicialização.", 'error');
                 return;
             }
 
@@ -770,7 +981,7 @@
                 if (error) throw error;
 
                 if (recordsToExport.length === 0) {
-                    showMessageBox("Informação", "Não há dados para exportar para CSV.");
+                    showToast("Não há dados para exportar para CSV.", 'info');
                     return;
                 }
 
@@ -793,13 +1004,13 @@
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    showMessageBox("Exportação Concluída", "Dados exportados para 'controle_manutencao_veiculos.csv' com sucesso!");
+                    showToast("Dados exportados para 'controle_manutencao_veiculos.csv' com sucesso!", 'success');
                 } else {
                     showMessageBox("Erro de Navegador", "Seu navegador não suporta download de arquivos diretamente. Por favor, copie o conteúdo abaixo e cole em um arquivo de texto, salvando como .csv:\n\n" + csvContent);
                 }
             } catch (e) {
                 console.error("Error exporting data: ", e);
-                showMessageBox("Erro na Exportação", "Erro ao exportar dados: " + e.message);
+                showToast("Erro na Exportação: " + e.message, 'error');
             }
         }
 
@@ -817,11 +1028,11 @@
             logAppAction("Envio de Formulário (Motorista)", `Tentativa de registrar quilometragem. Placa: "${driverPlate}", Funcionário: "${driverResponsibleEmployee}", KM: ${driverDailyMileage}`);
 
             if (!isAuthReady) {
-                showMessageBox("Erro", "O sistema não está pronto. Por favor, aguarde a inicialização.");
+                showToast("O sistema não está pronto. Por favor, aguarde a inicialização.", 'error');
                 return;
             }
             if (!driverResponsibleEmployee || !driverPlate || isNaN(driverDailyMileage) || driverDailyMileage < 0) {
-                showMessageBox("Erro de Entrada", "Por favor, preencha todos os campos corretamente.");
+                showToast("Por favor, preencha todos os campos corretamente.", 'error');
                 logAppAction("Erro de Entrada", "Campos do formulário do motorista incompletos ou inválidos.");
                 return;
             }
@@ -836,13 +1047,12 @@
 
                 if (plateCheckError) {
                     console.error("[Console] Erro ao verificar a existência da placa:", plateCheckError);
-                    showMessageBox("Erro de Busca", "Erro ao verificar a placa: " + plateCheckError.message);
+                    showToast("Erro ao verificar a placa: " + plateCheckError.message, 'error');
                     return;
                 }
 
                 if (!plateCheck || plateCheck.length === 0) {
-                    // Changed message to "Placa inexistente" as requested
-                    showMessageBox("Erro", `Placa inexistente`);
+                    showToast(`Placa inexistente`, 'error');
                     logAppAction("Placa Não Cadastrada", `Placa "${driverPlate}" não encontrada no cadastro do gestor.`);
                     return;
                 }
@@ -863,7 +1073,7 @@
 
                 if (selectError) {
                     console.error("[Console] Erro durante a seleção do veículo para o motorista:", selectError);
-                    showMessageBox("Erro de Busca", "Erro ao buscar veículo: " + selectError.message);
+                    showToast("Erro ao buscar veículo: " + selectError.message, 'error');
                     return; // Stop execution on select error
                 }
 
@@ -880,19 +1090,19 @@
 
                     if (updateError) {
                         console.error("[Console] Erro durante a atualização da quilometragem:", updateError);
-                        showMessageBox("Erro de Atualização", "Erro ao atualizar quilometragem: " + updateError.message);
+                        showToast("Erro ao atualizar quilometragem: " + updateError.message, 'error');
                         return; // Stop execution on update error
                     }
-                    showMessageBox("Sucesso", `Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km!`);
+                    showToast(`Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km!`, 'success');
                     logAppAction("Atualização de Quilometragem", `Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km.`);
                 } else {
-                    showMessageBox("Veículo Não Encontrado", `Veículo com placa "${driverPlate}" e funcionário "${driverResponsibleEmployee}" não encontrado. Verifique os dados ou contate o gestor.`);
+                    showToast(`Veículo com placa "${driverPlate}" e funcionário "${driverResponsibleEmployee}" não encontrado. Verifique os dados ou contate o gestor.`, 'error');
                     logAppAction("Veículo Não Encontrado", `Nenhum veículo correspondente encontrado para Placa: "${driverPlate}", Funcionário: "${driverResponsibleEmployee}".`);
                 }
                 document.getElementById('dailyMileageForm').reset();
             } catch (e) {
                 console.error("[Console] Erro geral ao registrar quilometragem: ", e);
-                showMessageBox("Erro Inesperado", "Ocorreu um erro ao registrar quilometragem: " + e.message);
+                showToast("Ocorreu um erro ao registrar quilometragem: " + e.message, 'error');
             }
         }
 
@@ -906,11 +1116,11 @@
             logAppAction("Envio de Formulário (Funcionário)", `Tentativa de adicionar funcionário: "${employeeName}"`);
 
             if (!employeeName) {
-                showMessageBox("Erro de Entrada", "Por favor, digite o nome do funcionário.");
+                showToast("Por favor, digite o nome do funcionário.", 'error');
                 return;
             }
             if (!isAuthReady) {
-                showMessageBox("Erro", "O sistema não está pronto. Por favor, aguarde a inicialização.");
+                showToast("O sistema não está pronto. Por favor, aguarde a inicialização.", 'error');
                 return;
             }
 
@@ -928,7 +1138,7 @@
                 }
 
                 if (existingEmployee) {
-                    showMessageBox("Erro", `O funcionário "${employeeName}" já existe.`);
+                    showToast(`O funcionário "${employeeName}" já existe.`, 'info');
                     return;
                 }
 
@@ -939,11 +1149,11 @@
 
                 if (error) throw error;
 
-                showMessageBox("Sucesso", `Funcionário "${employeeName}" adicionado com sucesso!`);
+                showToast(`Funcionário "${employeeName}" adicionado com sucesso!`, 'success');
                 document.getElementById('employeeForm').reset();
             } catch (e) {
                 console.error("Error adding employee: ", e);
-                showMessageBox("Erro", "Erro ao adicionar funcionário: " + e.message);
+                showToast("Erro ao adicionar funcionário: " + e.message, 'error');
             }
         }
 
@@ -963,11 +1173,11 @@
                         .eq('user_id', gestorUserId);
 
                     if (error) throw error;
-                    showMessageBox("Sucesso", "Funcionário excluído com sucesso!");
+                    showToast("Funcionário excluído com sucesso!", 'success');
                     logAppAction("Exclusão de Funcionário", `Funcionário (ID: ${id}) excluído.`);
                 } catch (e) {
                     console.error("Error deleting employee: ", e);
-                    showMessageBox("Erro", "Erro ao excluir funcionário: " + e.message);
+                    showToast("Erro ao excluir funcionário: " + e.message, 'error');
                 }
             } else {
                 logAppAction("Exclusão de Funcionário", `Exclusão do funcionário (ID: ${id}) cancelada.`);
@@ -992,6 +1202,8 @@
                 document.getElementById('plate').readOnly = false; // Ensure plate is writable by default for new entries
                 document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo'; // Set initial button text
                 logAppAction("Login do Gestor", "Login bem-sucedido.");
+                // Default to dashboard tab on login
+                showDashboardTab();
             } else {
                 gestorLoginError.classList.remove('hidden');
                 logAppAction("Login do Gestor", "Login falhou: Senha incorreta.");
@@ -1050,11 +1262,16 @@
             document.getElementById('gestorLoginError').classList.add('hidden');
             document.getElementById('gestorLogin').classList.remove('hidden');
             document.getElementById('gestorContent').classList.add('hidden');
-            // Default to vehicle management tab
-            document.getElementById('vehicleManagementSection').classList.remove('hidden');
-            document.getElementById('employeeManagementSection').classList.add('hidden');
-            document.getElementById('showVehicleManagement').classList.add('border-indigo-500', 'text-indigo-600');
+            // Default to dashboard tab on initial entry to gestor portal
+            document.getElementById('dashboardSection').classList.add('hidden'); // Ensure hidden initially
+            document.getElementById('vehicleManagementSection').classList.add('hidden'); // Ensure hidden initially
+            document.getElementById('employeeManagementSection').classList.add('hidden'); // Ensure hidden initially
+            
+            // Reset tab styling
+            document.getElementById('showDashboard').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showVehicleManagement').classList.remove('border-indigo-500', 'text-indigo-600');
             document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+
             logAppAction("Navegação", "Acessando Portal do Gestor (Tela de Login).");
         }
 
@@ -1084,12 +1301,29 @@
         }
 
         /**
+         * Switches the Gestor view to Dashboard.
+         */
+        function showDashboardTab() {
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            document.getElementById('vehicleManagementSection').classList.add('hidden');
+            document.getElementById('employeeManagementSection').classList.add('hidden');
+
+            document.getElementById('showDashboard').classList.add('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showVehicleManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            logAppAction("Navegação (Gestor)", "Acessando aba 'Dashboard'.");
+        }
+
+        /**
          * Switches the Gestor view to Vehicle Management.
          */
         function showVehicleManagementTab() {
+            document.getElementById('dashboardSection').classList.add('hidden');
             document.getElementById('vehicleManagementSection').classList.remove('hidden');
             document.getElementById('employeeManagementSection').classList.add('hidden');
+
             document.getElementById('showVehicleManagement').classList.add('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showDashboard').classList.remove('border-indigo-500', 'text-indigo-600');
             document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
             
             // Ensure plate field is editable and editing state is cleared when switching to this tab
@@ -1105,9 +1339,12 @@
          * Switches the Gestor view to Employee Management.
          */
         function showEmployeeManagementTab() {
+            document.getElementById('dashboardSection').classList.add('hidden');
             document.getElementById('vehicleManagementSection').classList.add('hidden');
             document.getElementById('employeeManagementSection').classList.remove('hidden');
+
             document.getElementById('showEmployeeManagement').classList.add('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showDashboard').classList.remove('border-indigo-500', 'text-indigo-600');
             document.getElementById('showVehicleManagement').classList.remove('border-indigo-500', 'text-indigo-600');
             logAppAction("Navegação (Gestor)", "Acessando aba 'Gerenciar Funcionários'.");
         }
@@ -1130,12 +1367,44 @@
             document.getElementById('backButtonGestorLogin').addEventListener('click', backToLandingPage);
             document.getElementById('gestorLoginForm').addEventListener('submit', handleGestorLogin);
             document.getElementById('forgotPasswordBtn').addEventListener('click', handleForgotPassword);
+            document.getElementById('showDashboard').addEventListener('click', showDashboardTab); // New Dashboard tab
             document.getElementById('showVehicleManagement').addEventListener('click', showVehicleManagementTab);
             document.getElementById('showEmployeeManagement').addEventListener('click', showEmployeeManagementTab);
             document.getElementById('maintenanceForm').addEventListener('submit', handleMaintenanceFormSubmit);
             document.getElementById('exportCsvBtn').addEventListener('click', handleExportCsv);
             document.getElementById('employeeForm').addEventListener('submit', handleEmployeeFormSubmit);
             document.getElementById('backButtonGestorContent').addEventListener('click', backToGestorLogin);
+            document.getElementById('vehicleSearch').addEventListener('input', (event) => {
+                renderMaintenanceRecordsGestor(allMaintenanceRecords, event.target.value);
+            });
+
+            // Add sorting listeners for vehicle table headers
+            document.querySelectorAll('#vehicleManagementSection thead th[data-sort]').forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.sort;
+                    if (currentVehicleSortColumn === column) {
+                        currentVehicleSortDirection = currentVehicleSortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentVehicleSortColumn = column;
+                        currentVehicleSortDirection = 'asc';
+                    }
+                    renderMaintenanceRecordsGestor(allMaintenanceRecords, document.getElementById('vehicleSearch').value);
+                });
+            });
+
+            // Add sorting listeners for employee table headers
+            document.querySelectorAll('#employeeManagementSection thead th[data-sort]').forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.sort;
+                    if (currentEmployeeSortColumn === column) {
+                        currentEmployeeSortDirection = currentEmployeeSortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentEmployeeSortColumn = column;
+                        currentEmployeeSortDirection = 'asc';
+                    }
+                    renderEmployees(currentEmployees);
+                });
+            });
 
             // Message Box Close Button
             document.getElementById('messageBoxClose').addEventListener('click', () => {
@@ -1149,9 +1418,7 @@
          */
         async function initializeApp() {
             setupEventListeners();
-            // The addInitialDataIfEmpty function now does nothing, ensuring a clean slate.
             await addInitialDataIfEmpty(); 
-            // Initial data loading for employees will trigger renderEmployees, which populates selects
             setupRealtimeListenerEmployees(); // Load employees and set up real-time updates
             logAppAction("Inicialização", "Aplicativo inicializado.");
         }
