@@ -172,10 +172,7 @@
             <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 text-center flex-grow">
                 <i class="fas fa-user-secret text-green-600 mr-3"></i>Portal do Gestor
             </h1>
-            <button id="logoutGestorBtn"
-                    class="ml-4 px-4 py-2 bg-red-500 text-white rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out">
-                <i class="fas fa-sign-out-alt mr-2"></i>Sair
-            </button>
+            <!-- Removed the logoutGestorBtn as per user request -->
         </div>
 
         <!-- Gestor Login Form -->
@@ -1423,14 +1420,6 @@
         }
 
         /**
-         * Returns to the Gestor Dashboard from other Gestor content tabs.
-         */
-        function backToGestorDashboard() {
-            showDashboardTab();
-            logAppAction("Navegação", "Voltando para o Dashboard do Gestor.");
-        }
-
-        /**
          * Switches the Gestor view to Dashboard.
          */
         function showDashboardTab() {
@@ -1497,15 +1486,15 @@
             document.getElementById('backButtonGestorLogin').addEventListener('click', backToLandingPage);
             document.getElementById('gestorLoginForm').addEventListener('submit', handleGestorLogin);
             document.getElementById('forgotPasswordBtn').addEventListener('click', handleForgotPassword);
-            document.getElementById('logoutGestorBtn').addEventListener('click', backToLandingPage); // New logout button for Gestor
+            // Removed logoutGestorBtn listener
             document.getElementById('showDashboard').addEventListener('click', showDashboardTab); // New Dashboard tab
             document.getElementById('showVehicleManagement').addEventListener('click', showVehicleManagementTab);
             document.getElementById('showEmployeeManagement').addEventListener('click', showEmployeeManagementTab);
             document.getElementById('maintenanceForm').addEventListener('submit', handleMaintenanceFormSubmit);
             document.getElementById('exportCsvBtn').addEventListener('click', handleExportCsv);
             document.getElementById('employeeForm').addEventListener('submit', handleEmployeeFormSubmit);
-            // Updated: backButtonGestorContent now goes to dashboard
-            document.getElementById('backButtonGestorContent').addEventListener('click', backToGestorDashboard);
+            // Updated: backButtonGestorContent now goes to landing page
+            document.getElementById('backButtonGestorContent').addEventListener('click', backToLandingPage);
             document.getElementById('vehicleSearch').addEventListener('input', (event) => {
                 renderMaintenanceRecordsGestor(allMaintenanceRecords, event.target.value);
             });
