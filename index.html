@@ -821,10 +821,69 @@
          * Adds initial data (employees and vehicles) if the app metadata flag is not set for the current user.
          */
         async function addInitialDataIfEmpty() {
-            console.log("Checking if initial data needs to be added for gestorUserId:", gestorUserId);
-            // Removed all initial data insertion logic as per user request.
-            // The app will now start with empty tables, ready for new registrations.
-            logAppAction("Verificação de Dados Iniciais", "Dados iniciais não serão adicionados. Aplicativo pronto para novos cadastros.");
+            logAppAction("Verificação de Dados Iniciais", `Verificando se dados iniciais precisam ser adicionados para o usuário: ${gestorUserId}`);
+
+            try {
+                // Check if employees table is empty for this user
+                const { count: employeeCount, error: employeeCountError } = await supabase
+                    .from(EMPLOYEES_TABLE)
+                    .select('id', { count: 'exact' })
+                    .eq('user_id', gestorUserId);
+
+                if (employeeCountError) throw employeeCountError;
+
+                // Check if maintenance records table is empty for this user
+                const { count: maintenanceCount, error: maintenanceCountError } = await supabase
+                    .from(MAINTENANCE_RECORDS_TABLE)
+                    .select('id', { count: 'exact' })
+                    .eq('user_id', gestorUserId);
+
+                if (maintenanceCountError) throw maintenanceCountError;
+
+                if (employeeCount === 0 && maintenanceCount === 0) {
+                    logAppAction("Dados Iniciais", "Tabelas de funcionários e manutenção vazias. Adicionando dados de exemplo.");
+
+                    // Sample Employees
+                    const sampleEmployees = [
+                        { name: 'João Silva', user_id: gestorUserId },
+                        { name: 'Maria Oliveira', user_id: gestorUserId },
+                        { name: 'Pedro Souza', user_id: gestorUserId },
+                        { name: 'Ana Costa', user_id: gestorUserId },
+                        { name: 'Carlos Pereira', user_id: gestorUserId }
+                    ];
+
+                    const { error: employeeInsertError } = await supabase
+                        .from(EMPLOYEES_TABLE)
+                        .insert(sampleEmployees);
+
+                    if (employeeInsertError) throw employeeInsertError;
+                    showToast("Funcionários de exemplo adicionados!", 'success');
+                    logAppAction("Dados Iniciais", "Funcionários de exemplo inseridos.");
+
+                    // Sample Maintenance Records
+                    const sampleMaintenanceRecords = [
+                        { plate: 'ABC1234', current_mileage: 50000, next_maintenance_due_km: 60000, responsible_employee: 'João Silva', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'XYZ5678', current_mileage: 75000, next_maintenance_due_km: 70000, responsible_employee: 'Maria Oliveira', user_id: gestorUserId, last_modified_at: new Date(Date.now() - 86400000 * 5).toISOString() }, // 5 days ago, overdue
+                        { plate: 'DEF9012', current_mileage: 20000, next_maintenance_due_km: 25000, responsible_employee: 'João Silva', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'GHI3456', current_mileage: 99500, next_maintenance_due_km: 100000, responsible_employee: 'Pedro Souza', user_id: gestorUserId, last_modified_at: new Date().toISOString() }, // Near maintenance
+                        { plate: 'JKL7890', current_mileage: 12000, next_maintenance_due_km: 30000, responsible_employee: 'Ana Costa', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'MNO1122', current_mileage: 45000, next_maintenance_due_km: 44000, responsible_employee: 'Carlos Pereira', user_id: gestorUserId, last_modified_at: new Date(Date.now() - 86400000 * 10).toISOString() } // 10 days ago, overdue
+                    ];
+
+                    const { error: maintenanceInsertError } = await supabase
+                        .from(MAINTENANCE_RECORDS_TABLE)
+                        .insert(sampleMaintenanceRecords);
+
+                    if (maintenanceInsertError) throw maintenanceInsertError;
+                    showToast("Registros de veículos de exemplo adicionados!", 'success');
+                    logAppAction("Dados Iniciais", "Registros de veículos de exemplo inseridos.");
+                } else {
+                    logAppAction("Dados Iniciais", "Dados existentes encontrados. Não adicionando dados de exemplo.");
+                }
+            } catch (e) {
+                console.error("Error adding initial data:", e);
+                showToast("Erro ao adicionar dados iniciais: " + e.message, 'error');
+            }
         }
 
         // --- Event Handlers ---
