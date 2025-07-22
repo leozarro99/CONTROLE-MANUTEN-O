@@ -768,7 +768,7 @@
             employees.sort((a, b) => {
                 let valA = a[currentEmployeeSortColumn] || '';
                 let valB = b[currentEmployeeSortColumn] || '';
-                return currentEmployeeSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                return currentEmployeeSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(a);
             });
 
             if (employees.length === 0) {
@@ -1100,8 +1100,11 @@
                     return;
                 }
 
+                // Add UTF-8 BOM to ensure correct character encoding in Excel
+                let csvContent = '\uFEFF'; 
+                
                 // Use semicolon as delimiter and replace internal semicolons with commas
-                let csvContent = `Total de Veículos;${recordsToExport.length}\n`; // Add total vehicles as the first line
+                csvContent += `Total de Veículos;${recordsToExport.length}\n`; // Add total vehicles as the first line
                 csvContent += "Placa;Quilometragem Atual (Km);Próxima Revisão (Km);Km Faltantes;Responsável;Última Modificação\n";
                 recordsToExport.forEach(record => {
                     const nextMaintenanceDueKm = record.next_maintenance_due_km || 0;
