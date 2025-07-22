@@ -843,13 +843,18 @@
                 if (employeeCount === 0 && maintenanceCount === 0) {
                     logAppAction("Dados Iniciais", "Tabelas de funcionários e manutenção vazias. Adicionando dados de exemplo.");
 
-                    // Sample Employees
+                    // Sample Employees (More diverse names)
                     const sampleEmployees = [
                         { name: 'João Silva', user_id: gestorUserId },
                         { name: 'Maria Oliveira', user_id: gestorUserId },
                         { name: 'Pedro Souza', user_id: gestorUserId },
                         { name: 'Ana Costa', user_id: gestorUserId },
-                        { name: 'Carlos Pereira', user_id: gestorUserId }
+                        { name: 'Carlos Pereira', user_id: gestorUserId },
+                        { name: 'Fernanda Lima', user_id: gestorUserId },
+                        { name: 'Rafael Santos', user_id: gestorUserId },
+                        { name: 'Gabriela Alves', user_id: gestorUserId },
+                        { name: 'Lucas Martins', user_id: gestorUserId },
+                        { name: 'Beatriz Rocha', user_id: gestorUserId }
                     ];
 
                     const { error: employeeInsertError } = await supabase
@@ -860,14 +865,32 @@
                     showToast("Funcionários de exemplo adicionados!", 'success');
                     logAppAction("Dados Iniciais", "Funcionários de exemplo inseridos.");
 
-                    // Sample Maintenance Records
+                    // Sample Maintenance Records (More records, diverse statuses, and responsible employees)
                     const sampleMaintenanceRecords = [
+                        // Vehicles in good standing
                         { plate: 'ABC1234', current_mileage: 50000, next_maintenance_due_km: 60000, responsible_employee: 'João Silva', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'XYZ5678', current_mileage: 75000, next_maintenance_due_km: 70000, responsible_employee: 'Maria Oliveira', user_id: gestorUserId, last_modified_at: new Date(Date.now() - 86400000 * 5).toISOString() }, // 5 days ago, overdue
                         { plate: 'DEF9012', current_mileage: 20000, next_maintenance_due_km: 25000, responsible_employee: 'João Silva', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'GHI3456', current_mileage: 99500, next_maintenance_due_km: 100000, responsible_employee: 'Pedro Souza', user_id: gestorUserId, last_modified_at: new Date().toISOString() }, // Near maintenance
                         { plate: 'JKL7890', current_mileage: 12000, next_maintenance_due_km: 30000, responsible_employee: 'Ana Costa', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
-                        { plate: 'MNO1122', current_mileage: 45000, next_maintenance_due_km: 44000, responsible_employee: 'Carlos Pereira', user_id: gestorUserId, last_modified_at: new Date(Date.now() - 86400000 * 10).toISOString() } // 10 days ago, overdue
+                        { plate: 'PQR3344', current_mileage: 15000, next_maintenance_due_km: 28000, responsible_employee: 'Rafael Santos', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'STU5566', current_mileage: 5000, next_maintenance_due_km: 18000, responsible_employee: 'Gabriela Alves', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'VWX7788', current_mileage: 30000, next_maintenance_due_km: 45000, responsible_employee: 'Lucas Martins', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'YZA9900', current_mileage: 2500, next_maintenance_due_km: 10000, responsible_employee: 'Beatriz Rocha', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'BCD1122', current_mileage: 60000, next_maintenance_due_km: 75000, responsible_employee: 'Maria Oliveira', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'EFG3344', current_mileage: 8000, next_maintenance_due_km: 22000, responsible_employee: 'Pedro Souza', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'HIJ5566', current_mileage: 35000, next_maintenance_due_km: 50000, responsible_employee: 'Fernanda Lima', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+
+                        // Vehicles near maintenance (within 1000km)
+                        { plate: 'GHI3456', current_mileage: 99500, next_maintenance_due_km: 100000, responsible_employee: 'Pedro Souza', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'QWE1234', current_mileage: 29800, next_maintenance_due_km: 30000, responsible_employee: 'Carlos Pereira', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'RTY5678', current_mileage: 49200, next_maintenance_due_km: 50000, responsible_employee: 'Rafael Santos', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'UOP9012', current_mileage: 78900, next_maintenance_due_km: 79500, responsible_employee: 'Gabriela Alves', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+                        { plate: 'ASD3456', current_mileage: 9900, next_maintenance_due_km: 10000, responsible_employee: 'Lucas Martins', user_id: gestorUserId, last_modified_at: new Date().toISOString() },
+
+                        // Vehicles with overdue maintenance
+                        { plate: 'XYZ5678', current_mileage: 75000, next_maintenance_due_km: 70000, responsible_employee: 'Maria Oliveira', user_id: gestorUserId, last_modified_at: new Date(Date.now() - 86400000 * 5).toISOString() }, // 5 days ago, overdue
+                        { plate: 'MNO1122', current_mileage: 45000, next_maintenance_due_km: 44000, responsible_employee: 'Carlos Pereira', user_id: gestorUserId, last_modified_at: new Date(Date.now() - 86400000 * 10).toISOString() }, // 10 days ago, overdue
+                        { plate: 'FGH4455', current_mileage: 120000, next_maintenance_due_km: 115000, responsible_employee: 'Fernanda Lima', user_id: gestorUserId, last_modified_at: new Date(Date.now() - 86400000 * 20).toISOString() }, // 20 days ago, very overdue
+                        { plate: 'IJK6677', current_mileage: 30000, next_maintenance_due_km: 29000, responsible_employee: 'Beatriz Rocha', user_id: gestorUserId, last_modified_at: new Date(Date.now() - 86400000 * 2).toISOString() } // 2 days ago, overdue
                     ];
 
                     const { error: maintenanceInsertError } = await supabase
