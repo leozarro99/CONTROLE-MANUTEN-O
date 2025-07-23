@@ -156,14 +156,15 @@
                 <label for="driverPlate" class="block text-base font-medium text-gray-700 mb-2">Placa do Veículo</label>
                 <input type="text" id="driverPlate" name="driverPlate" required
                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
+                <span id="driverPlateValidationMessage" class="text-sm mt-1"></span>
             </div>
             <div>
                 <label for="driverDailyMileage" class="block text-base font-medium text-gray-700 mb-2">Quilometragem do Dia (Km)</label>
                 <input type="number" id="driverDailyMileage" name="driverDailyMileage" required min="0"
                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
             </div>
-            <button type="submit"
-                    class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-lg text-white bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-xl">
+            <button type="submit" id="submitDailyMileageBtn"
+                    class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-lg text-white bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                 <i class="fas fa-save mr-2"></i>Registrar Quilometragem
             </button>
         </form>
@@ -183,6 +184,7 @@
                 <label for="fuelPlate" class="block text-base font-medium text-gray-700 mb-2">Placa do Veículo</label>
                 <input type="text" id="fuelPlate" name="fuelPlate" required
                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
+                <span id="fuelPlateValidationMessage" class="text-sm mt-1"></span>
             </div>
             <div>
                 <label for="fuelType" class="block text-base font-medium text-gray-700 mb-2">Tipo de Combustível</label>
@@ -198,8 +200,8 @@
                 <input type="number" id="fuelValue" name="fuelValue" required min="0" step="0.01"
                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
             </div>
-            <button type="submit"
-                    class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-lg text-white bg-gradient-to-r from-green-600 to-teal-700 hover:from-green-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-xl">
+            <button type="submit" id="submitFuelEntryBtn"
+                    class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-lg text-white bg-gradient-to-r from-green-600 to-teal-700 hover:from-green-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                 <i class="fas fa-gas-pump mr-2"></i>Registrar Abastecimento
             </button>
         </form>
@@ -1301,6 +1303,65 @@
             logAppAction("Verificação de Dados Iniciais", "Função addInitialDataIfEmpty está desativada. Não adicionando dados de exemplo.");
         }
 
+        /**
+         * Validates the plate input field against existing vehicles in Supabase.
+         * Updates the input's border color, displays a message, and enables/disables the submit button.
+         * @param {string} plateInputId - The ID of the plate input element.
+         * @param {string} messageSpanId - The ID of the span element to display validation messages.
+         * @param {string} submitButtonId - The ID of the submit button to enable/disable.
+         * @returns {Promise<boolean>} - True if the plate is valid, false otherwise.
+         */
+        async function validatePlateInput(plateInputId, messageSpanId, submitButtonId) {
+            const plateInput = document.getElementById(plateInputId);
+            const messageSpan = document.getElementById(messageSpanId);
+            const submitButton = document.getElementById(submitButtonId);
+            const plate = plateInput.value.toUpperCase().trim();
+
+            // Reset styles and message
+            plateInput.classList.remove('border-red-500', 'border-green-500');
+            messageSpan.textContent = '';
+            messageSpan.classList.remove('text-red-600', 'text-green-600');
+            submitButton.disabled = true; // Disable button by default
+
+            if (!plate) {
+                messageSpan.textContent = '';
+                return false;
+            }
+
+            try {
+                const { data: plateCheck, error: plateCheckError } = await supabase
+                    .from(MAINTENANCE_RECORDS_TABLE)
+                    .select('id')
+                    .eq('plate', plate)
+                    .eq('user_id', gestorUserId);
+
+                if (plateCheckError) throw plateCheckError;
+
+                if (plateCheck && plateCheck.length > 0) {
+                    plateInput.classList.add('border-green-500');
+                    messageSpan.textContent = 'Placa válida';
+                    messageSpan.classList.add('text-green-600');
+                    submitButton.disabled = false; // Enable button
+                    return true;
+                } else {
+                    plateInput.classList.add('border-red-500');
+                    messageSpan.textContent = 'Placa inexistente';
+                    messageSpan.classList.add('text-red-600');
+                    submitButton.disabled = true; // Keep button disabled
+                    return false;
+                }
+            } catch (e) {
+                console.error("Error during plate validation:", e);
+                showToast("Erro ao validar placa: " + e.message, 'error');
+                plateInput.classList.add('border-red-500');
+                messageSpan.textContent = 'Erro na validação';
+                messageSpan.classList.add('text-red-600');
+                submitButton.disabled = true; // Keep button disabled
+                return false;
+            }
+        }
+
+
         // --- Event Handlers ---
 
         /**
@@ -1533,6 +1594,13 @@
          */
         async function handleDailyMileageSubmit(event) {
             event.preventDefault();
+            // Perform plate validation again before submission
+            const isPlateValid = await validatePlateInput('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn');
+            if (!isPlateValid) {
+                showToast("Por favor, corrija a placa do veículo antes de registrar a quilometragem.", 'error');
+                return;
+            }
+
             // Trim whitespace from employee name and convert plate to uppercase for consistent matching
             const driverResponsibleEmployee = document.getElementById('driverResponsibleEmployee').value.trim();
             const driverPlate = document.getElementById('driverPlate').value.toUpperCase().trim();
@@ -1544,14 +1612,14 @@
                 showToast("O sistema não está pronto. Por favor, aguarde a inicialização.", 'error');
                 return;
             }
-            if (!driverResponsibleEmployee || !driverPlate || isNaN(driverDailyMileage) || driverDailyMileage < 0) {
+            if (!driverResponsibleEmployee || isNaN(driverDailyMileage) || driverDailyMileage < 0) {
                 showToast("Por favor, preencha todos os campos corretamente.", 'error');
                 logAppAction("Erro de Entrada", "Campos do formulário do motorista incompletos ou inválidos.");
                 return;
             }
 
             try {
-                // 1. Check if the plate exists at all for this gestorUserId
+                // 1. Check if the plate exists at all for this gestorUserId (already done by validatePlateInput)
                 const { data: plateCheck, error: plateCheckError } = await supabase
                     .from(MAINTENANCE_RECORDS_TABLE)
                     .select('id, current_mileage')
@@ -1561,12 +1629,6 @@
                 if (plateCheckError) {
                     console.error("[Console] Erro ao verificar a existência da placa:", plateCheckError);
                     showToast("Erro ao verificar a placa: " + plateCheckError.message, 'error');
-                    return;
-                }
-
-                if (!plateCheck || plateCheck.length === 0) {
-                    showToast(`Placa inexistente`, 'error');
-                    logAppAction("Placa Não Cadastrada", `Placa "${driverPlate}" não encontrada no cadastro do gestor.`);
                     return;
                 }
 
@@ -1604,6 +1666,8 @@
                 showToast(`Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km!`, 'success');
                 logAppAction("Atualização de Quilometragem", `Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km.`);
                 document.getElementById('dailyMileageForm').reset();
+                // Re-validate plate to reset state after successful submission
+                await validatePlateInput('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn');
             } catch (e) {
                 console.error("[Console] Erro geral ao registrar quilometragem: ", e);
                 showToast("Ocorreu um erro ao registrar quilometragem: " + e.message, 'error');
@@ -1616,6 +1680,13 @@
          */
         async function handleFuelEntrySubmit(event) {
             event.preventDefault();
+            // Perform plate validation again before submission
+            const isPlateValid = await validatePlateInput('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn');
+            if (!isPlateValid) {
+                showToast("Por favor, corrija a placa do veículo antes de registrar o abastecimento.", 'error');
+                return;
+            }
+
             const fuelResponsibleEmployee = document.getElementById('fuelResponsibleEmployee').value.trim();
             const fuelPlate = document.getElementById('fuelPlate').value.toUpperCase().trim();
             const fuelType = document.getElementById('fuelType').value;
@@ -1627,28 +1698,14 @@
                 showToast("O sistema não está pronto. Por favor, aguarde a inicialização.", 'error');
                 return;
             }
-            if (!fuelResponsibleEmployee || !fuelPlate || !fuelType || isNaN(fuelValue) || fuelValue <= 0) {
+            if (!fuelResponsibleEmployee || !fuelType || isNaN(fuelValue) || fuelValue <= 0) {
                 showToast("Por favor, preencha todos os campos do abastecimento corretamente.", 'error');
                 logAppAction("Erro de Entrada", "Campos do formulário de abastecimento incompletos ou inválidos.");
                 return;
             }
 
             try {
-                // Check if the plate exists for this gestorUserId
-                const { data: plateCheck, error: plateCheckError } = await supabase
-                    .from(MAINTENANCE_RECORDS_TABLE)
-                    .select('id')
-                    .eq('plate', fuelPlate)
-                    .eq('user_id', gestorUserId);
-
-                if (plateCheckError) throw plateCheckError;
-
-                if (!plateCheck || plateCheck.length === 0) {
-                    showToast(`Placa inexistente`, 'error');
-                    logAppAction("Placa Não Cadastrada", `Placa "${fuelPlate}" não encontrada no cadastro do gestor para abastecimento.`);
-                    return;
-                }
-
+                // Check if the plate exists for this gestorUserId (already done by validatePlateInput)
                 const { error } = await supabase
                     .from(FUEL_RECORDS_TABLE)
                     .insert({
@@ -1665,6 +1722,8 @@
                 showToast(`Abastecimento para o veículo ${fuelPlate} no valor de R$ ${fuelValue.toFixed(2).replace('.', ',')} registrado com sucesso!`, 'success');
                 logAppAction("Registro de Abastecimento", `Abastecimento para ${fuelPlate} registrado.`);
                 document.getElementById('fuelEntryForm').reset();
+                // Re-validate plate to reset state after successful submission
+                await validatePlateInput('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn');
             }
             catch (e) {
                 console.error("Error saving fuel record: ", e);
@@ -1830,6 +1889,14 @@
             document.getElementById('fuelEntryForm').reset();
             populateEmployeeSelects();
             showDailyMileageEntryTab(); // Default to daily mileage entry
+            // Reset plate validation state when entering driver portal
+            document.getElementById('driverPlate').classList.remove('border-red-500', 'border-green-500');
+            document.getElementById('driverPlateValidationMessage').textContent = '';
+            document.getElementById('submitDailyMileageBtn').disabled = true;
+            document.getElementById('fuelPlate').classList.remove('border-red-500', 'border-green-500');
+            document.getElementById('fuelPlateValidationMessage').textContent = '';
+            document.getElementById('submitFuelEntryBtn').disabled = true;
+
             logAppAction("Navegação", "Acessando Portal do Motorista.");
         }
 
@@ -1950,6 +2017,10 @@
             document.getElementById('showDailyMileageEntry').classList.add('border-indigo-500', 'text-indigo-600');
             document.getElementById('showFuelEntry').classList.remove('border-indigo-500', 'text-indigo-600');
             logAppAction("Navegação (Motorista)", "Acessando aba 'Registrar KM'.");
+            // Reset validation for daily mileage form when switching tabs
+            document.getElementById('driverPlate').classList.remove('border-red-500', 'border-green-500');
+            document.getElementById('driverPlateValidationMessage').textContent = '';
+            document.getElementById('submitDailyMileageBtn').disabled = true;
         }
 
         /**
@@ -1963,6 +2034,10 @@
             document.getElementById('showDailyMileageEntry').classList.remove('border-indigo-500', 'text-indigo-600');
             populateEmployeeSelects(); // Ensure employee dropdown is updated for fuel form
             logAppAction("Navegação (Motorista)", "Acessando aba 'Abastecimento'.");
+            // Reset validation for fuel entry form when switching tabs
+            document.getElementById('fuelPlate').classList.remove('border-red-500', 'border-green-500');
+            document.getElementById('fuelPlateValidationMessage').textContent = '';
+            document.getElementById('submitFuelEntryBtn').disabled = true;
         }
 
         /**
@@ -2006,6 +2081,11 @@
             // Driver Portal Tab Buttons
             document.getElementById('showDailyMileageEntry').addEventListener('click', showDailyMileageEntryTab);
             document.getElementById('showFuelEntry').addEventListener('click', showFuelEntryTab);
+
+            // Real-time plate validation on blur
+            document.getElementById('driverPlate').addEventListener('blur', () => validatePlateInput('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn'));
+            document.getElementById('fuelPlate').addEventListener('blur', () => validatePlateInput('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn'));
+
 
             // Gestor Portal Buttons
             document.getElementById('backButtonGestorLogin').addEventListener('click', backToLandingPage);
