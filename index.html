@@ -863,7 +863,7 @@
                 }
 
                 if (typeof valA === 'string') {
-                    return currentFuelSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                    return currentFuelSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(a);
                 } else {
                     return currentFuelSortDirection === 'asc' ? valA - valB : valB - valA;
                 }
@@ -953,7 +953,7 @@
                 }
 
                 if (typeof valA === 'string') {
-                    return currentVehicleSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                    return currentVehicleSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(a);
                 } else {
                     return currentVehicleSortDirection === 'asc' ? valA - valB : valB - valA;
                 }
@@ -1117,9 +1117,8 @@
                 });
             }
             logAppAction("População de Placas", `Campos de seleção de placa atualizados com ${allMaintenanceRecords.length} placas.`);
-            // After populating, ensure the validation state is set
-            validatePlateSelection('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn');
-            validatePlateSelection('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn');
+            // Removed immediate calls to validatePlateSelection here.
+            // Validation will now be triggered by 'change' event or form submission.
         }
 
 
@@ -1902,12 +1901,13 @@
             populatePlateSelects(); // Populate plate selects when entering driver portal
             showDailyMileageEntryTab(); // Default to daily mileage entry
             // Reset plate validation state when entering driver portal
-            document.getElementById('driverPlate').classList.remove('border-red-500', 'border-green-500');
-            document.getElementById('driverPlateValidationMessage').textContent = '';
-            document.getElementById('submitDailyMileageBtn').disabled = true;
-            document.getElementById('fuelPlate').classList.remove('border-red-500', 'border-green-500');
-            document.getElementById('fuelPlateValidationMessage').textContent = '';
-            document.getElementById('submitFuelEntryBtn').disabled = true;
+            // Removed these lines to prevent initial validation message
+            // document.getElementById('driverPlate').classList.remove('border-red-500', 'border-green-500');
+            // document.getElementById('driverPlateValidationMessage').textContent = '';
+            // document.getElementById('submitDailyMileageBtn').disabled = true;
+            // document.getElementById('fuelPlate').classList.remove('border-red-500', 'border-green-500');
+            // document.getElementById('fuelPlateValidationMessage').textContent = '';
+            // document.getElementById('submitFuelEntryBtn').disabled = true;
 
             logAppAction("Navegação", "Acessando Portal do Motorista.");
         }
@@ -2030,7 +2030,10 @@
             document.getElementById('showFuelEntry').classList.remove('border-indigo-500', 'text-indigo-600');
             logAppAction("Navegação (Motorista)", "Acessando aba 'Registrar KM'.");
             // Reset validation for daily mileage form when switching tabs
-            validatePlateSelection('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn');
+            // Only disable the button initially, don't show message
+            document.getElementById('submitDailyMileageBtn').disabled = true;
+            document.getElementById('driverPlate').classList.remove('border-red-500', 'border-green-500');
+            document.getElementById('driverPlateValidationMessage').textContent = '';
         }
 
         /**
@@ -2045,7 +2048,10 @@
             populateEmployeeSelects(); // Ensure employee dropdown is updated for fuel form
             logAppAction("Navegação (Motorista)", "Acessando aba 'Abastecimento'.");
             // Reset validation for fuel entry form when switching tabs
-            validatePlateSelection('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn');
+            // Only disable the button initially, don't show message
+            document.getElementById('submitFuelEntryBtn').disabled = true;
+            document.getElementById('fuelPlate').classList.remove('border-red-500', 'border-green-500');
+            document.getElementById('fuelPlateValidationMessage').textContent = '';
         }
 
         /**
