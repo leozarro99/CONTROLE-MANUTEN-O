@@ -456,6 +456,7 @@
         let isAuthReady = true; // For this setup with anon key, auth is immediately ready
         let allMaintenanceRecords = []; // Cache for all maintenance records (for filtering/sorting)
         let currentEmployees = []; // Cache for employee data
+        let gestorListenersInitialized = false; // Flag to ensure listeners are only set up once
 
         let currentVehicleSortColumn = 'plate';
         let currentVehicleSortDirection = 'asc';
@@ -1321,8 +1322,19 @@
                 gestorLoginError.classList.add('hidden');
                 document.getElementById('gestorLogin').classList.add('hidden');
                 document.getElementById('gestorContent').classList.remove('hidden');
-                setupRealtimeListenerGestor();
-                setupRealtimeListenerEmployees(); // Start listening for employee data
+                
+                // Only set up real-time listeners if they haven't been initialized yet
+                if (!gestorListenersInitialized) {
+                    setupRealtimeListenerGestor();
+                    setupRealtimeListenerEmployees();
+                    gestorListenersInitialized = true; // Set the flag to true
+                    logAppAction("Login do Gestor", "Listeners de tempo real inicializados.");
+                } else {
+                    // If listeners are already initialized, just fetch and render data to refresh
+                    fetchAndRenderMaintenanceRecords();
+                    // No need to re-render employees explicitly here, as its listener also fetches on subscribe.
+                }
+
                 document.getElementById('plate').readOnly = false; // Ensure plate is writable by default for new entries
                 document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo'; // Reset button text
                 logAppAction("Login do Gestor", "Login bem-sucedido.");
