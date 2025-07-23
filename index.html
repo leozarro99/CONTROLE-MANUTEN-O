@@ -254,19 +254,22 @@
             <!-- Navigation for Gestor Tabs -->
             <div class="flex justify-center mb-8 border-b-2 border-gray-200">
                 <!-- Tabs with increased padding and w-1/2 -->
-                <button id="showDashboard" class="py-4 px-8 w-1/3 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
+                <button id="showDashboard" class="py-4 px-8 w-1/4 text-lg font-semibold text-gray-700 border-b-4 border-indigo-500 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition duration-150 ease-in-out">
                     Dashboard
                 </button>
-                <button id="showVehicleManagement" class="py-4 px-8 w-1/3 text-lg font-semibold text-gray-700 border-b-4 border-indigo-500 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition duration-150 ease-in-out">
+                <button id="showVehicleManagement" class="py-4 px-8 w-1/4 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
                     Gerenciar Veículos
                 </button>
-                <button id="showEmployeeManagement" class="py-4 px-8 w-1/3 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
+                <button id="showFuelManagement" class="py-4 px-8 w-1/4 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
+                    Abastecimentos
+                </button>
+                <button id="showEmployeeManagement" class="py-4 px-8 w-1/4 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
                     Gerenciar Funcionários
                 </button>
             </div>
 
             <!-- Dashboard Section (Now includes statistics) -->
-            <div id="dashboardSection" class="hidden">
+            <div id="dashboardSection">
                 <h2 class="text-2xl font-semibold text-gray-700 mb-5">Visão Geral da Frota (Porcentagem)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <!-- Vehicles Within Normality Percentage Card (NOT CLICKABLE) -->
@@ -333,7 +336,7 @@
             </div>
 
             <!-- Vehicle Management Section -->
-            <div id="vehicleManagementSection">
+            <div id="vehicleManagementSection" class="hidden">
                 <h2 class="text-2xl font-semibold text-gray-700 mb-5">Adicionar/Atualizar Dados do Veículo</h2>
                 <!-- Add/Update Vehicle Form (Gestor's Form) -->
                 <form id="maintenanceForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 p-6 bg-blue-50 rounded-lg shadow-inner border border-blue-100">
@@ -403,6 +406,77 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- NEW: Fuel Management Section -->
+            <div id="fuelManagementSection" class="hidden">
+                <div id="fuelDashboardSummary">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-5">Visão Geral de Abastecimentos</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <!-- Total Fuel Spent Card (CLICKABLE) -->
+                        <div id="fuelStatsCardTotal" data-filter="all" class="bg-purple-50 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
+                            <div>
+                                <p class="text-sm font-medium text-purple-700">Valor Total Abastecido</p>
+                                <p id="totalFuelSpent" class="text-3xl font-bold text-purple-900 mt-1">R$ 0,00</p>
+                            </div>
+                            <i class="fas fa-dollar-sign text-purple-500 text-4xl opacity-50"></i>
+                        </div>
+                        <!-- Total Gasoline Spent Card (CLICKABLE) -->
+                        <div id="fuelStatsCardGasoline" data-filter="Gasolina" class="bg-orange-50 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
+                            <div>
+                                <p class="text-sm font-medium text-orange-700">Total Gasolina</p>
+                                <p id="totalGasolineSpent" class="text-3xl font-bold text-orange-900 mt-1">R$ 0,00</p>
+                            </div>
+                            <i class="fas fa-gas-pump text-orange-500 text-4xl opacity-50"></i>
+                        </div>
+                        <!-- Total Diesel Spent Card (CLICKABLE) -->
+                        <div id="fuelStatsCardDiesel" data-filter="Diesel" class="bg-gray-100 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
+                            <div>
+                                <p class="text-sm font-medium text-gray-700">Total Diesel</p>
+                                <p id="totalDieselSpent" class="text-3xl font-bold text-gray-900 mt-1">R$ 0,00</p>
+                            </div>
+                            <i class="fas fa-truck-moving text-gray-500 text-4xl opacity-50"></i>
+                        </div>
+                        <!-- Total Refuel Events Card (CLICKABLE) -->
+                        <div id="fuelStatsCardEvents" data-filter="all" class="bg-blue-50 p-6 rounded-lg shadow-md flex items-center justify-between cursor-pointer transform transition-transform duration-200 ease-in-out hover:scale-103 hover:shadow-xl">
+                            <div>
+                                <p class="text-sm font-medium text-blue-700">Nº Abastecimentos</p>
+                                <p id="totalRefuelEvents" class="text-3xl font-bold text-blue-900 mt-1">0</p>
+                            </div>
+                            <i class="fas fa-receipt text-blue-500 text-4xl opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Fuel Table (initially hidden) -->
+                <div id="detailedFuelTable" class="hidden">
+                    <h2 class="text-2xl font-semibold text-gray-700 mb-5">Registros Detalhados de Abastecimentos</h2>
+                    <div class="rounded-lg shadow-md border border-gray-200 mt-8 overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-lg cursor-pointer hover:bg-gray-200 transition duration-150 ease-in-out" data-sort="date">Data <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-200 transition duration-150 ease-in-out" data-sort="plate">Placa <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-200 transition duration-150 ease-in-out" data-sort="responsible_employee">Funcionário <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-200 transition duration-150 ease-in-out" data-sort="fuel_type">Tipo Combustível <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tr-lg cursor-pointer hover:bg-gray-200 transition duration-150 ease-in-out" data-sort="value">Valor (R$) <i class="fas fa-sort text-gray-400 ml-1"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody id="fuelRecordsList" class="bg-white divide-y divide-gray-200">
+                                <!-- Fuel records will be inserted here by JavaScript -->
+                                <tr class="odd:bg-white even:bg-gray-50">
+                                    <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum abastecimento registrado ainda.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex justify-center mt-6">
+                        <button id="backToFuelDashboardBtn"
+                                class="inline-flex items-center px-6 py-2 border border-transparent text-base font-medium rounded-md shadow-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
+                            <i class="fas fa-arrow-left mr-2"></i>Voltar ao Dashboard de Abastecimentos
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -502,8 +576,8 @@
 
         let isAuthReady = true; // For this setup with anon key, auth is immediately ready
         let allMaintenanceRecords = []; // Cache for all maintenance records (for filtering/sorting)
-        let allDailyMileageLogs = []; // NEW: Cache for daily mileage logs
-        let allFuelRecords = []; // NEW: Cache for fuel records
+        let allDailyMileageLogs = []; // Cache for daily mileage logs
+        let allFuelRecords = []; // Cache for fuel records
         let currentEmployees = []; // Cache for employee data
         let gestorListenersInitialized = false; // Flag to ensure listeners are only set up once
 
@@ -511,13 +585,15 @@
         let currentVehicleSortDirection = 'asc';
         let currentEmployeeSortColumn = 'name';
         let currentEmployeeSortDirection = 'asc';
+        let currentFuelSortColumn = 'date'; // NEW: Default sort for fuel records
+        let currentFuelSortDirection = 'desc'; // NEW: Default sort for fuel records
 
         // --- Supabase Table Names ---
         const MAINTENANCE_RECORDS_TABLE = 'maintenance_records';
         const EMPLOYEES_TABLE = 'employees';
-        const DAILY_MILEAGE_LOGS_TABLE = 'daily_mileage_logs'; // NEW TABLE
-        const FUEL_RECORDS_TABLE = 'fuel_records'; // NEW TABLE
-        const APP_METADATA_TABLE = 'app_metadata'; // Table to store app metadata like initial data flag
+        const DAILY_MILEAGE_LOGS_TABLE = 'daily_mileage_logs';
+        const FUEL_RECORDS_TABLE = 'fuel_records';
+        const APP_METADATA_TABLE = 'app_metadata';
         const INITIAL_DATA_FLAG_DOC_ID = 'initialDataLoaded';
 
         // --- Maintenance Thresholds (User defined) ---
@@ -700,6 +776,87 @@
         }
 
         /**
+         * Renders the fuel statistics in the fuel dashboard summary.
+         * @param {Array<Object>} records - All fuel records.
+         */
+        function renderFuelDashboardSummary(records) {
+            const totalFuelSpent = records.reduce((sum, record) => sum + (record.value || 0), 0);
+            const totalGasolineSpent = records.filter(record => record.fuel_type === 'Gasolina').reduce((sum, record) => sum + (record.value || 0), 0);
+            const totalDieselSpent = records.filter(record => record.fuel_type === 'Diesel').reduce((sum, record) => sum + (record.value || 0), 0);
+            const totalRefuelEvents = records.length;
+
+            document.getElementById('totalFuelSpent').textContent = `R$ ${totalFuelSpent.toFixed(2).replace('.', ',')}`;
+            document.getElementById('totalGasolineSpent').textContent = `R$ ${totalGasolineSpent.toFixed(2).replace('.', ',')}`;
+            document.getElementById('totalDieselSpent').textContent = `R$ ${totalDieselSpent.toFixed(2).replace('.', ',')}`;
+            document.getElementById('totalRefuelEvents').textContent = totalRefuelEvents;
+
+            logAppAction("Dashboard de Combustível Renderizado", `Total: ${totalFuelSpent}, Gasolina: ${totalGasolineSpent}, Diesel: ${totalDieselSpent}, Eventos: ${totalRefuelEvents}`);
+        }
+
+        /**
+         * Renders the detailed list of fuel records for the Gestor portal.
+         * @param {Array<Object>} records - Array of fuel record objects.
+         * @param {string} [filterType='all'] - Optional filter type: 'all', 'Gasolina', 'Diesel'.
+         */
+        function renderDetailedFuelRecords(records, filterType = 'all') {
+            const fuelRecordsList = document.getElementById('fuelRecordsList');
+            fuelRecordsList.innerHTML = ''; // Clear existing rows
+
+            let filteredRecords = records;
+
+            // Apply filter based on filterType
+            if (filterType !== 'all') {
+                filteredRecords = filteredRecords.filter(record => record.fuel_type === filterType);
+                logAppAction("Filtragem de Abastecimentos", `Filtrando por tipo de combustível: "${filterType}". ${filteredRecords.length} resultados.`);
+            } else {
+                logAppAction("Filtragem de Abastecimentos", `Exibindo todos os abastecimentos. ${filteredRecords.length} resultados.`);
+            }
+
+            // Apply sorting
+            filteredRecords.sort((a, b) => {
+                let valA, valB;
+                if (currentFuelSortColumn === 'date') {
+                    valA = new Date(a.date || 0).getTime();
+                    valB = new Date(b.date || 0).getTime();
+                } else if (currentFuelSortColumn === 'value') {
+                    valA = a.value || 0;
+                    valB = b.value || 0;
+                } else {
+                    valA = a[currentFuelSortColumn] || '';
+                    valB = b[currentFuelSortColumn] || '';
+                }
+
+                if (typeof valA === 'string') {
+                    return currentFuelSortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                } else {
+                    return currentFuelSortDirection === 'asc' ? valA - valB : valB - valA;
+                }
+            });
+
+            if (filteredRecords.length === 0) {
+                fuelRecordsList.innerHTML = `<tr class="odd:bg-white even:bg-gray-50"><td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Nenhum abastecimento encontrado para este filtro.</td></tr>`;
+                return;
+            }
+
+            filteredRecords.forEach((record, index) => {
+                const formattedDate = formatDateToDDMMYYYY(record.date);
+                const formattedValue = `R$ ${record.value.toFixed(2).replace('.', ',')}`;
+
+                const row = document.createElement('tr');
+                row.className = `hover:bg-gray-100 transition duration-150 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`;
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${formattedDate}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.plate || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.responsible_employee || 'Não atribuído'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.fuel_type || 'N/A'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formattedValue}</td>
+                `;
+                fuelRecordsList.appendChild(row);
+            });
+        }
+
+
+        /**
          * Renders the list of maintenance records for the Gestor portal, applying search and sort.
          * @param {Array<Object>} records - Array of maintenance record objects.
          * @param {string} [searchTerm=''] - Optional search term.
@@ -870,12 +1027,12 @@
         function populateEmployeeSelects() {
             const driverSelect = document.getElementById('driverResponsibleEmployee');
             const gestorSelect = document.getElementById('responsibleEmployee');
-            const fuelSelect = document.getElementById('fuelResponsibleEmployee'); // NEW: Fuel form employee select
+            const fuelSelect = document.getElementById('fuelResponsibleEmployee'); // Fuel form employee select
 
             // Clear existing options, keep the default "Selecione"
             driverSelect.innerHTML = '<option value="">-- Selecione --</option>';
             gestorSelect.innerHTML = '<option value="">-- Selecione --</option>';
-            fuelSelect.innerHTML = '<option value="">-- Selecione --</option>'; // Clear for fuel form
+            fuelSelect.innerHTML = '<option value="">-- Selecione --</option>';
 
             currentEmployees.forEach(employee => {
                 const optionDriver = document.createElement('option');
@@ -888,7 +1045,7 @@
                 optionGestor.textContent = employee.name;
                 gestorSelect.appendChild(optionGestor);
 
-                const optionFuel = document.createElement('option'); // NEW: Add to fuel form select
+                const optionFuel = document.createElement('option');
                 optionFuel.value = employee.name;
                 optionFuel.textContent = employee.name;
                 fuelSelect.appendChild(optionFuel);
@@ -1015,6 +1172,11 @@
                     .order('date', { ascending: false });
                 if (error) throw error;
                 allFuelRecords = data;
+                renderFuelDashboardSummary(allFuelRecords); // Update fuel dashboard summary
+                // If detailed table is visible, re-render it
+                if (!document.getElementById('detailedFuelTable').classList.contains('hidden')) {
+                    renderDetailedFuelRecords(allFuelRecords, document.getElementById('detailedFuelTable').dataset.currentFilter || 'all');
+                }
                 logAppAction("Busca de Dados Concluída", `Total de registros de abastecimento: ${data.length}`);
             } catch (e) {
                 console.error("Error fetching fuel records:", e);
@@ -1042,6 +1204,11 @@
                         allFuelRecords = allFuelRecords.filter(record => record.id !== payload.old.id);
                     }
                     allFuelRecords.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                    renderFuelDashboardSummary(allFuelRecords); // Update fuel dashboard summary
+                    // If detailed table is visible, re-render it
+                    if (!document.getElementById('detailedFuelTable').classList.contains('hidden')) {
+                        renderDetailedFuelRecords(allFuelRecords, document.getElementById('detailedFuelTable').dataset.currentFilter || 'all');
+                    }
                 })
                 .subscribe();
             logAppAction("Listener em Tempo Real (Abastecimento)", "Listener para registros de abastecimento ativado.");
@@ -1384,7 +1551,7 @@
                     return;
                 }
 
-                // 2. Insert into daily_mileage_logs (NEW)
+                // 2. Insert into daily_mileage_logs
                 const { error: insertLogError } = await supabase
                     .from(DAILY_MILEAGE_LOGS_TABLE)
                     .insert({
@@ -1416,7 +1583,7 @@
         }
 
         /**
-         * Handles the submission of the fuel entry form by a driver. (NEW FUNCTION)
+         * Handles the submission of the fuel entry form by a driver.
          * @param {Event} event - The form submission event.
          */
         async function handleFuelEntrySubmit(event) {
@@ -1571,21 +1738,20 @@
                 // Only set up real-time listeners if they haven't been initialized yet
                 if (!gestorListenersInitialized) {
                     setupRealtimeListenerGestor();
-                    setupRealtimeListenerEmployees(); // Now called only once here
-                    setupRealtimeListenerDailyMileageLogs(); // NEW: Initialize daily mileage logs listener
-                    setupRealtimeListenerFuelRecords(); // NEW: Initialize fuel records listener
-                    gestorListenersInitialized = true; // Set the flag to true
+                    setupRealtimeListenerEmployees();
+                    setupRealtimeListenerDailyMileageLogs();
+                    setupRealtimeListenerFuelRecords();
+                    gestorListenersInitialized = true;
                     logAppAction("Login do Gestor", "Listeners de tempo real inicializados.");
                 } else {
                     // If listeners are already initialized, just fetch and render data to refresh
                     fetchAndRenderMaintenanceRecords();
-                    fetchDailyMileageLogs(); // Refresh daily mileage logs
-                    fetchFuelRecords(); // Refresh fuel records
-                    // No need to re-render employees explicitly here, as its listener also fetches on subscribe.
+                    fetchDailyMileageLogs();
+                    fetchFuelRecords();
                 }
 
-                document.getElementById('plate').readOnly = false; // Ensure plate is writable by default for new entries
-                document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo'; // Reset button text
+                document.getElementById('plate').readOnly = false;
+                document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo';
                 logAppAction("Login do Gestor", "Login bem-sucedido.");
                 // Default to dashboard tab on login
                 showDashboardTab();
@@ -1632,7 +1798,7 @@
             document.getElementById('gestorSection').classList.add('hidden');
             document.getElementById('driverPortalSection').classList.remove('hidden');
             document.getElementById('dailyMileageForm').reset();
-            document.getElementById('fuelEntryForm').reset(); // Reset fuel form
+            document.getElementById('fuelEntryForm').reset();
             populateEmployeeSelects();
             showDailyMileageEntryTab(); // Default to daily mileage entry
             logAppAction("Navegação", "Acessando Portal do Motorista.");
@@ -1653,6 +1819,7 @@
             // Reset tab styling
             document.getElementById('showDashboard').classList.remove('border-indigo-500', 'text-indigo-600');
             document.getElementById('showVehicleManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showFuelManagement').classList.remove('border-indigo-500', 'text-indigo-600'); // NEW
             document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
 
             logAppAction("Navegação", "Acessando Portal do Gestor (Tela de Login).");
@@ -1674,10 +1841,12 @@
         function showDashboardTab() {
             document.getElementById('dashboardSection').classList.remove('hidden');
             document.getElementById('vehicleManagementSection').classList.add('hidden');
+            document.getElementById('fuelManagementSection').classList.add('hidden'); // NEW
             document.getElementById('employeeManagementSection').classList.add('hidden');
 
             document.getElementById('showDashboard').classList.add('border-indigo-500', 'text-indigo-600');
             document.getElementById('showVehicleManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showFuelManagement').classList.remove('border-indigo-500', 'text-indigo-600'); // NEW
             document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
             logAppAction("Navegação (Gestor)", "Acessando aba 'Dashboard'.");
         }
@@ -1688,10 +1857,12 @@
         function showVehicleManagementTab() {
             document.getElementById('dashboardSection').classList.add('hidden');
             document.getElementById('vehicleManagementSection').classList.remove('hidden');
+            document.getElementById('fuelManagementSection').classList.add('hidden'); // NEW
             document.getElementById('employeeManagementSection').classList.add('hidden');
 
             document.getElementById('showVehicleManagement').classList.add('border-indigo-500', 'text-indigo-600');
             document.getElementById('showDashboard').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showFuelManagement').classList.remove('border-indigo-500', 'text-indigo-600'); // NEW
             document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
             
             // Ensure plate field is editable and editing state is cleared when switching to this tab
@@ -1704,21 +1875,44 @@
         }
 
         /**
+         * Switches the Gestor view to Fuel Management. (NEW FUNCTION)
+         */
+        function showFuelManagementTab() {
+            document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('vehicleManagementSection').classList.add('hidden');
+            document.getElementById('fuelManagementSection').classList.remove('hidden'); // Show fuel management section
+            document.getElementById('employeeManagementSection').classList.add('hidden');
+
+            document.getElementById('fuelDashboardSummary').classList.remove('hidden'); // Show summary by default
+            document.getElementById('detailedFuelTable').classList.add('hidden'); // Hide detailed table by default
+
+            document.getElementById('showFuelManagement').classList.add('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showDashboard').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showVehicleManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showEmployeeManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            logAppAction("Navegação (Gestor)", "Acessando aba 'Abastecimentos'.");
+            // Re-render fuel dashboard summary to ensure it's up-to-date
+            renderFuelDashboardSummary(allFuelRecords);
+        }
+
+        /**
          * Switches the Gestor view to Employee Management.
          */
         function showEmployeeManagementTab() {
             document.getElementById('dashboardSection').classList.add('hidden');
             document.getElementById('vehicleManagementSection').classList.add('hidden');
+            document.getElementById('fuelManagementSection').classList.add('hidden'); // NEW
             document.getElementById('employeeManagementSection').classList.remove('hidden');
 
             document.getElementById('showEmployeeManagement').classList.add('border-indigo-500', 'text-indigo-600');
             document.getElementById('showDashboard').classList.remove('border-indigo-500', 'text-indigo-600');
             document.getElementById('showVehicleManagement').classList.remove('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showFuelManagement').classList.remove('border-indigo-500', 'text-indigo-600'); // NEW
             logAppAction("Navegação (Gestor)", "Acessando aba 'Gerenciar Funcionários'.");
         }
 
         /**
-         * Switches the Driver view to Daily Mileage Entry. (NEW FUNCTION)
+         * Switches the Driver view to Daily Mileage Entry.
          */
         function showDailyMileageEntryTab() {
             document.getElementById('dailyMileageForm').classList.remove('hidden');
@@ -1730,7 +1924,7 @@
         }
 
         /**
-         * Switches the Driver view to Fuel Entry. (NEW FUNCTION)
+         * Switches the Driver view to Fuel Entry.
          */
         function showFuelEntryTab() {
             document.getElementById('dailyMileageForm').classList.add('hidden');
@@ -1741,6 +1935,29 @@
             populateEmployeeSelects(); // Ensure employee dropdown is updated for fuel form
             logAppAction("Navegação (Motorista)", "Acessando aba 'Abastecimento'.");
         }
+
+        /**
+         * Shows the detailed fuel table and hides the summary.
+         * @param {string} filterType - 'all', 'Gasolina', or 'Diesel'.
+         */
+        function showDetailedFuelTable(filterType) {
+            document.getElementById('fuelDashboardSummary').classList.add('hidden');
+            document.getElementById('detailedFuelTable').classList.remove('hidden');
+            document.getElementById('detailedFuelTable').dataset.currentFilter = filterType; // Store current filter
+            renderDetailedFuelRecords(allFuelRecords, filterType);
+            logAppAction("Navegação (Gestor - Abastecimentos)", `Visualizando tabela detalhada de abastecimentos com filtro: ${filterType}.`);
+        }
+
+        /**
+         * Shows the fuel dashboard summary and hides the detailed table.
+         */
+        function showFuelDashboardSummary() {
+            document.getElementById('fuelDashboardSummary').classList.remove('hidden');
+            document.getElementById('detailedFuelTable').classList.add('hidden');
+            delete document.getElementById('detailedFuelTable').dataset.currentFilter; // Clear filter
+            logAppAction("Navegação (Gestor - Abastecimentos)", "Voltando para o dashboard de abastecimentos.");
+        }
+
 
         // --- Initialization ---
 
@@ -1755,11 +1972,11 @@
             // Driver Portal Buttons
             document.getElementById('backButtonDriver').addEventListener('click', backToLandingPage);
             document.getElementById('dailyMileageForm').addEventListener('submit', handleDailyMileageSubmit); 
-            document.getElementById('fuelEntryForm').addEventListener('submit', handleFuelEntrySubmit); // NEW: Fuel form submit listener
+            document.getElementById('fuelEntryForm').addEventListener('submit', handleFuelEntrySubmit);
 
             // Driver Portal Tab Buttons
             document.getElementById('showDailyMileageEntry').addEventListener('click', showDailyMileageEntryTab);
-            document.getElementById('showFuelEntry').addEventListener('click', showFuelEntryTab); // NEW: Fuel tab button
+            document.getElementById('showFuelEntry').addEventListener('click', showFuelEntryTab);
 
             // Gestor Portal Buttons
             document.getElementById('backButtonGestorLogin').addEventListener('click', backToLandingPage);
@@ -1771,6 +1988,7 @@
 
             document.getElementById('showDashboard').addEventListener('click', showDashboardTab); 
             document.getElementById('showVehicleManagement').addEventListener('click', showVehicleManagementTab);
+            document.getElementById('showFuelManagement').addEventListener('click', showFuelManagementTab); // NEW
             document.getElementById('showEmployeeManagement').addEventListener('click', showEmployeeManagementTab);
 
             document.getElementById('maintenanceForm').addEventListener('submit', handleMaintenanceFormSubmit);
@@ -1812,6 +2030,20 @@
                 });
             });
 
+            // NEW: Add sorting listeners for fuel table headers
+            document.querySelectorAll('#detailedFuelTable thead th[data-sort]').forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.sort;
+                    if (currentFuelSortColumn === column) {
+                        currentFuelSortDirection = currentFuelSortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentFuelSortColumn = column;
+                        currentFuelSortDirection = 'asc';
+                    }
+                    renderDetailedFuelRecords(allFuelRecords, document.getElementById('detailedFuelTable').dataset.currentFilter || 'all');
+                });
+            });
+
             // Dashboard statistics cards click listeners to navigate to Vehicle Management with specific filters
             document.getElementById('statsCardTotalVehicles').addEventListener('click', () => {
                 showVehicleManagementTab();
@@ -1834,6 +2066,15 @@
                 document.getElementById('vehicleSearch').value = 'Revisões Vencidas'; // Indicate filter
             });
 
+            // NEW: Fuel statistics cards click listeners to show detailed fuel table
+            document.getElementById('fuelStatsCardTotal').addEventListener('click', () => showDetailedFuelTable('all'));
+            document.getElementById('fuelStatsCardGasoline').addEventListener('click', () => showDetailedFuelTable('Gasolina'));
+            document.getElementById('fuelStatsCardDiesel').addEventListener('click', () => showDetailedFuelTable('Diesel'));
+            document.getElementById('fuelStatsCardEvents').addEventListener('click', () => showDetailedFuelTable('all')); // Events also show all
+
+            // NEW: Back button for detailed fuel table
+            document.getElementById('backToFuelDashboardBtn').addEventListener('click', showFuelDashboardSummary);
+
 
             // Message Box Close Button
             document.getElementById('messageBoxClose').addEventListener('click', () => {
@@ -1847,10 +2088,6 @@
          */
         async function initializeApp() {
             setupEventListeners();
-            // Removed the call to addInitialDataIfEmpty() as per user request to not generate sample data.
-            // await addInitialDataIfEmpty(); 
-            // Removed direct call to setupRealtimeListenerEmployees() from here.
-            // It will now be initialized only once within handleGestorLogin.
             logAppAction("Inicialização", "Aplicativo inicializado.");
         }
 
