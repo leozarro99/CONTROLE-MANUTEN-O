@@ -1842,20 +1842,12 @@
                 document.getElementById('gestorLogin').classList.add('hidden');
                 document.getElementById('gestorContent').classList.remove('hidden');
                 
-                // Only set up real-time listeners if they haven't been initialized yet
-                if (!gestorListenersInitialized) {
-                    setupRealtimeListenerGestor();
-                    setupRealtimeListenerEmployees();
-                    setupRealtimeListenerDailyMileageLogs();
-                    setupRealtimeListenerFuelRecords();
-                    gestorListenersInitialized = true;
-                    logAppAction("Login do Gestor", "Listeners de tempo real inicializados.");
-                } else {
-                    // If listeners are already initialized, just fetch and render data to refresh
-                    fetchAndRenderMaintenanceRecords();
-                    fetchDailyMileageLogs();
-                    fetchFuelRecords();
-                }
+                // Data is already being fetched and kept real-time by initializeApp
+                // No need to call setupRealtimeListener... here again.
+                // Just ensure the latest data is rendered for the gestor view.
+                fetchAndRenderMaintenanceRecords(); // Re-render for gestor view
+                fetchDailyMileageLogs(); // Re-fetch/re-render for gestor view if needed
+                fetchFuelRecords(); // Re-fetch/re-render for gestor view if needed
 
                 document.getElementById('plate').readOnly = false;
                 document.getElementById('submitVehicleBtn').innerHTML = '<i class="fas fa-plus-circle mr-2"></i>Adicionar Veículo';
@@ -2213,6 +2205,11 @@
          */
         async function initializeApp() {
             setupEventListeners();
+            // Initialize listeners and fetch initial data on app load
+            setupRealtimeListenerEmployees(); // Fetch employees early
+            setupRealtimeListenerGestor(); // Fetch vehicles early (populates allMaintenanceRecords)
+            setupRealtimeListenerDailyMileageLogs(); // Fetch daily mileage logs
+            setupRealtimeListenerFuelRecords(); // Fetch fuel records
             logAppAction("Inicialização", "Aplicativo inicializado.");
         }
 
