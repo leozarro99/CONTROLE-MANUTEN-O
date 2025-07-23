@@ -132,6 +132,17 @@
             </p>
         </div>
 
+        <!-- Driver Portal Tabs -->
+        <div class="flex justify-center mb-6 border-b-2 border-gray-200">
+            <button id="showDailyMileageEntry" class="py-3 px-6 w-1/2 text-lg font-semibold text-gray-700 border-b-4 border-indigo-500 hover:text-indigo-600 focus:outline-none focus:text-indigo-600 transition duration-150 ease-in-out">
+                Registrar KM
+            </button>
+            <button id="showFuelEntry" class="py-3 px-6 w-1/2 text-lg font-medium text-gray-500 border-b-4 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 transition duration-150 ease-in-out">
+                Abastecimento
+            </button>
+        </div>
+
+        <!-- Daily Mileage Form (existing) -->
         <form id="dailyMileageForm" class="space-y-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg shadow-inner border border-blue-200">
             <div>
                 <label for="driverResponsibleEmployee" class="block text-base font-medium text-gray-700 mb-2">Seu Nome</label>
@@ -154,6 +165,42 @@
             <button type="submit"
                     class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-lg text-white bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-xl">
                 <i class="fas fa-save mr-2"></i>Registrar Quilometragem
+            </button>
+        </form>
+
+        <!-- Fuel Entry Form (NEW) -->
+        <form id="fuelEntryForm" class="space-y-6 p-6 bg-gradient-to-br from-green-50 to-teal-100 rounded-lg shadow-inner border border-green-200 hidden">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Registro de Abastecimento</h2>
+            <div>
+                <label for="fuelResponsibleEmployee" class="block text-base font-medium text-gray-700 mb-2">Seu Nome</label>
+                <select id="fuelResponsibleEmployee" name="fuelResponsibleEmployee" required
+                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out appearance-none">
+                    <option value="">-- Selecione --</option>
+                    <!-- Employee options will be loaded dynamically here -->
+                </select>
+            </div>
+            <div>
+                <label for="fuelPlate" class="block text-base font-medium text-gray-700 mb-2">Placa do Veículo</label>
+                <input type="text" id="fuelPlate" name="fuelPlate" required
+                       class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
+            </div>
+            <div>
+                <label for="fuelType" class="block text-base font-medium text-gray-700 mb-2">Tipo de Combustível</label>
+                <select id="fuelType" name="fuelType" required
+                        class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out appearance-none">
+                    <option value="">-- Selecione --</option>
+                    <option value="Gasolina">Gasolina</option>
+                    <option value="Diesel">Diesel</option>
+                </select>
+            </div>
+            <div>
+                <label for="fuelValue" class="block text-base font-medium text-gray-700 mb-2">Valor do Abastecimento (R$)</label>
+                <input type="number" id="fuelValue" name="fuelValue" required min="0" step="0.01"
+                       class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
+            </div>
+            <button type="submit"
+                    class="w-full inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-lg text-white bg-gradient-to-r from-green-600 to-teal-700 hover:from-green-700 hover:to-teal-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-200 ease-in-out transform hover:scale-105 hover:shadow-xl">
+                <i class="fas fa-gas-pump mr-2"></i>Registrar Abastecimento
             </button>
         </form>
 
@@ -455,6 +502,8 @@
 
         let isAuthReady = true; // For this setup with anon key, auth is immediately ready
         let allMaintenanceRecords = []; // Cache for all maintenance records (for filtering/sorting)
+        let allDailyMileageLogs = []; // NEW: Cache for daily mileage logs
+        let allFuelRecords = []; // NEW: Cache for fuel records
         let currentEmployees = []; // Cache for employee data
         let gestorListenersInitialized = false; // Flag to ensure listeners are only set up once
 
@@ -466,6 +515,8 @@
         // --- Supabase Table Names ---
         const MAINTENANCE_RECORDS_TABLE = 'maintenance_records';
         const EMPLOYEES_TABLE = 'employees';
+        const DAILY_MILEAGE_LOGS_TABLE = 'daily_mileage_logs'; // NEW TABLE
+        const FUEL_RECORDS_TABLE = 'fuel_records'; // NEW TABLE
         const APP_METADATA_TABLE = 'app_metadata'; // Table to store app metadata like initial data flag
         const INITIAL_DATA_FLAG_DOC_ID = 'initialDataLoaded';
 
@@ -593,6 +644,21 @@
                 minute: '2-digit',
                 second: '2-digit'
             });
+        }
+
+        /**
+         * Formats a timestamp string into dd/mm/yyyy.
+         * @param {string} timestamp - The ISO timestamp string.
+         * @returns {string} - Formatted date string (dd/mm/yyyy).
+         */
+        function formatDateToDDMMYYYY(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = new Date(timestamp);
+            if (isNaN(date.getTime())) return 'Inválido';
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
         }
 
         // --- Render Functions ---
@@ -804,10 +870,12 @@
         function populateEmployeeSelects() {
             const driverSelect = document.getElementById('driverResponsibleEmployee');
             const gestorSelect = document.getElementById('responsibleEmployee');
+            const fuelSelect = document.getElementById('fuelResponsibleEmployee'); // NEW: Fuel form employee select
 
             // Clear existing options, keep the default "Selecione"
             driverSelect.innerHTML = '<option value="">-- Selecione --</option>';
             gestorSelect.innerHTML = '<option value="">-- Selecione --</option>';
+            fuelSelect.innerHTML = '<option value="">-- Selecione --</option>'; // Clear for fuel form
 
             currentEmployees.forEach(employee => {
                 const optionDriver = document.createElement('option');
@@ -819,6 +887,11 @@
                 optionGestor.value = employee.name;
                 optionGestor.textContent = employee.name;
                 gestorSelect.appendChild(optionGestor);
+
+                const optionFuel = document.createElement('option'); // NEW: Add to fuel form select
+                optionFuel.value = employee.name;
+                optionFuel.textContent = employee.name;
+                fuelSelect.appendChild(optionFuel);
             });
             logAppAction("População de Seletores", `Campos de seleção de funcionário atualizados com ${currentEmployees.length} funcionários.`);
         }
@@ -882,6 +955,96 @@
                 })
                 .subscribe();
             logAppAction("Listener em Tempo Real (Gestor)", "Listener para registros de manutenção ativado.");
+        }
+
+        /**
+         * Fetches and caches daily mileage logs.
+         */
+        async function fetchDailyMileageLogs() {
+            logAppAction("Busca de Dados", "Iniciando busca de registros de KM por dia.");
+            try {
+                const { data, error } = await supabase
+                    .from(DAILY_MILEAGE_LOGS_TABLE)
+                    .select('*')
+                    .eq('user_id', gestorUserId)
+                    .order('date', { ascending: false });
+                if (error) throw error;
+                allDailyMileageLogs = data;
+                logAppAction("Busca de Dados Concluída", `Total de registros de KM por dia: ${data.length}`);
+            } catch (e) {
+                console.error("Error fetching daily mileage logs:", e);
+                showToast("Erro ao carregar dados de KM por dia: " + e.message, 'error');
+            }
+        }
+
+        /**
+         * Sets up real-time listeners for daily mileage logs.
+         */
+        function setupRealtimeListenerDailyMileageLogs() {
+            fetchDailyMileageLogs(); // Initial fetch
+            supabase
+                .channel('daily_mileage_logs_changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: DAILY_MILEAGE_LOGS_TABLE, filter: `user_id=eq.${gestorUserId}` }, payload => {
+                    logAppAction("Supabase Realtime (KM por Dia)", `Mudança detectada na tabela de KM por dia: ${payload.eventType}`);
+                    if (payload.eventType === 'INSERT') {
+                        allDailyMileageLogs.unshift(payload.new);
+                    } else if (payload.eventType === 'UPDATE') {
+                        const index = allDailyMileageLogs.findIndex(record => record.id === payload.old.id);
+                        if (index !== -1) {
+                            allDailyMileageLogs[index] = payload.new;
+                        }
+                    } else if (payload.eventType === 'DELETE') {
+                        allDailyMileageLogs = allDailyMileageLogs.filter(record => record.id !== payload.old.id);
+                    }
+                    allDailyMileageLogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                })
+                .subscribe();
+            logAppAction("Listener em Tempo Real (KM por Dia)", "Listener para registros de KM por dia ativado.");
+        }
+
+        /**
+         * Fetches and caches fuel records.
+         */
+        async function fetchFuelRecords() {
+            logAppAction("Busca de Dados", "Iniciando busca de registros de abastecimento.");
+            try {
+                const { data, error } = await supabase
+                    .from(FUEL_RECORDS_TABLE)
+                    .select('*')
+                    .eq('user_id', gestorUserId)
+                    .order('date', { ascending: false });
+                if (error) throw error;
+                allFuelRecords = data;
+                logAppAction("Busca de Dados Concluída", `Total de registros de abastecimento: ${data.length}`);
+            } catch (e) {
+                console.error("Error fetching fuel records:", e);
+                showToast("Erro ao carregar dados de abastecimento: " + e.message, 'error');
+            }
+        }
+
+        /**
+         * Sets up real-time listeners for fuel records.
+         */
+        function setupRealtimeListenerFuelRecords() {
+            fetchFuelRecords(); // Initial fetch
+            supabase
+                .channel('fuel_records_changes')
+                .on('postgres_changes', { event: '*', schema: 'public', table: FUEL_RECORDS_TABLE, filter: `user_id=eq.${gestorUserId}` }, payload => {
+                    logAppAction("Supabase Realtime (Abastecimento)", `Mudança detectada na tabela de abastecimento: ${payload.eventType}`);
+                    if (payload.eventType === 'INSERT') {
+                        allFuelRecords.unshift(payload.new);
+                    } else if (payload.eventType === 'UPDATE') {
+                        const index = allFuelRecords.findIndex(record => record.id === payload.old.id);
+                        if (index !== -1) {
+                            allFuelRecords[index] = payload.new;
+                        }
+                    } else if (payload.eventType === 'DELETE') {
+                        allFuelRecords = allFuelRecords.filter(record => record.id !== payload.old.id);
+                    }
+                    allFuelRecords.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                })
+                .subscribe();
+            logAppAction("Listener em Tempo Real (Abastecimento)", "Listener para registros de abastecimento ativado.");
         }
 
         /**
@@ -1079,60 +1242,90 @@
         }
 
         /**
+         * Initiates download of a CSV file.
+         * @param {string} filename - The name of the file to download.
+         * @param {string} content - The CSV content.
+         */
+        function downloadCsv(filename, content) {
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                logAppAction("Download CSV", `Arquivo "${filename}" gerado e download iniciado.`);
+            } else {
+                showMessageBox("Erro de Navegador", `Seu navegador não suporta download de arquivos diretamente. Por favor, copie o conteúdo para "${filename}" abaixo e cole em um arquivo de texto, salvando como .csv:\n\n` + content);
+            }
+        }
+
+        /**
          * Handles exporting maintenance data to CSV.
          */
         async function handleExportCsv() {
-            logAppAction("Exportação CSV", "Botão 'Exportar para CSV' clicado. Iniciando exportação.");
+            logAppAction("Exportação CSV", "Botão 'Exportar para CSV' clicado. Iniciando exportação de múltiplos arquivos.");
             if (!isAuthReady) {
                 showToast("O sistema não está pronto para exportar. Por favor, aguarde a inicialização.", 'error');
                 return;
             }
 
             try {
-                const { data: recordsToExport, error } = await supabase
+                // Fetch all necessary data
+                const { data: maintenanceData, error: maintenanceError } = await supabase
                     .from(MAINTENANCE_RECORDS_TABLE)
                     .select('*')
                     .eq('user_id', gestorUserId);
+                if (maintenanceError) throw maintenanceError;
 
-                if (error) throw error;
+                const { data: dailyMileageData, error: dailyMileageError } = await supabase
+                    .from(DAILY_MILEAGE_LOGS_TABLE)
+                    .select('*')
+                    .eq('user_id', gestorUserId);
+                if (dailyMileageError) throw dailyMileageError;
 
-                if (recordsToExport.length === 0) {
-                    showToast("Não há dados para exportar para CSV.", 'info');
+                const { data: fuelData, error: fuelError } = await supabase
+                    .from(FUEL_RECORDS_TABLE)
+                    .select('*')
+                    .eq('user_id', gestorUserId);
+                if (fuelError) throw fuelError;
+
+                if (maintenanceData.length === 0 && dailyMileageData.length === 0 && fuelData.length === 0) {
+                    showToast("Não há dados para exportar.", 'info');
                     return;
                 }
 
-                // Add UTF-8 BOM to ensure correct character encoding in Excel
-                let csvContent = '\uFEFF'; 
-                
-                // Use semicolon as delimiter and replace internal semicolons with commas
-                csvContent += `Total de Veículos;${recordsToExport.length}\n`; // Add total vehicles as the first line
-                csvContent += "Placa;Quilometragem Atual (Km);Próxima Revisão (Km);Km Faltantes;Responsável;Última Modificação\n";
-                recordsToExport.forEach(record => {
-                    const nextMaintenanceDueKm = record.next_maintenance_due_km || 0;
-                    const kmRemainingForMaintenance = nextMaintenanceDueKm - (record.current_mileage || 0);
-                    const lastModified = formatTimestamp(record.last_modified_at);
-
-                    // Sanitize data by replacing semicolons within fields with commas
-                    const plate = (record.plate || '').replace(/;/g, ',');
-                    const responsibleEmployee = (record.responsible_employee || 'Não atribuído').replace(/;/g, ',');
-
-                    csvContent += `${plate};${record.current_mileage || 'N/A'};${nextMaintenanceDueKm};${kmRemainingForMaintenance <= 0 ? 'VENCIDA' : kmRemainingForMaintenance};${responsibleEmployee};${lastModified}\n`;
+                // --- Generate "Manutenção Veículos" CSV ---
+                let maintenanceCsvContent = '\uFEFF'; // BOM for UTF-8
+                maintenanceCsvContent += "Placa;KM Atual;Próxima Revisão\n";
+                maintenanceData.forEach(record => {
+                    maintenanceCsvContent += `${(record.plate || '').replace(/;/g, ',')};${record.current_mileage || 'N/A'};${record.next_maintenance_due_km || 'N/A'}\n`;
                 });
+                downloadCsv('manutencao_veiculos.csv', maintenanceCsvContent);
 
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                if (link.download !== undefined) {
-                    const url = URL.createObjectURL(blob);
-                    link.setAttribute('href', url);
-                    link.setAttribute('download', 'controle_manutencao_veiculos.csv');
-                    link.style.visibility = 'hidden';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    showToast("Dados exportados para 'controle_manutencao_veiculos.csv' com sucesso!", 'success');
-                } else {
-                    showMessageBox("Erro de Navegador", "Seu navegador não suporta download de arquivos diretamente. Por favor, copie o conteúdo abaixo e cole em um arquivo de texto, salvando como .csv:\n\n" + csvContent);
-                }
+                // --- Generate "KM por Dia" CSV ---
+                let dailyMileageCsvContent = '\uFEFF'; // BOM for UTF-8
+                dailyMileageCsvContent += "Dia;Placa;Funcionário;Quilometragem Registrada\n";
+                dailyMileageData.forEach(record => {
+                    const formattedDate = formatDateToDDMMYYYY(record.date);
+                    dailyMileageCsvContent += `${formattedDate};${(record.plate || '').replace(/;/g, ',')};${(record.responsible_employee || 'Não atribuído').replace(/;/g, ',')};${record.mileage_recorded || 'N/A'}\n`;
+                });
+                downloadCsv('km_por_dia.csv', dailyMileageCsvContent);
+
+                // --- Generate "Abastecimentos" CSV ---
+                let fuelCsvContent = '\uFEFF'; // BOM for UTF-8
+                fuelCsvContent += "Dia;Placa;Funcionário;Tipo de Combustível;Valor (R$)\n";
+                fuelData.forEach(record => {
+                    const formattedDate = formatDateToDDMMYYYY(record.date);
+                    fuelCsvContent += `${formattedDate};${(record.plate || '').replace(/;/g, ',')};${(record.responsible_employee || 'Não atribuído').replace(/;/g, ',')};${(record.fuel_type || 'N/A').replace(/;/g, ',')};${(record.value || 0).toFixed(2).replace('.', ',')}\n`; // Format value as currency
+                });
+                downloadCsv('abastecimentos.csv', fuelCsvContent);
+
+                showToast("Três arquivos CSV foram gerados e o download foi iniciado. Importe-os separadamente no Excel para ter as abas desejadas.", 'success');
+
             } catch (e) {
                 console.error("Error exporting data: ", e);
                 showToast("Erro na Exportação: " + e.message, 'error');
@@ -1163,10 +1356,10 @@
             }
 
             try {
-                // First, check if the plate exists at all for this gestorUserId
+                // 1. Check if the plate exists at all for this gestorUserId
                 const { data: plateCheck, error: plateCheckError } = await supabase
                     .from(MAINTENANCE_RECORDS_TABLE)
-                    .select('id')
+                    .select('id, current_mileage')
                     .eq('plate', driverPlate)
                     .eq('user_id', gestorUserId);
 
@@ -1182,52 +1375,104 @@
                     return;
                 }
 
-                // If plate exists, proceed to check for employee and update
-                console.log("[Console] Buscando veículo com:", {
-                    plate: driverPlate,
-                    employee: driverResponsibleEmployee,
-                    userId: gestorUserId
-                });
+                const vehicleToUpdate = plateCheck[0]; // Get the vehicle record
 
-                const { data: vehicles, error: selectError } = await supabase
+                // Check if the entered mileage is less than the current mileage
+                if (driverDailyMileage < (vehicleToUpdate.current_mileage || 0)) {
+                    showToast(`A quilometragem registrada (${driverDailyMileage}) não pode ser menor que a quilometragem atual do veículo (${vehicleToUpdate.current_mileage || 0}).`, 'error');
+                    logAppAction("Erro de Validação", `Quilometragem inserida menor que a atual para placa: ${driverPlate}`);
+                    return;
+                }
+
+                // 2. Insert into daily_mileage_logs (NEW)
+                const { error: insertLogError } = await supabase
+                    .from(DAILY_MILEAGE_LOGS_TABLE)
+                    .insert({
+                        user_id: gestorUserId,
+                        date: new Date().toISOString(),
+                        plate: driverPlate,
+                        responsible_employee: driverResponsibleEmployee,
+                        mileage_recorded: driverDailyMileage
+                    });
+                if (insertLogError) throw insertLogError;
+                logAppAction("Registro de KM por Dia", `KM ${driverDailyMileage} para ${driverPlate} registrada no log.`);
+
+                // 3. Update current_mileage in maintenance_records
+                const { error: updateError } = await supabase
                     .from(MAINTENANCE_RECORDS_TABLE)
-                    .select('id, plate, responsible_employee')
-                    .eq('plate', driverPlate)
-                    .eq('responsible_employee', driverResponsibleEmployee)
+                    .update({ current_mileage: driverDailyMileage, last_modified_at: new Date().toISOString() })
+                    .eq('id', vehicleToUpdate.id)
                     .eq('user_id', gestorUserId);
 
-                if (selectError) {
-                    console.error("[Console] Erro durante a seleção do veículo para o motorista:", selectError);
-                    showToast("Erro ao buscar veículo: " + selectError.message, 'error');
-                    return; // Stop execution on select error
-                }
+                if (updateError) throw updateError;
 
-                console.log("[Console] Veículos encontrados (após verificação de funcionário):", vehicles);
-
-                if (vehicles && vehicles.length > 0) {
-                    const vehicleToUpdate = vehicles[0];
-                    console.log("[Console] Veículo encontrado, tentando atualizar:", vehicleToUpdate);
-                    const { error: updateError } = await supabase
-                        .from(MAINTENANCE_RECORDS_TABLE)
-                        .update({ current_mileage: driverDailyMileage, last_modified_at: new Date().toISOString() }) // Also update last_modified_at
-                        .eq('id', vehicleToUpdate.id)
-                        .eq('user_id', gestorUserId); // Ensure user_id is also matched for update
-
-                    if (updateError) {
-                        console.error("[Console] Erro durante a atualização da quilometragem:", updateError);
-                        showToast("Erro ao atualizar quilometragem: " + updateError.message, 'error');
-                        return; // Stop execution on update error
-                    }
-                    showToast(`Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km!`, 'success');
-                    logAppAction("Atualização de Quilometragem", `Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km.`);
-                } else {
-                    showToast(`Veículo com placa "${driverPlate}" e funcionário "${driverResponsibleEmployee}" não encontrado. Verifique os dados ou contate o gestor.`, 'error');
-                    logAppAction("Veículo Não Encontrado", `Nenhum veículo correspondente encontrado para Placa: "${driverPlate}", Funcionário: "${driverResponsibleEmployee}".`);
-                }
+                showToast(`Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km!`, 'success');
+                logAppAction("Atualização de Quilometragem", `Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km.`);
                 document.getElementById('dailyMileageForm').reset();
             } catch (e) {
                 console.error("[Console] Erro geral ao registrar quilometragem: ", e);
                 showToast("Ocorreu um erro ao registrar quilometragem: " + e.message, 'error');
+            }
+        }
+
+        /**
+         * Handles the submission of the fuel entry form by a driver. (NEW FUNCTION)
+         * @param {Event} event - The form submission event.
+         */
+        async function handleFuelEntrySubmit(event) {
+            event.preventDefault();
+            const fuelResponsibleEmployee = document.getElementById('fuelResponsibleEmployee').value.trim();
+            const fuelPlate = document.getElementById('fuelPlate').value.toUpperCase().trim();
+            const fuelType = document.getElementById('fuelType').value;
+            const fuelValue = parseFloat(document.getElementById('fuelValue').value);
+
+            logAppAction("Envio de Formulário (Abastecimento)", `Tentativa de registrar abastecimento. Placa: "${fuelPlate}", Funcionário: "${fuelResponsibleEmployee}", Tipo: "${fuelType}", Valor: ${fuelValue}`);
+
+            if (!isAuthReady) {
+                showToast("O sistema não está pronto. Por favor, aguarde a inicialização.", 'error');
+                return;
+            }
+            if (!fuelResponsibleEmployee || !fuelPlate || !fuelType || isNaN(fuelValue) || fuelValue <= 0) {
+                showToast("Por favor, preencha todos os campos do abastecimento corretamente.", 'error');
+                logAppAction("Erro de Entrada", "Campos do formulário de abastecimento incompletos ou inválidos.");
+                return;
+            }
+
+            try {
+                // Check if the plate exists for this gestorUserId
+                const { data: plateCheck, error: plateCheckError } = await supabase
+                    .from(MAINTENANCE_RECORDS_TABLE)
+                    .select('id')
+                    .eq('plate', fuelPlate)
+                    .eq('user_id', gestorUserId);
+
+                if (plateCheckError) throw plateCheckError;
+
+                if (!plateCheck || plateCheck.length === 0) {
+                    showToast(`Placa inexistente`, 'error');
+                    logAppAction("Placa Não Cadastrada", `Placa "${fuelPlate}" não encontrada no cadastro do gestor para abastecimento.`);
+                    return;
+                }
+
+                const { error } = await supabase
+                    .from(FUEL_RECORDS_TABLE)
+                    .insert({
+                        user_id: gestorUserId,
+                        date: new Date().toISOString(),
+                        plate: fuelPlate,
+                        responsible_employee: fuelResponsibleEmployee,
+                        fuel_type: fuelType,
+                        value: fuelValue
+                    });
+
+                if (error) throw error;
+
+                showToast(`Abastecimento para o veículo ${fuelPlate} no valor de R$ ${fuelValue.toFixed(2).replace('.', ',')} registrado com sucesso!`, 'success');
+                logAppAction("Registro de Abastecimento", `Abastecimento para ${fuelPlate} registrado.`);
+                document.getElementById('fuelEntryForm').reset();
+            } catch (e) {
+                console.error("Error saving fuel record: ", e);
+                showToast("Erro ao salvar registro de abastecimento: " + e.message, 'error');
             }
         }
 
@@ -1326,12 +1571,16 @@
                 // Only set up real-time listeners if they haven't been initialized yet
                 if (!gestorListenersInitialized) {
                     setupRealtimeListenerGestor();
-                    setupRealtimeListenerEmployees();
+                    setupRealtimeListenerEmployees(); // Now called only once here
+                    setupRealtimeListenerDailyMileageLogs(); // NEW: Initialize daily mileage logs listener
+                    setupRealtimeListenerFuelRecords(); // NEW: Initialize fuel records listener
                     gestorListenersInitialized = true; // Set the flag to true
                     logAppAction("Login do Gestor", "Listeners de tempo real inicializados.");
                 } else {
                     // If listeners are already initialized, just fetch and render data to refresh
                     fetchAndRenderMaintenanceRecords();
+                    fetchDailyMileageLogs(); // Refresh daily mileage logs
+                    fetchFuelRecords(); // Refresh fuel records
                     // No need to re-render employees explicitly here, as its listener also fetches on subscribe.
                 }
 
@@ -1383,7 +1632,9 @@
             document.getElementById('gestorSection').classList.add('hidden');
             document.getElementById('driverPortalSection').classList.remove('hidden');
             document.getElementById('dailyMileageForm').reset();
+            document.getElementById('fuelEntryForm').reset(); // Reset fuel form
             populateEmployeeSelects();
+            showDailyMileageEntryTab(); // Default to daily mileage entry
             logAppAction("Navegação", "Acessando Portal do Motorista.");
         }
 
@@ -1466,6 +1717,31 @@
             logAppAction("Navegação (Gestor)", "Acessando aba 'Gerenciar Funcionários'.");
         }
 
+        /**
+         * Switches the Driver view to Daily Mileage Entry. (NEW FUNCTION)
+         */
+        function showDailyMileageEntryTab() {
+            document.getElementById('dailyMileageForm').classList.remove('hidden');
+            document.getElementById('fuelEntryForm').classList.add('hidden');
+
+            document.getElementById('showDailyMileageEntry').classList.add('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showFuelEntry').classList.remove('border-indigo-500', 'text-indigo-600');
+            logAppAction("Navegação (Motorista)", "Acessando aba 'Registrar KM'.");
+        }
+
+        /**
+         * Switches the Driver view to Fuel Entry. (NEW FUNCTION)
+         */
+        function showFuelEntryTab() {
+            document.getElementById('dailyMileageForm').classList.add('hidden');
+            document.getElementById('fuelEntryForm').classList.remove('hidden');
+
+            document.getElementById('showFuelEntry').classList.add('border-indigo-500', 'text-indigo-600');
+            document.getElementById('showDailyMileageEntry').classList.remove('border-indigo-500', 'text-indigo-600');
+            populateEmployeeSelects(); // Ensure employee dropdown is updated for fuel form
+            logAppAction("Navegação (Motorista)", "Acessando aba 'Abastecimento'.");
+        }
+
         // --- Initialization ---
 
         /**
@@ -1478,7 +1754,12 @@
 
             // Driver Portal Buttons
             document.getElementById('backButtonDriver').addEventListener('click', backToLandingPage);
-            document.getElementById('dailyMileageForm').addEventListener('submit', handleDailyMileageSubmit); // Added submit listener for driver form
+            document.getElementById('dailyMileageForm').addEventListener('submit', handleDailyMileageSubmit); 
+            document.getElementById('fuelEntryForm').addEventListener('submit', handleFuelEntrySubmit); // NEW: Fuel form submit listener
+
+            // Driver Portal Tab Buttons
+            document.getElementById('showDailyMileageEntry').addEventListener('click', showDailyMileageEntryTab);
+            document.getElementById('showFuelEntry').addEventListener('click', showFuelEntryTab); // NEW: Fuel tab button
 
             // Gestor Portal Buttons
             document.getElementById('backButtonGestorLogin').addEventListener('click', backToLandingPage);
@@ -1488,7 +1769,7 @@
             // Gestor Portal Title click returns to landing page
             document.getElementById('gestorPortalTitle').addEventListener('click', backToLandingPage);
 
-            document.getElementById('showDashboard').addEventListener('click', showDashboardTab); // New Dashboard tab
+            document.getElementById('showDashboard').addEventListener('click', showDashboardTab); 
             document.getElementById('showVehicleManagement').addEventListener('click', showVehicleManagementTab);
             document.getElementById('showEmployeeManagement').addEventListener('click', showEmployeeManagementTab);
 
@@ -1568,7 +1849,8 @@
             setupEventListeners();
             // Removed the call to addInitialDataIfEmpty() as per user request to not generate sample data.
             // await addInitialDataIfEmpty(); 
-            setupRealtimeListenerEmployees(); // Load employees and set up real-time updates
+            // Removed direct call to setupRealtimeListenerEmployees() from here.
+            // It will now be initialized only once within handleGestorLogin.
             logAppAction("Inicialização", "Aplicativo inicializado.");
         }
 
