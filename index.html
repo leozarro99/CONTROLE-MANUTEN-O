@@ -1324,7 +1324,7 @@
                 });
                 downloadCsv('abastecimentos.csv', fuelCsvContent);
 
-                showToast("Três arquivos CSV foram gerados e o download foi iniciado. Importe-os separadamente no Excel para ter as abas desejadas.", 'success');
+                showToast("Três arquivos CSV foram gerados e o download foi iniciado. Para ter as abas desejadas no Excel, abra o Excel e use a opção 'Dados' > 'Obter Dados Externos' > 'De Texto/CSV' para importar cada arquivo CSV em uma nova aba.", 'success');
 
             } catch (e) {
                 console.error("Error exporting data: ", e);
