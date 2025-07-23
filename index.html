@@ -447,6 +447,26 @@
                             <i class="fas fa-receipt text-blue-500 text-4xl opacity-50"></i>
                         </div>
                     </div>
+                    
+                    <!-- NEW: Fuel Percentage Cards -->
+                    <h3 class="text-xl font-semibold text-gray-700 mb-5 mt-8">Distribuição de Combustível</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-orange-100 p-6 rounded-lg shadow-md flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-orange-800">Porcentagem Gasolina</p>
+                                <p id="gasolinePercentage" class="text-3xl font-bold text-orange-900 mt-1">0%</p>
+                            </div>
+                            <i class="fas fa-percentage text-orange-500 text-4xl opacity-50"></i>
+                        </div>
+                        <div class="bg-gray-200 p-6 rounded-lg shadow-md flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">Porcentagem Diesel</p>
+                                <p id="dieselPercentage" class="text-3xl font-bold text-gray-900 mt-1">0%</p>
+                            </div>
+                            <i class="fas fa-percentage text-gray-500 text-4xl opacity-50"></i>
+                        </div>
+                    </div>
+
                 </div>
 
                 <!-- Detailed Fuel Table (initially hidden) -->
@@ -776,7 +796,7 @@
         }
 
         /**
-         * Renders the fuel statistics in the fuel dashboard summary.
+         * Renders the fuel statistics in the fuel dashboard summary, including percentages.
          * @param {Array<Object>} records - All fuel records.
          */
         function renderFuelDashboardSummary(records) {
@@ -785,12 +805,20 @@
             const totalDieselSpent = records.filter(record => record.fuel_type === 'Diesel').reduce((sum, record) => sum + (record.value || 0), 0);
             const totalRefuelEvents = records.length;
 
+            // Calculate percentages
+            const gasolinePercentage = totalFuelSpent > 0 ? ((totalGasolineSpent / totalFuelSpent) * 100).toFixed(1) : 0;
+            const dieselPercentage = totalFuelSpent > 0 ? ((totalDieselSpent / totalFuelSpent) * 100).toFixed(1) : 0;
+
             document.getElementById('totalFuelSpent').textContent = `R$ ${totalFuelSpent.toFixed(2).replace('.', ',')}`;
             document.getElementById('totalGasolineSpent').textContent = `R$ ${totalGasolineSpent.toFixed(2).replace('.', ',')}`;
             document.getElementById('totalDieselSpent').textContent = `R$ ${totalDieselSpent.toFixed(2).replace('.', ',')}`;
             document.getElementById('totalRefuelEvents').textContent = totalRefuelEvents;
+            
+            // Update new percentage elements
+            document.getElementById('gasolinePercentage').textContent = `${gasolinePercentage}%`;
+            document.getElementById('dieselPercentage').textContent = `${dieselPercentage}%`;
 
-            logAppAction("Dashboard de Combustível Renderizado", `Total: ${totalFuelSpent}, Gasolina: ${totalGasolineSpent}, Diesel: ${totalDieselSpent}, Eventos: ${totalRefuelEvents}`);
+            logAppAction("Dashboard de Combustível Renderizado", `Total: ${totalFuelSpent}, Gasolina: ${totalGasolineSpent} (${gasolinePercentage}%), Diesel: ${totalDieselSpent} (${dieselPercentage}%), Eventos: ${totalRefuelEvents}`);
         }
 
         /**
@@ -1637,7 +1665,8 @@
                 showToast(`Abastecimento para o veículo ${fuelPlate} no valor de R$ ${fuelValue.toFixed(2).replace('.', ',')} registrado com sucesso!`, 'success');
                 logAppAction("Registro de Abastecimento", `Abastecimento para ${fuelPlate} registrado.`);
                 document.getElementById('fuelEntryForm').reset();
-            } catch (e) {
+            }
+            catch (e) {
                 console.error("Error saving fuel record: ", e);
                 showToast("Erro ao salvar registro de abastecimento: " + e.message, 'error');
             }
