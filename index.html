@@ -154,8 +154,11 @@
             </div>
             <div>
                 <label for="driverPlate" class="block text-base font-medium text-gray-700 mb-2">Placa do Veículo</label>
-                <input type="text" id="driverPlate" name="driverPlate" required
-                       class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
+                <select id="driverPlate" name="driverPlate" required
+                       class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out appearance-none">
+                    <option value="">-- Selecione --</option>
+                    <!-- Plate options will be loaded dynamically here -->
+                </select>
                 <span id="driverPlateValidationMessage" class="text-sm mt-1"></span>
             </div>
             <div>
@@ -182,8 +185,11 @@
             </div>
             <div>
                 <label for="fuelPlate" class="block text-base font-medium text-gray-700 mb-2">Placa do Veículo</label>
-                <input type="text" id="fuelPlate" name="fuelPlate" required
-                       class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out">
+                <select id="fuelPlate" name="fuelPlate" required
+                       class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-base transition duration-150 ease-in-out appearance-none">
+                    <option value="">-- Selecione --</option>
+                    <!-- Plate options will be loaded dynamically here -->
+                </select>
                 <span id="fuelPlateValidationMessage" class="text-sm mt-1"></span>
             </div>
             <div>
@@ -1083,6 +1089,40 @@
             logAppAction("População de Seletores", `Campos de seleção de funcionário atualizados com ${currentEmployees.length} funcionários.`);
         }
 
+        /**
+         * Populates the plate select dropdowns in the driver portal.
+         */
+        function populatePlateSelects() {
+            const driverPlateSelect = document.getElementById('driverPlate');
+            const fuelPlateSelect = document.getElementById('fuelPlate');
+
+            // Clear existing options, keep the default "Selecione"
+            driverPlateSelect.innerHTML = '<option value="">-- Selecione --</option>';
+            fuelPlateSelect.innerHTML = '<option value="">-- Selecione --</option>';
+
+            // Ensure allMaintenanceRecords is available and not empty
+            if (allMaintenanceRecords && allMaintenanceRecords.length > 0) {
+                allMaintenanceRecords.forEach(record => {
+                    if (record.plate) {
+                        const optionDriver = document.createElement('option');
+                        optionDriver.value = record.plate;
+                        optionDriver.textContent = record.plate;
+                        driverPlateSelect.appendChild(optionDriver);
+
+                        const optionFuel = document.createElement('option');
+                        optionFuel.value = record.plate;
+                        optionFuel.textContent = record.plate;
+                        fuelPlateSelect.appendChild(optionFuel);
+                    }
+                });
+            }
+            logAppAction("População de Placas", `Campos de seleção de placa atualizados com ${allMaintenanceRecords.length} placas.`);
+            // After populating, ensure the validation state is set
+            validatePlateSelection('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn');
+            validatePlateSelection('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn');
+        }
+
+
         // --- Supabase Data Operations & Real-time Listeners ---
 
         /**
@@ -1103,6 +1143,7 @@
                 allMaintenanceRecords = data; // Cache the data
                 renderMaintenanceRecordsGestor(allMaintenanceRecords, document.getElementById('vehicleSearch').value);
                 renderDashboard(allMaintenanceRecords); // Update dashboard
+                populatePlateSelects(); // Update plate dropdowns after fetching
                 logAppAction("Busca de Dados Concluída", `Total de registros: ${data.length}`);
             } catch (e) {
                 console.error("Error fetching maintenance data:", e);
@@ -1139,6 +1180,7 @@
                     
                     renderMaintenanceRecordsGestor(allMaintenanceRecords, document.getElementById('vehicleSearch').value);
                     renderDashboard(allMaintenanceRecords);
+                    populatePlateSelects(); // Update plate dropdowns on changes
                 })
                 .subscribe();
             logAppAction("Listener em Tempo Real (Gestor)", "Listener para registros de manutenção ativado.");
@@ -1304,60 +1346,36 @@
         }
 
         /**
-         * Validates the plate input field against existing vehicles in Supabase.
-         * Updates the input's border color, displays a message, and enables/disables the submit button.
-         * @param {string} plateInputId - The ID of the plate input element.
+         * Validates the plate select field.
+         * Updates the select's border color, displays a message, and enables/disables the submit button.
+         * @param {string} selectId - The ID of the select element.
          * @param {string} messageSpanId - The ID of the span element to display validation messages.
          * @param {string} submitButtonId - The ID of the submit button to enable/disable.
-         * @returns {Promise<boolean>} - True if the plate is valid, false otherwise.
+         * @returns {boolean} - True if a valid option is selected, false otherwise.
          */
-        async function validatePlateInput(plateInputId, messageSpanId, submitButtonId) {
-            const plateInput = document.getElementById(plateInputId);
+        function validatePlateSelection(selectId, messageSpanId, submitButtonId) {
+            const plateSelect = document.getElementById(selectId);
             const messageSpan = document.getElementById(messageSpanId);
             const submitButton = document.getElementById(submitButtonId);
-            const plate = plateInput.value.toUpperCase().trim();
+            const selectedPlate = plateSelect.value;
 
             // Reset styles and message
-            plateInput.classList.remove('border-red-500', 'border-green-500');
+            plateSelect.classList.remove('border-red-500', 'border-green-500');
             messageSpan.textContent = '';
             messageSpan.classList.remove('text-red-600', 'text-green-600');
             submitButton.disabled = true; // Disable button by default
 
-            if (!plate) {
-                messageSpan.textContent = '';
-                return false;
-            }
-
-            try {
-                const { data: plateCheck, error: plateCheckError } = await supabase
-                    .from(MAINTENANCE_RECORDS_TABLE)
-                    .select('id')
-                    .eq('plate', plate)
-                    .eq('user_id', gestorUserId);
-
-                if (plateCheckError) throw plateCheckError;
-
-                if (plateCheck && plateCheck.length > 0) {
-                    plateInput.classList.add('border-green-500');
-                    messageSpan.textContent = 'Placa válida';
-                    messageSpan.classList.add('text-green-600');
-                    submitButton.disabled = false; // Enable button
-                    return true;
-                } else {
-                    plateInput.classList.add('border-red-500');
-                    messageSpan.textContent = 'Placa inexistente';
-                    messageSpan.classList.add('text-red-600');
-                    submitButton.disabled = true; // Keep button disabled
-                    return false;
-                }
-            } catch (e) {
-                console.error("Error during plate validation:", e);
-                showToast("Erro ao validar placa: " + e.message, 'error');
-                plateInput.classList.add('border-red-500');
-                messageSpan.textContent = 'Erro na validação';
+            if (!selectedPlate) { // If no plate is selected (default option)
+                plateSelect.classList.add('border-red-500');
+                messageSpan.textContent = 'Por favor, selecione uma placa';
                 messageSpan.classList.add('text-red-600');
-                submitButton.disabled = true; // Keep button disabled
                 return false;
+            } else {
+                plateSelect.classList.add('border-green-500');
+                messageSpan.textContent = 'Placa selecionada';
+                messageSpan.classList.add('text-green-600');
+                submitButton.disabled = false; // Enable button
+                return true;
             }
         }
 
@@ -1595,9 +1613,9 @@
         async function handleDailyMileageSubmit(event) {
             event.preventDefault();
             // Perform plate validation again before submission
-            const isPlateValid = await validatePlateInput('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn');
+            const isPlateValid = validatePlateSelection('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn');
             if (!isPlateValid) {
-                showToast("Por favor, corrija a placa do veículo antes de registrar a quilometragem.", 'error');
+                showToast("Por favor, selecione uma placa válida antes de registrar a quilometragem.", 'error');
                 return;
             }
 
@@ -1619,12 +1637,13 @@
             }
 
             try {
-                // 1. Check if the plate exists at all for this gestorUserId (already done by validatePlateInput)
+                // 1. Get current mileage for the selected plate
                 const { data: plateCheck, error: plateCheckError } = await supabase
                     .from(MAINTENANCE_RECORDS_TABLE)
                     .select('id, current_mileage')
                     .eq('plate', driverPlate)
-                    .eq('user_id', gestorUserId);
+                    .eq('user_id', gestorUserId)
+                    .single(); // Use single because we expect only one vehicle per plate
 
                 if (plateCheckError) {
                     console.error("[Console] Erro ao verificar a existência da placa:", plateCheckError);
@@ -1632,7 +1651,7 @@
                     return;
                 }
 
-                const vehicleToUpdate = plateCheck[0]; // Get the vehicle record
+                const vehicleToUpdate = plateCheck; // Get the vehicle record
 
                 // Check if the entered mileage is less than the current mileage
                 if (driverDailyMileage < (vehicleToUpdate.current_mileage || 0)) {
@@ -1667,7 +1686,7 @@
                 logAppAction("Atualização de Quilometragem", `Quilometragem do veículo ${driverPlate} atualizada para ${driverDailyMileage} Km.`);
                 document.getElementById('dailyMileageForm').reset();
                 // Re-validate plate to reset state after successful submission
-                await validatePlateInput('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn');
+                validatePlateSelection('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn');
             } catch (e) {
                 console.error("[Console] Erro geral ao registrar quilometragem: ", e);
                 showToast("Ocorreu um erro ao registrar quilometragem: " + e.message, 'error');
@@ -1681,9 +1700,9 @@
         async function handleFuelEntrySubmit(event) {
             event.preventDefault();
             // Perform plate validation again before submission
-            const isPlateValid = await validatePlateInput('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn');
+            const isPlateValid = validatePlateSelection('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn');
             if (!isPlateValid) {
-                showToast("Por favor, corrija a placa do veículo antes de registrar o abastecimento.", 'error');
+                showToast("Por favor, selecione uma placa válida antes de registrar o abastecimento.", 'error');
                 return;
             }
 
@@ -1705,7 +1724,7 @@
             }
 
             try {
-                // Check if the plate exists for this gestorUserId (already done by validatePlateInput)
+                // No need to check plate existence here, as it's selected from existing ones
                 const { error } = await supabase
                     .from(FUEL_RECORDS_TABLE)
                     .insert({
@@ -1723,7 +1742,7 @@
                 logAppAction("Registro de Abastecimento", `Abastecimento para ${fuelPlate} registrado.`);
                 document.getElementById('fuelEntryForm').reset();
                 // Re-validate plate to reset state after successful submission
-                await validatePlateInput('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn');
+                validatePlateSelection('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn');
             }
             catch (e) {
                 console.error("Error saving fuel record: ", e);
@@ -1888,6 +1907,7 @@
             document.getElementById('dailyMileageForm').reset();
             document.getElementById('fuelEntryForm').reset();
             populateEmployeeSelects();
+            populatePlateSelects(); // Populate plate selects when entering driver portal
             showDailyMileageEntryTab(); // Default to daily mileage entry
             // Reset plate validation state when entering driver portal
             document.getElementById('driverPlate').classList.remove('border-red-500', 'border-green-500');
@@ -2018,9 +2038,7 @@
             document.getElementById('showFuelEntry').classList.remove('border-indigo-500', 'text-indigo-600');
             logAppAction("Navegação (Motorista)", "Acessando aba 'Registrar KM'.");
             // Reset validation for daily mileage form when switching tabs
-            document.getElementById('driverPlate').classList.remove('border-red-500', 'border-green-500');
-            document.getElementById('driverPlateValidationMessage').textContent = '';
-            document.getElementById('submitDailyMileageBtn').disabled = true;
+            validatePlateSelection('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn');
         }
 
         /**
@@ -2035,9 +2053,7 @@
             populateEmployeeSelects(); // Ensure employee dropdown is updated for fuel form
             logAppAction("Navegação (Motorista)", "Acessando aba 'Abastecimento'.");
             // Reset validation for fuel entry form when switching tabs
-            document.getElementById('fuelPlate').classList.remove('border-red-500', 'border-green-500');
-            document.getElementById('fuelPlateValidationMessage').textContent = '';
-            document.getElementById('submitFuelEntryBtn').disabled = true;
+            validatePlateSelection('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn');
         }
 
         /**
@@ -2082,9 +2098,9 @@
             document.getElementById('showDailyMileageEntry').addEventListener('click', showDailyMileageEntryTab);
             document.getElementById('showFuelEntry').addEventListener('click', showFuelEntryTab);
 
-            // Real-time plate validation on blur
-            document.getElementById('driverPlate').addEventListener('blur', () => validatePlateInput('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn'));
-            document.getElementById('fuelPlate').addEventListener('blur', () => validatePlateInput('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn'));
+            // Plate validation on change for select boxes
+            document.getElementById('driverPlate').addEventListener('change', () => validatePlateSelection('driverPlate', 'driverPlateValidationMessage', 'submitDailyMileageBtn'));
+            document.getElementById('fuelPlate').addEventListener('change', () => validatePlateSelection('fuelPlate', 'fuelPlateValidationMessage', 'submitFuelEntryBtn'));
 
 
             // Gestor Portal Buttons
