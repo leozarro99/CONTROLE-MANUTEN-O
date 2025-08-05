@@ -1597,7 +1597,7 @@
                 });
                 downloadCsv('abastecimentos.csv', fuelCsvContent);
 
-                showToast("Três arquivos CSV foram gerados e o download foi iniciado. Para ter as abas desejadas no Excel, abra o Excel e use a opção 'Dados' > 'Obter Dados Externos' > 'De Texto/CSV' para importar cada arquivo CSV em uma nova aba.", 'success');
+                showToast("Três arquivos CSV foram gerados e o download foi iniciado. Para ter os dados em ABAS SEPARADAS dentro de UMA ÚNICA PLANILHA Excel, siga estes passos no Excel: 1. Abra o Excel. 2. Vá para a aba 'Dados'. 3. Clique em 'Obter Dados' (ou 'De Texto/CSV'). 4. Selecione 'De Arquivo' > 'De Texto/CSV'. 5. Importe CADA arquivo CSV SEPARADAMENTE, e para cada um, escolha 'Carregar Para...' e selecione 'Nova Planilha'.", 'success');
 
             } catch (e) {
                 console.error("Error exporting data: ", e);
@@ -1637,9 +1637,10 @@
 
             try {
                 // 1. Get current mileage for the selected plate
-                const { data: plateCheck, error: plateCheckError } = await supabase
+                // MODIFIED: Select all fields to ensure next_maintenance_due_km is not lost
+                const { data: vehicleToUpdate, error: plateCheckError } = await supabase
                     .from(MAINTENANCE_RECORDS_TABLE)
-                    .select('id, current_mileage')
+                    .select('*') 
                     .eq('plate', driverPlate)
                     .eq('user_id', gestorUserId)
                     .single(); // Use single because we expect only one vehicle per plate
@@ -1649,8 +1650,6 @@
                     showToast("Erro ao verificar a placa: " + plateCheckError.message, 'error');
                     return;
                 }
-
-                const vehicleToUpdate = plateCheck; // Get the vehicle record
 
                 // Check if the entered mileage is less than the current mileage
                 if (driverDailyMileage < (vehicleToUpdate.current_mileage || 0)) {
@@ -1901,13 +1900,14 @@
             populatePlateSelects(); // Populate plate selects when entering driver portal
             showDailyMileageEntryTab(); // Default to daily mileage entry
             // Reset plate validation state when entering driver portal
-            // Removed these lines to prevent initial validation message
-            // document.getElementById('driverPlate').classList.remove('border-red-500', 'border-green-500');
-            // document.getElementById('driverPlateValidationMessage').textContent = '';
-            // document.getElementById('submitDailyMileageBtn').disabled = true;
-            // document.getElementById('fuelPlate').classList.remove('border-red-500', 'border-green-500');
-            // document.getElementById('fuelPlateValidationMessage').textContent = '';
-            // document.getElementById('submitFuelEntryBtn').disabled = true;
+            // Only disable the button initially, don't show message
+            document.getElementById('submitDailyMileageBtn').disabled = true;
+            document.getElementById('driverPlate').classList.remove('border-red-500', 'border-green-500');
+            document.getElementById('driverPlateValidationMessage').textContent = '';
+            
+            document.getElementById('submitFuelEntryBtn').disabled = true;
+            document.getElementById('fuelPlate').classList.remove('border-red-500', 'border-green-500');
+            document.getElementById('fuelPlateValidationMessage').textContent = '';
 
             logAppAction("Navegação", "Acessando Portal do Motorista.");
         }
